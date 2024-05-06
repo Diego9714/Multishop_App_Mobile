@@ -8,7 +8,7 @@ import morgan             from 'morgan'
 import bodyParser from 'body-parser'
 
 // Routes
-import authRouter from './routes/auth.routes.js'
+import clientRouter from './routes/clients.routes.js'
 
 const app = express()
 
@@ -24,4 +24,4 @@ app.listen(PORT, ()=>{
 })
 
 // Use Routes
-app.use("/api", authRouter)
+app.use("/api", clientRouter)

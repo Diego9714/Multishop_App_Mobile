@@ -1,8 +1,7 @@
 import { createAccessToken }   from '../libs/jwt.js'
 import { pool }   from '../connection/mysql.connect.js'
-import bcrypt     from "bcrypt"
 
-export class Users {
+export class Clients {
   static async search(username , password) {
     try {
       let msg = {
@@ -23,7 +22,7 @@ export class Users {
         let isMatch = await bcrypt.compare(password, user[0].pass_vend)
 
         let userToken = {
-          cod_ven : user[0].cod_ven,
+          id_ven : user[0].cod_ven,
           user_ven : user[0].user_ven,
           nom_ven : user[0].nom_ven,
           ced_ven : user[0].ced_ven
@@ -50,38 +49,39 @@ export class Users {
     }
   }
 
-  static async searchProfile(user) {
+  static async all(cod_ven) {
     try {
       let msg = {
         status: false,
-        msg: "Usuario no encontrado",
+        msg: "Clients not founded",
         code: 404
       }
 
       const connection = await pool.getConnection()
 
-      let sql = 'SELECT username , email , createdAt , updatedAt FROM users WHERE id_user = ?;'
-      let [search] = await connection.execute(sql,[user])
-    
+      let sql = 'SELECT cod_ven , cod_cli , nom_cli , rif_cli , dir1_cli , tel_cli FROM scli WHERE cod_ven = ?;'
+      let [clients] = await connection.execute(sql, [cod_ven])
+      
       connection.release()
 
-      if(search){
-
-        let idUser      = user
-        let username    = search[0].username
-        let email       = search[0].email
-        let createdAt   = search[0].createdAt
-        let updatedAt   = search[0].updatedAt
+      if(clients.length > 0){
+        
+        let clientsToken = {
+          cod_ven : clients[0].cod_ven,
+          cod_cli : clients[0].cod_cli,
+          nom_cli : clients[0].nom_cli,
+          rif_cli : clients[0].rif_cli,
+          dir1_cli : clients[0].dir1_cli,
+          tel_cli : clients[0].tel_cli
+        }
+        
+        let tokenClient = await createAccessToken(clientsToken)
 
         msg = {
           status: true,
-          msg: "Usuario encontrado",
+          msg: "clients found",
           code: 200,
-          idUser,
-          username,
-          email,
-          createdAt,
-          updatedAt
+          tokenClient
         } 
       }
   

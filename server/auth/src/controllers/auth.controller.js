@@ -4,7 +4,8 @@ export const controller = {}
 
 controller.login = async (req, res) => {
   try {
-    const { username , password } = req.body
+    const { username, password } = req.body
+
     const filterKeys = Object.keys(req.body)
   
     if (filterKeys.length < 2 || !username || !password) {
