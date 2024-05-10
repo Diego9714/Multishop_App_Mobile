@@ -1,7 +1,6 @@
 import {Tabs} from 'expo-router'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { View, Image } from 'react-native'
-
 const Layout = () => {
   
   const settingsNav = {
@@ -54,7 +53,7 @@ const Layout = () => {
         }}
       />
     </Tabs>
-  )
+)
 }
 
 export default Layout

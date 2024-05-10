@@ -2,7 +2,7 @@
 import React, { useState , useEffect }     from 'react'
 import { SafeAreaView }                    from 'react-native-safe-area-context'
 import { StatusBar }                       from 'expo-status-bar'
-import instance                            from '../../global/api'
+import {instanceAuth}                            from '../../global/api'
 import AsyncStorage                        from '@react-native-async-storage/async-storage'
 import { router }                          from 'expo-router'
 import { 
@@ -20,6 +20,8 @@ import { images }                         from '../../constants'
 import { MaterialIcons }                  from '@expo/vector-icons'
 // Styles
 import styles                             from '../../styles/login.styles'
+// Context
+
 
 const Login = () => {
 
@@ -30,6 +32,8 @@ const Login = () => {
     const checkLogin = async () => {
       try {
         const token = await AsyncStorage.getItem('tokenUser')
+        // const token = await AsyncStorage.removeItem('tokenUser')
+
         if(token){
           router.replace('/(tabs)/Home')
         }
@@ -47,7 +51,7 @@ const Login = () => {
         password
       }
   
-      const res = await instance.post(`/api/login`, user)
+      const res = await instanceAuth.post(`/api/login`, user)
       const token = res.data.tokenUser
       await AsyncStorage.setItem('tokenUser', token)
       router.replace('/(tabs)/Home')

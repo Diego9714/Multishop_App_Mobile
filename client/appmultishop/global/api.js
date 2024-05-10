@@ -1,11 +1,33 @@
 import axios from "axios"
 
-const instance = axios.create({
+export const instanceAuth = axios.create({
   // baseURL: `https://multishop-app1-production.up.railway.app/`,
-  baseURL: 'http://192.168.1.105:4001',
+  baseURL: 'http://192.168.1.102:4000',
   headers: {
     Accept: "application/json"
   }
 })
 
-export default instance
+export const instanceClient = axios.create({
+  // baseURL: `https://multishop-app1-production.up.railway.app/`,
+  baseURL: 'http://192.168.1.102:5000',
+  headers: {
+    Accept: "application/json"
+  }
+})
+
+export const instanceOrders = axios.create({
+  // baseURL: `https://multishop-app1-production.up.railway.app/`,
+  baseURL: 'http://192.168.1.100:4001',
+  headers: {
+    Accept: "application/json"
+  }
+})
+
+export const instanceProducts = axios.create({
+  // baseURL: `https://multishop-app1-production.up.railway.app/`,
+  baseURL: 'http://192.168.1.100:4001',
+  headers: {
+    Accept: "application/json"
+  }
+})

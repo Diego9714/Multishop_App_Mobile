@@ -7,6 +7,7 @@ controller.getClients = async (req, res) => {
     const { cod_ven } = req.user
     
     const clients = await Clients.all(cod_ven)
+    console.log(clients)
     res.status(clients.code).json(clients)
 
   } catch (error) {

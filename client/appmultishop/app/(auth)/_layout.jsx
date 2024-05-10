@@ -1,10 +1,13 @@
 import {Stack} from 'expo-router'
+import {UserProvider} from '../../context/UserContext'
 
 const Layout = () => {
   return (
-    <Stack>
-      <Stack.Screen name='Login' options={{headerShown:false}}/>
-    </Stack>
+    <UserProvider>
+      <Stack>
+        <Stack.Screen name='Login' options={{headerShown:false}}/>
+      </Stack>
+    </UserProvider>
   )
 }
 

@@ -5,16 +5,16 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: 'row', 
     alignItems: 'center',
-    paddingTop:10,
-    paddingLeft:20,
-    paddingBottom:5,
+    paddingTop:"5%",
+    paddingLeft:"5%",
+    paddingBottom:"2%",
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#CDCDE0',
   },
   logo: {
-    width: 200,
-    height: 50
+    width: "50%",
+    height: "100%"
   }
 });
 
