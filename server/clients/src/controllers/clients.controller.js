@@ -4,7 +4,7 @@ export const controller = {}
 
 controller.getClients = async (req, res) => {
   try {
-    const { cod_ven } = req.user
+    const { cod_ven } = req.params
     
     const clients = await Clients.all(cod_ven)
     res.status(clients.code).json(clients)

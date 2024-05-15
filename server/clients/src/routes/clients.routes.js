@@ -12,6 +12,6 @@ import { authRequired } from '../middlewares/validateToken.js'
 
 
 // Routes
-router.get(CLIENTS, authRequired ,controller.getClients)
+router.get(CLIENTS,controller.getClients)
 
 export default router

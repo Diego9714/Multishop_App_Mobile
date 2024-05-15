@@ -1,8 +1,8 @@
 import axios from "axios"
 
 export const instanceAuth = axios.create({
-  // baseURL: `https://multishop-app1-production.up.railway.app/`,
-  baseURL: 'http://192.168.0.104:4000',
+  baseURL: `https://multishop-app-mobile-auth.onrender.com`,
+  // baseURL: 'http://192.168.0.104:4000',
   headers: {
     Accept: "application/json"
   }
@@ -10,7 +10,7 @@ export const instanceAuth = axios.create({
 
 export const instanceClient = axios.create({
   // baseURL: `https://multishop-app1-production.up.railway.app/`,
-  baseURL: 'http://192.168.0.104:5000',
+  baseURL: 'https://multishop-app-mobile-clients.onrender.com',
   headers: {
     Accept: "application/json"
   }
@@ -26,7 +26,7 @@ export const instanceOrders = axios.create({
 
 export const instanceProducts = axios.create({
   // baseURL: `https://multishop-app1-production.up.railway.app/`,
-  baseURL: 'http://192.168.0.104:6000',
+  baseURL: 'https://multishop-app-mobile-products.onrender.com',
   headers: {
     Accept: "application/json"
   }

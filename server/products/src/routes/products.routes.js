@@ -10,8 +10,7 @@ import {controller} from '../controllers/products.controller.js'
 // Schemas
 import { authRequired } from '../middlewares/validateToken.js'
 
-
 // Routes
-router.get(PRODUCTS , authRequired , controller.getProducts)
+router.get(PRODUCTS , controller.getProducts)
 
 export default router
