@@ -1,13 +1,15 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
+// Components
 import Navbar from '../../components/Navbar'
+import ListProducts from '../../components/ListProducts';
 
 
 const Products = () => {
   return (
     <View>
       <Navbar/>
-      <Text>Products</Text>
+      <ListProducts/>
     </View>
   )
 }

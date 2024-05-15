@@ -1,18 +1,13 @@
 // Dependencies
-import React, { useState , useEffect }     from 'react'
+import React, { useState , useContext , useEffect }     from 'react'
 import { SafeAreaView }                    from 'react-native-safe-area-context'
 import { StatusBar }                       from 'expo-status-bar'
-import {instanceAuth}                            from '../../global/api'
-import AsyncStorage                        from '@react-native-async-storage/async-storage'
-import { router }                          from 'expo-router'
 import { 
   View,
   TextInput,
   Image,
   KeyboardAvoidingView,
-  Pressable,
   Text,
-  Alert,
   TouchableOpacity
 } from 'react-native'
 // Resources
@@ -21,55 +16,25 @@ import { MaterialIcons }                  from '@expo/vector-icons'
 // Styles
 import styles                             from '../../styles/login.styles'
 // Context
-
+import { UserContext } from '../../context/UserContext'
 
 const Login = () => {
 
+  const { signIn , checkLogin , logoutt } = useContext(UserContext)
+
   const [username , setUsername ] = useState("")
   const [password , setPassword ] = useState("")
-  
-  useEffect(() => {
-    const checkLogin = async () => {
-      try {
-        const token = await AsyncStorage.getItem('tokenUser')
-        // const token = await AsyncStorage.removeItem('tokenUser')
 
-        if(token){
-          router.replace('/(tabs)/Home')
-        }
-      } catch (error) {
-        return error
-      }
-    }
+  useEffect(() => {
     checkLogin()
   },[])
 
   const handleLogin = async ( ) => {
-    try {
-      const user = {
-        username,
-        password
-      }
-  
-      const res = await instanceAuth.post(`/api/login`, user)
-      const token = res.data.tokenUser
-      await AsyncStorage.setItem('tokenUser', token)
-      router.replace('/(tabs)/Home')
-
-    } catch (error) {
-      switch(error.message){
-        case "Request failed with status code 500":
-          Alert.alert("Verifica tu usuario y contraseña", "Usuario o contraseña incorrectos")
-          break
-        case "Request failed with status code 400":
-          Alert.alert("Verifica tu usuario y contraseña", "Deben tener al menos 6 digitos",)
-          break
-      }
-    }
+    signIn(username, password)
   }
 
   return (
-    // <SafeAreaView>
+    <SafeAreaView>
       <KeyboardAvoidingView>
         <View style={styles.container}>
           <Image source={images.logo} resizeMode="contain" style={styles.logo} />
@@ -103,7 +68,7 @@ const Login = () => {
 
         </View>
       </KeyboardAvoidingView>
-    // </SafeAreaView>
+    </SafeAreaView>
   )
 }
 

@@ -10,7 +10,7 @@ import  {  jwtDecode  }       from  "jwt-decode"
 import { decode }             from "base-64"
 global.atob = decode
 // Api
-import {instanceClient}       from '../../global/api'
+import {instanceClient, instanceProducts}       from '../../global/api'
 
 
 const Home = () => {
@@ -22,6 +22,7 @@ const Home = () => {
           const decodedToken = jwtDecode(token)
           let cod_ven = decodedToken.cod_ven
           getClients(cod_ven)
+          getProducts()
         }
         
       } catch (error) {
@@ -39,6 +40,19 @@ const Home = () => {
       let listClients = res.data.clients
 
       await AsyncStorage.setItem('clients', JSON.stringify(listClients))
+
+    } catch (error) {
+      return error
+    }
+  }
+
+  const getProducts = async () => {
+    try {
+      const res = await instanceProducts.get(`/api/products`)
+
+      let listProducts = res.data.products
+
+      await AsyncStorage.setItem('products', JSON.stringify(listProducts))
 
     } catch (error) {
       return error

@@ -67,28 +67,27 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     height: '87%',
   },
-  clientItem: {
+  productItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomColor: "#f1f1f1",
     borderBottomWidth: 2,
     paddingVertical: 10,
-    // backgroundColor: 'black'  
   },
-  nameClient: {
+  nameProd: {
     textAlign: "justify",
     width: '30%',
-    paddingHorizontal: 5,
+    paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 10,
   },
-  tlfClient: {
+  exitsProd: {
     textAlign: "justify",
     width: '30%',
-    paddingHorizontal: 5,
+    paddingHorizontal: 2,
     paddingVertical: 10,
-    marginRight: "15%",
+    // marginRight: "15%",
     borderRadius: 10,
   },
   buttonAction: {
@@ -114,7 +113,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: "80%", // Ancho deseado del modal
-    height: "65%", // Alto deseado del modal
+    height: "50%", // Alto deseado del modal
     backgroundColor: '#f1f1f1',
     borderRadius: 10,
     // padding: 2,
