@@ -1,16 +1,14 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
   list: {
     width: "100%",
     height: "100%",
-    backgroundColor: '#fff',
-    // flex: 1
+    backgroundColor: '#fff'
   },
   titlePage:{
     height: 150,
-    alignItems: "center",
-    // flex: 1
+    alignItems: "center"
   },
   title: {
     marginTop: 20,
@@ -37,7 +35,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#EFEFEF',
     marginHorizontal: 10,
-    height: "60%",
+    height: "55%",
     borderRadius: 20,
   },
   headerContainer: {
@@ -45,15 +43,13 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
   },
-  headerTitle: {
+  headerTitleName: {
     color: '#fff',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 15,
-    alignItems: 'center',
+    marginLeft: '25%'
   },
   headerTitleButton: {
     color: '#fff',
+    marginRight: '5%'
   },
   header: {
     flexDirection: 'row',
@@ -73,38 +69,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderBottomColor: "#f1f1f1",
     borderBottomWidth: 2,
-    paddingVertical: 10,
-    // backgroundColor: 'black'  
+    paddingVertical: 10  
   },
   nameClient: {
-    textAlign: "justify",
-    width: '30%',
+    width: '70%',
     paddingHorizontal: 5,
     paddingVertical: 10,
-    borderRadius: 10,
-  },
-  tlfClient: {
-    textAlign: "justify",
-    width: '30%',
-    paddingHorizontal: 5,
-    paddingVertical: 10,
-    marginRight: "15%",
     borderRadius: 10,
   },
   buttonAction: {
-    width: 50,
     alignItems: 'center',
-    justifyContent: 'center',
     borderRadius: 10,
-    // marginRight: 10,
+    width: '30%'
   },
   button: {
     backgroundColor: "#B9B9B9",
-    borderRadius: 10,
-    width: "100%",
-    padding: 5,
+    borderRadius: 5,
+    width: "70%",
+    padding: '5%',
     alignItems: "center",
-    marginRight: "80%",
 
   },
   modalContainer: {
@@ -114,7 +97,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: "80%", // Ancho deseado del modal
-    height: "65%", // Alto deseado del modal
+    height: "80%", // Alto deseado del modal
     backgroundColor: '#f1f1f1',
     borderRadius: 10,
     // padding: 2,
@@ -128,10 +111,15 @@ const styles = StyleSheet.create({
 
   },
   titleModal:{
-    fontSize: 20,
-    fontWeight: "400",
+    fontSize: 22,
+    fontWeight: "600",
     textAlign: "center",
     marginBottom: 20,
+    width: '80%',
+  },
+  subtitleModal:{
+    marginTop: '2%',
+    width: '80%',
   },
   modalInfoClient: {
     width: "80%",
@@ -153,6 +141,14 @@ const styles = StyleSheet.create({
     height: "%10",
     borderRadius: 15,
     width: "90%",
+    textAlign: "center"
+  },
+  textModalDirecction: {
+    padding: 12,
+    height: "%10",
+    borderRadius: 15,
+    width: "64%",
+    textAlign: "justify"
   },
   sectionButtonsModal: {
     marginTop: "2%",
@@ -198,7 +194,25 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
   },
-
+  paginationContainer: {
+    width: '90%',
+    flexDirection: 'row',
+    marginHorizontal: '5%',
+    paddingVertical: 10,
+  },
+  pageButton: {
+    height: '20%',
+    padding: 10,
+    margin: 5,
+    backgroundColor: '#ddd',
+    borderRadius: 5,
+  },
+  pageButtonActive: {
+    backgroundColor: '#5B97DC',
+  },
+  pageButtonText: {
+    color: 'black',
+  },
 });
 
 export default styles;

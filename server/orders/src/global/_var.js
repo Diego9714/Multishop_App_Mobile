@@ -13,5 +13,4 @@ export const DB_NAME                   = process.env.NAME
 /* ----------- ROUTES ----------- */
 
 // Users
-export const PRODUCTS                  = process.env.PRODUCTS
-export const CATEGORY                  = process.env.CATEGORY
+export const REGISTER_ORDER            = process.env.REGISTER_ORDER

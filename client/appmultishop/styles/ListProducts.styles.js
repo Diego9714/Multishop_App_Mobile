@@ -27,6 +27,10 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     margin: 20,
   },
+  ViewSearchFilter: {
+    margin: 50,
+    backgroundColor: "black"
+  },
   textInput: {
     padding: 10,
     height: 50,
@@ -37,23 +41,23 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#EFEFEF',
     marginHorizontal: 10,
-    height: "60%",
+    height: "55%",
     borderRadius: 20,
   },
   headerContainer: {
+    width: '100%',
     backgroundColor: "#64a8d6",
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
   },
   headerTitle: {
     color: '#fff',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 15,
-    alignItems: 'center',
+    width: '70%',
+    textAlign: 'center'
   },
   headerTitleButton: {
     color: '#fff',
+    width: '20%',
   },
   header: {
     flexDirection: 'row',
@@ -77,33 +81,39 @@ const styles = StyleSheet.create({
   },
   nameProd: {
     textAlign: "justify",
-    width: '30%',
+    width: '70%',
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 10,
   },
   exitsProd: {
-    textAlign: "justify",
+    // backgroundColor: "black",
     width: '30%',
-    paddingHorizontal: 2,
-    paddingVertical: 10,
     // marginRight: "15%",
     borderRadius: 10,
   },
+  exitsText: {
+    textAlign: "justify",
+    justifyContent: "center",
+    width: '100%',
+    marginLeft: "20%",
+    borderRadius: 10,
+  },
   buttonAction: {
-    width: 50,
+    width: '20%',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 10,
+    // backgroundColor: "black"
     // marginRight: 10,
   },
   button: {
     backgroundColor: "#B9B9B9",
     borderRadius: 10,
-    width: "100%",
+    width: "80%",
     padding: 5,
     alignItems: "center",
-    marginRight: "80%",
+    marginRight: "30%",
 
   },
   modalContainer: {
@@ -113,7 +123,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: "80%", // Ancho deseado del modal
-    height: "50%", // Alto deseado del modal
+    height: "70%", // Alto deseado del modal
     backgroundColor: '#f1f1f1',
     borderRadius: 10,
     // padding: 2,
@@ -127,10 +137,15 @@ const styles = StyleSheet.create({
 
   },
   titleModal:{
-    fontSize: 20,
-    fontWeight: "400",
+    fontSize: 22,
+    fontWeight: "600",
     textAlign: "center",
     marginBottom: 20,
+    width: '80%',
+  },
+  subtitleModal:{
+    marginTop: '2%',
+    width: '80%',
   },
   modalInfoClient: {
     width: "80%",
@@ -152,6 +167,7 @@ const styles = StyleSheet.create({
     height: "%10",
     borderRadius: 15,
     width: "90%",
+    textAlign: "center"
   },
   sectionButtonsModal: {
     marginTop: "2%",
@@ -183,6 +199,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
+    marginTop: 10,
     marginBottom: 10, // Agrega margen inferior para separar los botones
     shadowColor: "#000",
     shadowOffset: {
@@ -197,7 +214,25 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
   },
-
+  paginationContainer: {
+    width: '90%',
+    flexDirection: 'row',
+    marginHorizontal: '5%',
+    paddingVertical: 10,
+  },
+  pageButton: {
+    height: '20%',
+    padding: 10,
+    margin: 5,
+    backgroundColor: '#ddd',
+    borderRadius: 5,
+  },
+  pageButtonActive: {
+    backgroundColor: '#5B97DC',
+  },
+  pageButtonText: {
+    color: 'black',
+  },
 });
 
 export default styles;

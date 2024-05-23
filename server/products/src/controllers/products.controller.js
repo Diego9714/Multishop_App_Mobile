@@ -11,3 +11,13 @@ controller.getProducts = async (req, res) => {
     return res.status(500).json({ error: error.message })
   }
 }
+
+controller.getCategory = async (req, res) => {
+  try {
+    const categories = await Products.categories()
+    res.status(categories.code).json(categories)
+
+  } catch (error) {
+    return res.status(500).json({ error: error.message })
+  }
+}

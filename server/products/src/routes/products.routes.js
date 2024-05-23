@@ -2,7 +2,7 @@ import {Router} from 'express'
 const router = Router()
 
 // Environment
-import { PRODUCTS } from '../global/_var.js'
+import { PRODUCTS , CATEGORY } from '../global/_var.js'
 
 // Controller
 import {controller} from '../controllers/products.controller.js'
@@ -12,5 +12,7 @@ import { authRequired } from '../middlewares/validateToken.js'
 
 // Routes
 router.get(PRODUCTS , controller.getProducts)
+router.get(CATEGORY , controller.getCategory)
+
 
 export default router

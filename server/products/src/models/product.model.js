@@ -13,8 +13,8 @@ export class Products {
       const connection = await pool.getConnection()
 
       let sql = `SELECT 
-      sinv.codigo , sinv.descrip , sinv.precio1 as precioBs , sinv.existencia , sinv.ccate,
-      detallepr.precio1 as precioUsd,
+      sinv.codigo , sinv.descrip , sinv.precio1 as precioBs , FLOOR(sinv.existencia) as existencia , sinv.ccate,
+      ROUND(detallepr.precio1, 2) as precioUsd,
       catego.ncate
       FROM sinv 
       INNER JOIN detallepr ON sinv.codigo = detallepr.codigo
@@ -32,6 +32,37 @@ export class Products {
           msg: "Products found",
           code: 200,
           products
+        } 
+      }
+  
+      return msg
+    } catch (error) {
+      return error
+    }
+  }
+
+  static async categories() {
+    try {
+      let msg = {
+        status: false,
+        msg: "Categories not founded",
+        code: 404
+      }
+
+      const connection = await pool.getConnection()
+
+      let sql = `SELECT ccate , ncate FROM catego;`
+      let [categories] = await connection.execute(sql)
+      
+      connection.release()
+
+      if(categories.length > 0){
+
+        msg = {
+          status: true,
+          msg: "Categories found",
+          code: 200,
+          categories
         } 
       }
   
