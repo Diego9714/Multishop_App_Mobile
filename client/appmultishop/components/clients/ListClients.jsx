@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Text, View, FlatList, Pressable, TextInput, ScrollView } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Ionicons } from '@expo/vector-icons'
-import { FontAwesome } from '@expo/vector-icons'
+import { Ionicons , FontAwesome , MaterialIcons } from '@expo/vector-icons'
 import styles from '../../styles/ListClients.styles'
 
 // Components
@@ -49,7 +48,8 @@ const ListClients = () => {
               setIsModalVisible(true)
             }}
           >
-            <Ionicons name="add-outline" size={30} color="black" />
+            {/* <Ionicons name="add-outline" size={30} color="black" /> */}
+            <MaterialIcons name="info-outline" size={30} color="black" />
           </Pressable>
         </View>
       </View>

@@ -4,23 +4,39 @@ export const controller = {}
 
 controller.saveOrder = async (req, res) => {
   try {
-    const { username, password } = req.body
+    let msg = {
+      status: false,
+      msg: "Unsuccessful synchronization",
+      code: 500
+    }
 
-    const filterKeys = Object.keys(req.body)
-  
-    if (filterKeys.length < 2 || !username || !password) {
+    const { order } = req.body
+
+    const filterOrder = Object.keys(order)
+
+    const ordersCompleted = []
+    const ordersNotCompleted = []
+
+    if(filterOrder.length > 0){
+      const user = await Orders.verify({order})
       
-      return res.status(400).json({ error: "Todos los campos deben tener información" })
+      if(user.code == 200){
+        
+      }
 
     }else{
-      const user = await Orders.search(username , password)
-      if(user.code == 200){
-        res.cookie('token', user.tokenUser)
-        res.json(user)
-      }else{
-        return res.status(500).json([[user.msg.msg]])
-      }
+
     }
+
+    const processOrder = {completed: ordersCompleted, notCompleted: ordersNotCompleted}
+
+    msg = {
+      status: true,
+      msg: "Successful synchronization",
+      code: 200,
+      processOrder
+    }
+
   } catch (error) {
     return res.status(500).json({ error: error.message })
   }

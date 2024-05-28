@@ -1,42 +1,54 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
   list: {
     width: "100%",
     height: "100%",
-    backgroundColor: '#fff',
-    // flex: 1
+    backgroundColor: '#fff'
   },
   titlePage:{
-    height: 150,
-    alignItems: "center",
-    // flex: 1
+    height: '6%',
+    alignItems: "center"
   },
   title: {
     marginTop: 20,
     fontSize: 20,
-    fontWeight: "400",
+    fontWeight: "400"
   },
-  ViewTextInput: {
+  finderContainer: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     width: "90%",
-    backgroundColor: '#EFEFEF',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
+    backgroundColor: '#5B97DC',
+    paddingRight: 15,
     borderRadius: 15,
-    margin: 20,
+    margin: 15,
   },
-  ViewSearchFilter: {
-    margin: 50,
-    backgroundColor: "black"
+  seekerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EFEFEF',
+    width: "75%",
+    borderRadius: 15,
+    paddingHorizontal: 10,
   },
-  textInput: {
-    padding: 10,
+  seeker: {
+    padding: 5,
     height: 50,
     borderRadius: 15,
-    width: "90%",
+    width: "85%",
     textAlign: 'justify'
+  },
+  filterContainer:{
+    width: '22%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 5
+  },
+  textFilter:{
+    color:'white'
   },
   container: {
     backgroundColor: '#EFEFEF',
@@ -87,9 +99,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   exitsProd: {
-    // backgroundColor: "black",
     width: '30%',
-    // marginRight: "15%",
     borderRadius: 10,
   },
   exitsText: {
@@ -104,8 +114,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 10,
-    // backgroundColor: "black"
-    // marginRight: 10,
   },
   button: {
     backgroundColor: "#B9B9B9",
@@ -120,13 +128,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)'
   },
   modalContent: {
-    width: "80%", // Ancho deseado del modal
-    height: "70%", // Alto deseado del modal
+    width: "80%",
+    height: "70%",
     backgroundColor: '#f1f1f1',
     borderRadius: 10,
-    // padding: 2,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: 'black',

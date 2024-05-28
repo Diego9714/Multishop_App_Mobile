@@ -1,22 +1,21 @@
 import { pool }   from '../connection/mysql.connect.js'
 
 export class Orders {
-  static async search(username , password) {
+  static async verify({order}) {
     try {
       let msg = {
         status: false,
-        msg: "User not found",
-        code: 500
+        msg: "This order already exists",
+        code: 400
       }
 
       const connection = await pool.getConnection()
 
-      let sql = 'SELECT cod_ven , user_vend , pass_vend , nom_ven , ced_ven FROM svend WHERE user_vend = ?;'
+      let sql = 'SELECT ced_ven FROM diariov WHERE user_vend = ?;'
       let [user] = await connection.execute(sql,[username])
       
       connection.release()
 
-      
       if(user) {        
         let isMatch = await bcrypt.compare(password, user[0].pass_vend)
 

@@ -15,7 +15,67 @@ const styles = StyleSheet.create({
   logo: {
     width: "50%",
     height: "100%"
-  }
+  },
+  modalBackground: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)'
+  },
+  activityIndicatorWrapper: {
+    backgroundColor: '#FFFFFF',
+    height: '40%',
+    width: '60%',
+    borderRadius: 10,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+  },
+  message: {
+    textAlign: 'center',
+    fontSize: 20,
+    color: '#333',
+    marginBottom: '20%'
+  },
+  buttonModal: {
+    width: 150,
+    height: 40,
+    backgroundColor: "#5B97DC",
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  buttonModalExit: {
+    width: 150,
+    height: 40,
+    backgroundColor: "#E72929",
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  buttonTextModal: {
+    color: "white",
+    textAlign: "center",
+  },
 });
 
 export default styles;

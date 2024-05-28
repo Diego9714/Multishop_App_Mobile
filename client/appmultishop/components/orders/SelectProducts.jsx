@@ -1,33 +1,44 @@
-import React, { useState, useEffect } from 'react'
-import { Text, View, Pressable, Modal, TextInput, ScrollView } from 'react-native'
-import { AntDesign, MaterialIcons, Ionicons, FontAwesome } from '@expo/vector-icons'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import ModalProduct from '../products/ModalProducts'
-import styles from '../../styles/SelectProducts.style'
+// Dependencies
+import React, { useState, useEffect }                           from 'react';
+import { Text, View, Pressable, Modal, TextInput, ScrollView, Alert }  from 'react-native';
+import { AntDesign, MaterialIcons, Ionicons, FontAwesome }      from '@expo/vector-icons';
+import AsyncStorage                                             from '@react-native-async-storage/async-storage';
+// Modals
+import ModalProduct   from '../products/ModalProducts';
+import SaveOrder      from './SaveOrder';
+// Styles
+import styles         from '../../styles/SelectProducts.style'
 
-const SelectProducts = ({ isVisible, onClose , client }) => {
-  const [selectedProductsCount, setSelectedProductsCount] = useState(0)
-  const [products, setProducts] = useState([])
-  const [visibleProducts, setVisibleProducts] = useState([])
-  const [searchProduct, setSearchProduct] = useState("")
-  const [page, setPage] = useState(1)
-  const [selectedProduct, setSelectedProduct] = useState(null)
-  const [isProductModalVisible, setIsProductModalVisible] = useState(false)
-  const itemsPerPage = 10
+const SelectProducts = ({ isVisible, onClose, client }) => {
+  const [selectedProductsCount, setSelectedProductsCount] = useState(0);
+  const [products, setProducts] = useState([]);
+  const [visibleProducts, setVisibleProducts] = useState([]);
+  const [searchProduct, setSearchProduct] = useState("");
+  const [page, setPage] = useState(1);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isProductModalVisible, setIsProductModalVisible] = useState(false);
+  const [isSaveOrderModalVisible, setIsSaveOrderModalVisible] = useState(false);
+  const [productQuantities, setProductQuantities] = useState({});
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const getProducts = async () => {
-      const productsInfo = await AsyncStorage.getItem('products')
-      const productsJson = JSON.parse(productsInfo)
-      setProducts(productsJson || [])
-    }
-    getProducts()
-  }, [])
+      const productsInfo = await AsyncStorage.getItem('products');
+      const productsJson = JSON.parse(productsInfo);
+      setProducts(productsJson || []);
+    };
+    getProducts();
+  }, []);
 
   useEffect(() => {
-    const filteredProducts = products.filter(product =>
-      product.descrip.toLowerCase().includes(searchProduct.toLowerCase())
-    )
+    let filteredProducts = products;
+
+    if (searchProduct.length >= 3) {
+      filteredProducts = filteredProducts.filter(product =>
+        product.descrip.toLowerCase().includes(searchProduct.toLowerCase())
+      );
+    }
+
     const start = (page - 1) * itemsPerPage
     const end = page * itemsPerPage
     setVisibleProducts(filteredProducts.slice(start, end))
@@ -41,48 +52,35 @@ const SelectProducts = ({ isVisible, onClose , client }) => {
       product.selected = true
       setSelectedProductsCount(selectedProductsCount + 1)
     }
-  };
+  }
 
-  const renderElements = ({ item }) => (
-    <View style={styles.productItem}>
-      <View style={styles.nameProd}>
-        <Text>{item.descrip}</Text>
-      </View>
-      <View style={styles.quantityContainer}>
-        <TextInput
-          style={styles.quantityInput}
-          keyboardType="numeric"
-          placeholder="Cantidad"
-        />
-      </View>
-      <View style={styles.buttonAction}>
-        <Pressable
-          style={styles.button}
-          onPress={() => handleProductSelection(item)}
-        >
-          {item.selected ? (
-            <Ionicons name="remove-outline" size={30} color="black" />
-          ) : (
-            <Ionicons name="add-outline" size={30} color="black" />
-          )}
-        </Pressable>
-        <Pressable
-          style={styles.button}
-          onPress={() => {
-            setSelectedProduct(item);
-            setIsProductModalVisible(true);
-          }}
-        >
-          <MaterialIcons name="info-outline" size={30} color="black" />
-        </Pressable>
-      </View>
-    </View>
-  );
+  const handleQuantityChange = (productId, text) => {
+    const product = products.find(p => p.id === productId)
+    let quantity = parseInt(text, 10)
+
+    if (isNaN(quantity)) {
+      setProductQuantities(prevQuantities => ({
+        ...prevQuantities,
+        [productId]: ''
+      }))
+      return
+    }
+
+    if (quantity > product.existencia) {
+      Alert.alert('Cantidad inválida', `La cantidad ingresada debe ser igual o menor a la existencia disponible (${product.existencia}).`)
+      return
+    }
+
+    setProductQuantities(prevQuantities => ({
+      ...prevQuantities,
+      [productId]: quantity
+    }))
+  }
 
   const renderPaginationButtons = () => {
     const filteredProducts = products.filter(product =>
       product.descrip.toLowerCase().includes(searchProduct.toLowerCase())
-    );
+    )
     const numberOfPages = Math.ceil(filteredProducts.length / itemsPerPage)
     let buttons = []
     for (let i = 1; i <= numberOfPages; i++) {
@@ -94,9 +92,9 @@ const SelectProducts = ({ isVisible, onClose , client }) => {
         >
           <Text style={styles.pageButtonText}>{i}</Text>
         </Pressable>
-      )
+      );
     }
-    return buttons
+    return buttons;
   };
 
   return (
@@ -144,6 +142,7 @@ const SelectProducts = ({ isVisible, onClose , client }) => {
                     style={styles.quantityInput}
                     keyboardType="numeric"
                     placeholder="Cantidad"
+                    onChangeText={text => handleQuantityChange(product.id, text)}
                   />
                 </View>
                 <View style={styles.buttonAction}>
@@ -182,7 +181,10 @@ const SelectProducts = ({ isVisible, onClose , client }) => {
           <Pressable style={styles.buttonExit} onPress={onClose}>
             <Text style={styles.buttonText}>Salir</Text>
           </Pressable>
-          <Pressable style={styles.buttonModal}>
+          <Pressable
+            style={styles.buttonModal}
+            onPress={() => setIsSaveOrderModalVisible(true)}
+          >
             <Text style={styles.buttonTextSave}>Guardar</Text>
             <AntDesign name="shoppingcart" size={26} color="white" />
             <View style={styles.counterContainer}>
@@ -198,6 +200,12 @@ const SelectProducts = ({ isVisible, onClose , client }) => {
             product={selectedProduct}
           />
         )}
+
+        <SaveOrder
+          isVisible={isSaveOrderModalVisible}
+          onClose={() => setIsSaveOrderModalVisible(false)}
+          client={client}
+        />
       </View>
     </Modal>
   );
