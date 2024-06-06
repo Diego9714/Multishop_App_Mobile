@@ -21,3 +21,13 @@ controller.getCategory = async (req, res) => {
     return res.status(500).json({ error: error.message })
   }
 }
+
+controller.getBrands = async (req, res) => {
+  try {
+    const brands = await Products.brands()
+    res.status(brands.code).json(brands)
+
+  } catch (error) {
+    return res.status(500).json({ error: error.message })
+  }
+}

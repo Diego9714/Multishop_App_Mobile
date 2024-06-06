@@ -15,10 +15,11 @@ export class Products {
       let sql = `SELECT 
       sinv.codigo , sinv.descrip , sinv.precio1 as precioBs , FLOOR(sinv.existencia) as existencia , sinv.ccate,
       ROUND(detallepr.precio1, 2) as precioUsd,
-      catego.ncate
+      catego.ncate, marca.nmarca , sinv.marca
       FROM sinv 
       INNER JOIN detallepr ON sinv.codigo = detallepr.codigo
       INNER JOIN catego ON sinv.ccate = catego.ccate
+      INNER JOIN marca ON sinv.marca = marca.cmarca
       WHERE sinv.existencia > 0
       ;`
       let [products] = await connection.execute(sql)
@@ -71,5 +72,37 @@ export class Products {
       return error
     }
   }
+
+  static async brands() {
+    try {
+      let msg = {
+        status: false,
+        msg: "Brands not founded",
+        code: 404
+      }
+
+      const connection = await pool.getConnection()
+
+      let sql = `SELECT cmarca , nmarca FROM marca;`
+      let [brands] = await connection.execute(sql)
+      
+      connection.release()
+
+      if(brands.length > 0){
+
+        msg = {
+          status: true,
+          msg: "Brands found",
+          code: 200,
+          brands
+        } 
+      }
+  
+      return msg
+    } catch (error) {
+      return error
+    }
+  }
+
 }
 

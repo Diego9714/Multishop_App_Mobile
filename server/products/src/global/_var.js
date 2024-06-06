@@ -15,3 +15,4 @@ export const DB_NAME                   = process.env.NAME
 // Users
 export const PRODUCTS                  = process.env.PRODUCTS
 export const CATEGORY                  = process.env.CATEGORY
+export const BRANDS                    = process.env.BRANDS

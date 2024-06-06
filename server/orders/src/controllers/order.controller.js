@@ -18,7 +18,7 @@ controller.saveOrder = async (req, res) => {
     const ordersNotCompleted = []
 
     if(filterOrder.length > 0){
-      const user = await Orders.verify({order})
+      const user = await Orders.saveOrder(order)
       
       if(user.code == 200){
         

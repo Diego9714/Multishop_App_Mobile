@@ -68,6 +68,68 @@ const styles = StyleSheet.create({
   textDetailedClient:{
     color: '#373A40'
   },
+  ProductContainer: {
+    width: "100%",
+    backgroundColor: '#fff',
+    borderTopRightRadius: 20,
+    borderTopLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    borderBottomLeftRadius: 20,
+  },
+  headerProductContainer: {
+    width: "100%",
+    backgroundColor: '#64a8d6',
+    borderTopRightRadius: 20,
+    borderTopLeftRadius: 20,
+  },
+  titleListContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+  },
+  titleListProduct: {
+    color: 'white',
+    flex: 2,
+    textAlign: 'center',
+  },
+  titleListQuantity: {
+    color: 'white',
+    flex: 1,
+    textAlign: 'center',
+  },
+  titleListPrice: {
+    color: 'white',
+    flex: 1,
+    textAlign: 'center',
+  },
+  selectedProductItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  nameProduct: {
+    flex: 2,
+    textAlign: 'left',
+  },
+  quantityProduct: {
+    flex: 1,
+    textAlign: 'center',
+  },
+  priceProduct: {
+    flex: 1,
+    textAlign: 'center',
+  },
+  selectedProductActions: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+
+
   closeButton: {
     marginTop: 20,
     paddingVertical: 10,
@@ -80,18 +142,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  // Tipo de factura
-  // containerSelectFactura: {
-  //   width: '100%',
-  //   margin: '4%',
-  //   padding: '4%',
-  //   backgroundColor: '#EFEFEF',
-  //   borderRadius: 20,
-  //   shadowColor: 'black',
-  //   shadowOpacity: 0.3,
-  //   shadowOffset: { width: 0, height: 4 },
-  //   shadowRadius: 6,
-  // }
+  // Productos seleccionados
+  
 });
 
 
