@@ -24,7 +24,7 @@ export class Users {
 
         let userToken = {
           cod_ven : user[0].cod_ven,
-          user_ven : user[0].user_ven,
+          user_ven : user[0].user_vend,
           nom_ven : user[0].nom_ven,
           ced_ven : user[0].ced_ven
         }

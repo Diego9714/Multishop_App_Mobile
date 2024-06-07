@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, Pressable, TextInput } from 'react-native';
-import styles from '../../styles/modalEditProd.styles';
+import styles from '../../styles/ModalEditProd.styles';
 
 const ModalEditProd = ({ isVisible, selectedProduct, onClose, onQuantityChange, onDeleteProduct }) => {
   const [quantity, setQuantity] = useState(selectedProduct?.quantity || 0);

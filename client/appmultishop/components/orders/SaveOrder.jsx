@@ -76,6 +76,12 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
     navigation.navigate(screenName)
   };
 
+  const generateRandomProductId = () => {
+    const randomNumber = Math.floor(Math.random() * 100000);
+    const timestamp = Date.now();
+    return `${timestamp}-${randomNumber}`;
+  };
+
   const handleSave = async () => {
     if (!invoiceType) {
       Alert.alert('Error', 'Debe seleccionar el tipo de factura');
@@ -83,6 +89,7 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
     }
 
     const orderData = {
+      id_scli: generateRandomProductId(),
       cod_cli: client.cod_cli,
       nom_cli: client.nom_cli,
       products: products.map(product => ({

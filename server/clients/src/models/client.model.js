@@ -59,7 +59,7 @@ export class Clients {
 
       const connection = await pool.getConnection()
 
-      let sql = 'SELECT cod_ven , cod_cli , nom_cli , rif_cli , dir1_cli , tel_cli FROM scli WHERE cod_ven = ?;'
+      let sql = 'SELECT id_scli , cod_ven , cod_cli , nom_cli , rif_cli , dir1_cli , tel_cli FROM scli WHERE cod_ven = ?;'
       let [clients] = await connection.execute(sql, [cod_ven])
       
       connection.release()
