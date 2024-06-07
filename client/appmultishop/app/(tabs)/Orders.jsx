@@ -1,17 +1,17 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import Navbar from '../../components/Navbar'
+import { Text, View }   from 'react-native'
+import React            from 'react'
+import Navbar           from '../../components/Navbar'
+// Components
+import SelectOrders     from '../../components/orders/SelectOrders'
 
 
 const Orders = () => {
   return (
     <View>
-      <Navbar/>
-      <Text>Orders</Text>
+      <Navbar />
+      <SelectOrders />
     </View>
   )
 }
 
 export default Orders
-
-const styles = StyleSheet.create({})

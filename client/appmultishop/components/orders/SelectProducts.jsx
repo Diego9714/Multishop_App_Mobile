@@ -1,113 +1,104 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Text, View, Pressable, Modal, TextInput, ScrollView } from 'react-native';
-import { AntDesign, MaterialIcons, Ionicons, FontAwesome } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import ModalProduct from '../products/ModalProducts';
-import SaveOrder from './SaveOrder';
-import styles from '../../styles/SelectProducts.style';
+import React, { useState, useEffect, useCallback } from 'react'
+import { Text, View, Pressable, Modal, TextInput, ScrollView } from 'react-native'
+import { AntDesign, MaterialIcons, Ionicons, FontAwesome } from '@expo/vector-icons'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import ModalProduct from '../products/ModalProducts'
+import SaveOrder from './SaveOrder'
+import styles from '../../styles/SelectProducts.styles'
 
 const SelectProducts = ({ isVisible, onClose, client }) => {
-  const [selectedProductsCount, setSelectedProductsCount] = useState(0);
-  const [products, setProducts] = useState([]);
-  const [visibleProducts, setVisibleProducts] = useState([]);
-  const [searchProduct, setSearchProduct] = useState("");
-  const [page, setPage] = useState(1);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [isProductModalVisible, setIsProductModalVisible] = useState(false);
-  const [isSaveOrderModalVisible, setIsSaveOrderModalVisible] = useState(false);
-  const [productQuantities, setProductQuantities] = useState({});
-  const itemsPerPage = 10;
+  const [selectedProductsCount, setSelectedProductsCount] = useState(0)
+  const [products, setProducts] = useState([])
+  const [visibleProducts, setVisibleProducts] = useState([])
+  const [searchProduct, setSearchProduct] = useState("")
+  const [page, setPage] = useState(1)
+  const [selectedProduct, setSelectedProduct] = useState(null)
+  const [isProductModalVisible, setIsProductModalVisible] = useState(false)
+  const [isSaveOrderModalVisible, setIsSaveOrderModalVisible] = useState(false)
+  const [productQuantities, setProductQuantities] = useState({})
+  const itemsPerPage = 10
 
   useEffect(() => {
     const getProducts = async () => {
-      const productsInfo = await AsyncStorage.getItem('products');
-      const productsJson = JSON.parse(productsInfo);
-      setProducts(productsJson || []);
-    };
-    getProducts();
-  }, []);
+      const productsInfo = await AsyncStorage.getItem('products')
+      const productsJson = JSON.parse(productsInfo)
+      setProducts(productsJson || [])
+    }
+    getProducts()
+  }, [])
 
   useEffect(() => {
-    let filteredProducts = products;
+    let filteredProducts = products
 
     if (searchProduct.length >= 3) {
       filteredProducts = filteredProducts.filter(product =>
         product.descrip.toLowerCase().includes(searchProduct.toLowerCase())
-      );
+      )
     }
 
-    const start = (page - 1) * itemsPerPage;
-    const end = page * itemsPerPage;
-    const paginatedProducts = filteredProducts.slice(start, end);
+    const start = (page - 1) * itemsPerPage
+    const end = page * itemsPerPage
+    const paginatedProducts = filteredProducts.slice(start, end)
 
     const updatedVisibleProducts = paginatedProducts.map(product => ({
       ...product,
       quantity: productQuantities[product.codigo] || 0,
       selected: product.codigo in productQuantities && productQuantities[product.codigo] > 0
-    }));
+    }))
 
-    setVisibleProducts(updatedVisibleProducts);
-  }, [page, products, searchProduct, productQuantities]);
+    setVisibleProducts(updatedVisibleProducts)
+  }, [page, products, searchProduct, productQuantities])
 
   const handleProductSelection = useCallback((product) => {
-    const updatedProductQuantities = { ...productQuantities };
+    const updatedProductQuantities = { ...productQuantities }
   
     if (product.selected) {
-      product.selected = false;
-      setSelectedProductsCount(prevCount => prevCount - 1);
-      delete updatedProductQuantities[product.codigo];
+      product.selected = false
+      setSelectedProductsCount(prevCount => prevCount - 1)
+      delete updatedProductQuantities[product.codigo]
     } else {
-      product.selected = true;
-      setSelectedProductsCount(prevCount => prevCount + 1);
-      updatedProductQuantities[product.codigo] = 1;  // Establecer cantidad por defecto a 1
+      product.selected = true
+      setSelectedProductsCount(prevCount => prevCount + 1)
+      updatedProductQuantities[product.codigo] = 1  // Establecer cantidad por defecto a 1
     }
   
-    setProductQuantities(updatedProductQuantities);
+    setProductQuantities(updatedProductQuantities)
     setProducts(products.map(p => 
       p.codigo === product.codigo ? { ...p, selected: !p.selected } : p
-    ));
-  }, [productQuantities, products]);
+    ))
+  }, [productQuantities, products])
 
   const handleQuantityChange = useCallback((productId, text) => {
-    const quantity = parseInt(text, 10) || 0;
-
+    const quantity = parseInt(text, 10) || 0
+  
     if (isNaN(quantity)) {
-      return;
+      return
     }
-
-    const updatedProductQuantities = { ...productQuantities };
-    updatedProductQuantities[productId] = quantity;
-
+  
+    const updatedProductQuantities = { ...productQuantities }
+    updatedProductQuantities[productId] = quantity
+  
     if (quantity === 0) {
-      delete updatedProductQuantities[productId];
+      delete updatedProductQuantities[productId]
     }
-
-    setProductQuantities(updatedProductQuantities);
-
-    const updatedProducts = products.map(product =>
-      product.codigo === productId
-        ? { ...product, selected: quantity > 0 }
-        : product
-    );
-
-    setProducts(updatedProducts);
-    setSelectedProductsCount(updatedProducts.filter(product => product.selected).length);
-  }, [productQuantities, products]);
+  
+    setProductQuantities(updatedProductQuantities)
+  }, [productQuantities])
 
   const handleProductDelete = useCallback((productId) => {
-    const updatedProductQuantities = { ...productQuantities };
-    delete updatedProductQuantities[productId];
-    setProductQuantities(updatedProductQuantities);
+    const updatedProductQuantities = { ...productQuantities }
+    delete updatedProductQuantities[productId]
+    setProductQuantities(updatedProductQuantities)
   
     const updatedProducts = products.map(product =>
       product.codigo === productId ? { ...product, selected: false } : product
-    );
-    setProducts(updatedProducts);
-    setSelectedProductsCount(prevCount => prevCount - 1);
-  }, [productQuantities, products]);
+    )
+    setProducts(updatedProducts)
+    setSelectedProductsCount(prevCount => prevCount - 1)
+  }, [productQuantities, products])
 
   const generateSelectedProductJSON = () => {
-    const selectedProducts = products.filter(product => product.selected);
+    const selectedProducts = products.filter(product => product.selected)
     const selectedProductsWithQuantities = selectedProducts.map(product => ({
       codigo: product.codigo,
       descrip: product.descrip,
@@ -115,24 +106,24 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
       quantity: productQuantities[product.codigo] || 0,
       priceUsd: product.precioUsd,
       priceBs: product.precioBs,
-    }));
+    }))
 
     const order = {
       cod_cli: client.cod_cli,
       nom_cli: client.nom_cli,
       products: selectedProductsWithQuantities
-    };
+    }
 
-    return order;
-  };
+    return order
+  }
 
   const renderPaginationButtons = () => {
     const filteredProducts = products.filter(product =>
       product.descrip.toLowerCase().includes(searchProduct.toLowerCase())
-    );
-    const numberOfPages = Math.ceil(filteredProducts.length / itemsPerPage);
-    let buttons = [];
-    for (let i = 1; i <= numberOfPages; i++) {
+    )
+    const numberOfPages = Math.ceil(filteredProducts.length / itemsPerPage)
+    let buttons = []
+    for (let i = 1 ; i <= numberOfPages ; i++) {
       buttons.push(
         <Pressable
         key={i}
@@ -141,10 +132,10 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
       >
         <Text style={styles.pageButtonText}>{i}</Text>
       </Pressable>
-    );
+    )
   }
-  return buttons;
-};
+  return buttons
+}
 
 return (
   <Modal visible={isVisible} animationType="slide">
@@ -208,8 +199,8 @@ return (
                 <Pressable
                   style={styles.button}
                   onPress={() => {
-                    setSelectedProduct(product);
-                    setIsProductModalVisible(true);
+                    setSelectedProduct(product)
+                    setIsProductModalVisible(true)
                   }}
                 >
                   <MaterialIcons name="info-outline" size={30} color="black" />
@@ -260,7 +251,7 @@ return (
       />
     </View>
   </Modal>
-);
-};
+)
+}
 
-export default SelectProducts;
+export default SelectProducts

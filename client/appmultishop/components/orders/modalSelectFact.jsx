@@ -1,6 +1,6 @@
 import React from 'react'
 import { Text, View, Modal, Pressable, StyleSheet } from 'react-native'
-import styles from '../../styles/modalSelectFact'
+import styles from '../../styles/ModalSelectFact.styles'
 
 const ModalSelectFact = ({ isVisible, onClose, onSelect }) => {
   return (

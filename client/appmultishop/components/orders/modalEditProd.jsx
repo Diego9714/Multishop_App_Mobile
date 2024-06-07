@@ -61,13 +61,14 @@ const ModalEditProd = ({ isVisible, selectedProduct, onClose, onQuantityChange, 
 
           </View>
 
+          <Pressable onPress={handleDeleteProduct} style={styles.closeButton}>
+            <Text style={styles.closeButtonText}>Eliminar</Text>
+          </Pressable>
+
           <Pressable onPress={onClose} style={styles.closeButton}>
             <Text style={styles.closeButtonText}>Cerrar</Text>
           </Pressable>
 
-          <Pressable onPress={handleDeleteProduct} style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>Eliminar Producto</Text>
-          </Pressable>
           
         </View>
       </View>

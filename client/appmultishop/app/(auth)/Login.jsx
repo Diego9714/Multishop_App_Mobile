@@ -1,7 +1,6 @@
 // Dependencies
-import React, { useState, useContext, useEffect } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
+import React, { useState, useContext, useEffect } from 'react'
+import { StatusBar } from 'expo-status-bar'
 import {
   View,
   TextInput,
@@ -11,29 +10,29 @@ import {
   Text,
   TouchableOpacity,
   Platform
-} from 'react-native';
+} from 'react-native'
 // Resources
-import { images } from '../../constants';
-import { MaterialIcons } from '@expo/vector-icons';
+import { images } from '../../constants'
+import { MaterialIcons } from '@expo/vector-icons'
 // Styles
-import styles from '../../styles/login.styles';
+import styles from '../../styles/Login.styles'
 // Context
-import { UserContext } from '../../context/UserContext';
+import { UserContext } from '../../context/UserContext'
 
 const Login = () => {
 
-  const { signIn, checkLogin, logoutt } = useContext(UserContext);
+  const { signIn, checkLogin, logoutt } = useContext(UserContext)
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
 
   useEffect(() => {
-    checkLogin();
-  }, []);
+    checkLogin()
+  }, [])
 
   const handleLogin = async () => {
-    signIn(username, password);
-  };
+    signIn(username, password)
+  }
 
   return (
     <KeyboardAvoidingView
@@ -80,7 +79,7 @@ const Login = () => {
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login

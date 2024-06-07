@@ -128,21 +128,52 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'flex-end',
   },
-
-
+  containerPrice: {
+    width: '70%',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent:'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 10
+  },
+  textPrice: {
+    marginTop: 10,
+  },
+  containerNote: {
+    width: '90%',
+    marginTop: 10,
+    marginBottom: 10
+  },
+  noteOrder:{
+    color: 'gray',
+    textAlign: 'justify'
+  },
+  containerButton:{
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent:'space-between',
+    alignItems: 'center',
+    width: '70%',
+    marginTop: 20
+  },
+  otherButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#5B97DC',
+    borderRadius: 5,
+  },
   closeButton: {
-    marginTop: 20,
     paddingVertical: 10,
     paddingHorizontal: 20,
     backgroundColor: '#FF0000',
     borderRadius: 5,
   },
-  closeButtonText: {
+  buttonText: {
     color: '#FFF',
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  // Productos seleccionados
   
 });
 

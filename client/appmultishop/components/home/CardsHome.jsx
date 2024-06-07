@@ -1,9 +1,9 @@
 import React                              from 'react'
 import { Text, View , TouchableOpacity  } from 'react-native'
-import { MaterialIcons }                  from '@expo/vector-icons';
-import { useNavigation }                  from '@react-navigation/native';
+import { MaterialIcons }                  from '@expo/vector-icons'
+import { useNavigation }                  from '@react-navigation/native'
 import MaterialCommunityIcons             from 'react-native-vector-icons/MaterialCommunityIcons'
-import styles                             from '../../styles/CardsHome.style'
+import styles                             from '../../styles/CardsHome.styles'
 
 // // Screens
 import Clients                            from '../../app/(tabs)/Clients'
@@ -16,7 +16,7 @@ const CardsHome = () => {
 
   const handlePress = (screenName) => {
     navigation.navigate(screenName)
-  };
+  }
 
   return (
     <View style={styles.container}>
