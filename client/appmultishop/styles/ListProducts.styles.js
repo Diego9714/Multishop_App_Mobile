@@ -222,10 +222,12 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
   },
+  
   paginationContainer: {
     width: '90%',
     flexDirection: 'row',
     marginHorizontal: '5%',
+    paddingHorizontal: '20%', 
     paddingVertical: 10,
   },
   pageButton: {
@@ -233,13 +235,14 @@ const styles = StyleSheet.create({
     padding: 10,
     margin: 5,
     backgroundColor: '#ddd',
-    borderRadius: 5,
+    borderRadius: 100,
   },
   pageButtonActive: {
     backgroundColor: '#5B97DC',
   },
   pageButtonText: {
     color: 'black',
+    textAlign: 'center',
   },
 });
 

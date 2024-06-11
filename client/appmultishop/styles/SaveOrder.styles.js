@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: '90%',
     padding: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: '#798CA0',
     alignItems: 'center',
     borderRadius: 20,
     shadowColor: 'black',
@@ -131,11 +131,11 @@ const styles = StyleSheet.create({
   containerPrice: {
     width: '70%',
     display: 'flex',
-    flexDirection: 'row',
-    justifyContent:'space-between',
+    flexDirection: 'column',
     alignItems: 'center',
     marginTop: 10,
-    marginBottom: 10
+    marginBottom: 10,
+    // backgroundColor: 'black'
   },
   textPrice: {
     marginTop: 10,
@@ -155,7 +155,8 @@ const styles = StyleSheet.create({
     justifyContent:'space-between',
     alignItems: 'center',
     width: '70%',
-    marginTop: 20
+    marginTop: 20,
+    gap: 10
   },
   otherButton: {
     paddingVertical: 10,

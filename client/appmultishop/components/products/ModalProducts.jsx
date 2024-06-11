@@ -3,6 +3,7 @@ import { Text, View, Pressable, Modal } from 'react-native';
 import styles from '../../styles/ListProducts.styles';
 
 const ModalProduct = ({ isVisible, onClose, product }) => {
+
   if (!product) return null;
 
   return (

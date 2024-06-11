@@ -5,10 +5,10 @@ import { useNavigation } from '@react-navigation/native';
 import ModalSelectFact from './modalSelectFact';
 import ModalEditProd from './modalEditProd';
 import styles from '../../styles/SaveOrder.styles';
-import Orders                             from '../../app/(tabs)/Orders'
+import Orders from '../../app/(tabs)/Orders';
 
 const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDeleteProduct }) => {
-  const [modalVisible, setModalVisible] = useState(false);
+  const [isProductModalVisible, setIsProductModalVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [invoiceType, setInvoiceType] = useState(null);
   const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
@@ -23,13 +23,13 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
     }
   }, [order]);
 
-  const openModal = (product) => {
+  const openProductModal = (product) => {
     setSelectedProduct(product);
-    setModalVisible(true);
+    setIsProductModalVisible(true);
   };
 
-  const closeModal = () => {
-    setModalVisible(false);
+  const closeProductModal = () => {
+    setIsProductModalVisible(false);
     setSelectedProduct(null);
   };
 
@@ -38,7 +38,7 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
     setIsInvoiceModalVisible(false);
   };
 
-  const handleQuantityChange = (productId, newQuantity) => {
+  const handleProductQuantityChange = (productId, newQuantity) => {
     onQuantityChange(productId, newQuantity);
     const updatedProducts = products.map(product =>
       product.codigo === productId ? { ...product, quantity: newQuantity } : product
@@ -46,14 +46,14 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
     setProducts(updatedProducts);
   };
 
-  const handleDeleteProduct = (productId) => {
+  const handleProductDelete = (productId) => {
     const updatedProducts = products.filter(product => product.codigo !== productId);
     setProducts(updatedProducts);
   
     if (onDeleteProduct) {
       onDeleteProduct(productId);
     }
-    closeModal();
+    closeProductModal();
   };
 
   useEffect(() => {
@@ -64,8 +64,8 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
         totalUsd += product.quantity * product.priceUsd;
         totalBs += product.quantity * product.priceBs;
       });
-      setTotalPriceUsd(totalUsd);
-      setTotalPriceBs(totalBs);
+      setTotalPriceUsd(parseFloat(totalUsd.toFixed(2)));
+      setTotalPriceBs(parseFloat(totalBs.toFixed(2)));
     } else {
       setTotalPriceUsd(0);
       setTotalPriceBs(0);
@@ -73,7 +73,7 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
   }, [products]);
 
   const handlePress = (screenName) => {
-    navigation.navigate(screenName)
+    navigation.navigate(screenName);
   };
 
   const generateRandomProductId = () => {
@@ -82,20 +82,20 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
     return `${timestamp}-${randomNumber}`;
   };
 
-  const handleSave = async () => {
+  const handleSaveOrder = async () => {
     if (!invoiceType) {
       Alert.alert('Error', 'Debe seleccionar el tipo de factura');
       return;
     }
-
+  
     const orderData = {
-      id_scli: generateRandomProductId(),
+      id_order: generateRandomProductId(),
       cod_cli: client.cod_cli,
       nom_cli: client.nom_cli,
       products: products.map(product => ({
         codigo: product.codigo,
         descrip: product.descrip,
-        exists: product.exists - product.quantity, // actualiza existencia
+        // exists: product.exists - product.quantity, // actualiza existencia (eliminado)
         quantity: product.quantity,
         priceUsd: product.priceUsd,
         priceBs: product.priceBs,
@@ -105,29 +105,14 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
       totalBs: totalPriceBs,
       fecha: new Date().toISOString(),
     };
-
+  
     try {
       const existingOrders = await AsyncStorage.getItem('OrdersClient');
       const orders = existingOrders ? JSON.parse(existingOrders) : [];
       orders.push(orderData);
       await AsyncStorage.setItem('OrdersClient', JSON.stringify(orders));
-
-      // Actualizar la lista de productos global
-      const existingProducts = await AsyncStorage.getItem('products');
-      let productList = existingProducts ? JSON.parse(existingProducts) : [];
-
-      // Actualizar existencias en la lista global de productos
-      products.forEach(orderProduct => {
-        const index = productList.findIndex(prod => prod.codigo === orderProduct.codigo);
-        if (index !== -1) {
-          productList[index].exists -= orderProduct.quantity;
-        }
-      });
-
-      // Guardar la lista de productos actualizada en AsyncStorage
-      await AsyncStorage.setItem('products', JSON.stringify(productList));
-
-      handlePress(Orders)
+  
+      handlePress(Orders);
     } catch (error) {
       console.error('Error saving order:', error);
     }
@@ -187,19 +172,19 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
 
             <ScrollView>
               {products && products.map((product, index) => (
-                <Pressable key={index} style={styles.selectedProductItem} onPress={() => openModal(product)}>
+                <Pressable key={index} style={styles.selectedProductItem} onPress={() => openProductModal(product)}>
                   <Text style={styles.nameProduct}>{product.descrip}</Text>
                   <Text style={styles.quantityProduct}>{product.quantity}</Text>
-                  <Text style={styles.priceProduct}>{product.quantity * product.priceUsd}</Text>
+                  <Text style={styles.priceProduct}>{(product.quantity * product.priceUsd).toFixed(2)}</Text>
                 </Pressable>
               ))}
             </ScrollView>
           </View>
           
           <View style={styles.containerPrice}>
-            <Text style={styles.textPrice}>Total (Usd) :  {totalPriceUsd}</Text>
-            <Text style={styles.textPrice}>|</Text>
-            <Text style={styles.textPrice}>Total (Bs) : {totalPriceBs}</Text>
+            <Text style={styles.textPrice}>Total: </Text>
+            <Text style={styles.textPrice}>USD :  {totalPriceUsd}</Text>
+            <Text style={styles.textPrice}>BS : {totalPriceBs}</Text>
           </View>
 
           <View style={styles.containerNote}>
@@ -207,25 +192,27 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
           </View>
 
           <View style={styles.containerButton}>
-            <Pressable onPress={handleSave} style={styles.otherButton}>
+            <Pressable onPress={handleSaveOrder} style={styles.otherButton}>
               <Text style={styles.buttonText}>Guardar</Text>
             </Pressable>
             <Pressable style={styles.otherButton}>
               <Text style={styles.buttonText}>Pdf</Text>
             </Pressable>
             <Pressable onPress={onClose} style={styles.closeButton}>
-              <Text style={styles.buttonText}>Salir</Text>
+              <Text style={styles.buttonText}>Regresar</Text>
             </Pressable>
           </View>
         </ScrollView>
 
-        <ModalEditProd
-          isVisible={modalVisible}
-          selectedProduct={selectedProduct}
-          onClose={closeModal}
-          onQuantityChange={handleQuantityChange}
-          onDeleteProduct={handleDeleteProduct}
-        />
+        {selectedProduct && (
+          <ModalEditProd
+            isVisible={isProductModalVisible}
+            selectedProduct={selectedProduct}
+            onClose={closeProductModal}
+            onQuantityChange={handleProductQuantityChange}
+            onDeleteProduct={handleProductDelete}
+          />
+        )}
 
         <ModalSelectFact
           isVisible={isInvoiceModalVisible}

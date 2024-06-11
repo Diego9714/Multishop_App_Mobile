@@ -1,11 +1,25 @@
-import React, { useState } from 'react';
-import { View, Text, Modal, ScrollView, Pressable } from 'react-native';
-import styles from '../../styles/ListClients.styles';
-import SelectProducts from '../orders/SelectProducts';
+import React, { useState } from 'react'
+import { View, Text, Modal, ScrollView, Pressable } from 'react-native'
+// Components Modal
+import SelectProducts from '../orders/SelectProducts'
+import VisitModal from './VisitModal'
+// Styles
+import styles from '../../styles/ListClients.styles'
 
-const ClientModal = ({ isModalVisible, selectedClient, onClose }) => {
+const ClientModal = ({ isVisibleClientModal, selectedClient, onClose }) => {
   const [isSelectProductsModalVisible, setIsSelectProductsModalVisible] = useState(false);
+  const [isOpenVisitModal , setIsOpenVisitModal] = useState(false)
 
+  // Visit Modal
+  const openVisitModal = () => {
+    setIsOpenVisitModal(true)
+  }
+
+  const closeVisitModal = () => {
+    setIsOpenVisitModal(false)
+  }
+
+  // Select Products Modal
   const openSelectProductsModal = () => {
     setIsSelectProductsModalVisible(true);
   };
@@ -17,7 +31,7 @@ const ClientModal = ({ isModalVisible, selectedClient, onClose }) => {
   if (!selectedClient) return null;
 
   return (
-    <Modal visible={isModalVisible} animationType="fade" transparent={true}>
+    <Modal visible={isVisibleClientModal} animationType="fade" transparent={true}>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.titleModal}>{selectedClient.nom_cli}</Text>
@@ -43,8 +57,11 @@ const ClientModal = ({ isModalVisible, selectedClient, onClose }) => {
             <Pressable style={styles.buttonModal} onPress={openSelectProductsModal}>
               <Text style={styles.buttonTextModal}>Realizar Pedido</Text>
             </Pressable>
-            <Pressable style={styles.buttonModal}>
+            <Pressable style={styles.buttonModal} onPress={openVisitModal}>
               <Text style={styles.buttonTextModal}>Registrar Visita</Text>
+            </Pressable>
+            <Pressable style={styles.buttonModal}>
+              <Text style={styles.buttonTextModal}>Registrar Abono</Text>
             </Pressable>
             <Pressable style={styles.buttonModalExit} onPress={onClose}>
               <Text style={styles.buttonTextModal}>Salir</Text>
@@ -53,11 +70,21 @@ const ClientModal = ({ isModalVisible, selectedClient, onClose }) => {
         </View>
       </View>
 
-      <SelectProducts 
-        isVisible={isSelectProductsModalVisible} 
-        onClose={closeSelectProductsModal} 
-        client={selectedClient} 
-      />
+      {selectedClient && (
+        <SelectProducts 
+          isVisible={isSelectProductsModalVisible} 
+          onClose={closeSelectProductsModal} 
+          client={selectedClient} 
+        />
+      )}
+
+      {selectedClient && (
+        <VisitModal 
+          isVisible={isOpenVisitModal} 
+          onClose={closeVisitModal} 
+          client={selectedClient} 
+        />
+      )}
     </Modal>
   );
 };

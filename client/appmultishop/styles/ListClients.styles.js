@@ -2,9 +2,11 @@ import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
   list: {
-    width: "100%",
-    height: "100%",
-    backgroundColor: '#fff'
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#fff',
+    position: 'relative',
+    zIndex: 1, // Asegura que el componente esté en la capa superior
   },
   titlePage:{
     height: 150,
@@ -20,10 +22,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: "90%",
     backgroundColor: '#EFEFEF',
-    paddingVertical: 5,
+    // paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 15,
-    margin: 20,
+    margin: '2%',
   },
   textInput: {
     padding: 10,
@@ -31,6 +33,12 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     width: "90%",
     textAlign: 'justify'
+  },
+  botonSearch:{
+    backgroundColor: '#64a8d6',
+    padding: 15,
+    borderTopRightRadius: 20,
+    borderBottomRightRadius: 20,
   },
   container: {
     backgroundColor: '#EFEFEF',
@@ -61,7 +69,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     marginHorizontal: 10,
-    height: '87%',
+    height: '85%',
   },
   clientItem: {
     flexDirection: 'row',
@@ -83,25 +91,27 @@ const styles = StyleSheet.create({
     width: '30%'
   },
   button: {
-    backgroundColor: "#B9B9B9",
-    borderRadius: 5,
-    width: "70%",
-    padding: '5%',
+    backgroundColor: "#D9D9D9",
+    borderRadius: 10,
+    width: "50%",
+    padding: '8%',
     alignItems: "center",
+    position: 'relative',
+    zIndex: 1, // Asegura que el componente esté en la capa superior
 
   },
   modalContainer: {
-    flex: 1,
+    width: '100%',
+    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)'
   },
   modalContent: {
     width: "80%", // Ancho deseado del modal
-    height: "80%", // Alto deseado del modal
     backgroundColor: '#f1f1f1',
     borderRadius: 10,
-    // padding: 2,
+    padding: 5,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: 'black',
@@ -109,10 +119,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 6,
     elevation: 4
-
   },
   titleModal:{
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "600",
     textAlign: "center",
     marginBottom: 20,
@@ -146,9 +155,9 @@ const styles = StyleSheet.create({
   },
   textModalDirecction: {
     padding: 12,
-    height: "%10",
+    height: "100%",
     borderRadius: 15,
-    width: "64%",
+    width: "100%",
     textAlign: "justify"
   },
   sectionButtonsModal: {
@@ -199,21 +208,29 @@ const styles = StyleSheet.create({
     width: '90%',
     flexDirection: 'row',
     marginHorizontal: '5%',
+    paddingHorizontal: '20%', 
     paddingVertical: 10,
   },
   pageButton: {
-    height: '20%',
+    height: '22%',
     padding: 10,
     margin: 5,
     backgroundColor: '#ddd',
-    borderRadius: 5,
+    borderRadius: 100,
   },
   pageButtonActive: {
     backgroundColor: '#5B97DC',
   },
   pageButtonText: {
     color: 'black',
+    textAlign: 'center',
   },
+  scrollView: {
+    width: "100%",
+    // height: "100%",
+    // backgroundColor: 'blue',
+    // alignContent: 'center'
+  }
 });
 
 export default styles;

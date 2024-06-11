@@ -4,71 +4,104 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  container: {
-    backgroundColor: '#FFFFFF',
-    height: 650,
-    width: '80%',
-    borderRadius: 10,
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: 10,
-    alignSelf: 'center',
-    position: 'absolute',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)'
   },
-  modalTitle: {
-    fontSize: 20,
-    color: '#333',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  detailedClientContainer: {
-    marginTop: 20,
-    marginBottom: 20,
-    width: '90%',
+  modalContent: {
+    width: "80%",
     padding: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: '#f1f1f1',
+    borderRadius: 10,
+    justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 20,
-    shadowColor: 'black',
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 4, height: 4 },
-    shadowRadius: 10,
-  },
-  nameInputDetailedClient: {
-    color: 'white',
-    width: '90%',
-    fontSize: 16,
-  },
-  infoClientContainer: {
-    width: '100%',
-    margin: '4%',
-    padding: '4%',
-    backgroundColor: '#EFEFEF',
-    borderRadius: 20,
     shadowColor: 'black',
     shadowOpacity: 0.3,
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 6,
+    elevation: 4
+
   },
-  textDetailedClient: {
-    color: '#373A40',
+  titleModal:{
+    fontSize: 22,
+    fontWeight: "600",
+    textAlign: "center",
+    marginBottom: 20,
+    width: '80%',
   },
-  closeButton: {
-    width: 150,
+  subtitleModal:{
+    marginTop: '2%',
+    width: '80%',
+  },
+  modalInfoClient: {
+    width: "80%",
+    backgroundColor: '#D0D0D0',
+    borderRadius: 20,
+    margin: "2%",
+    alignItems: "center",
+  },
+  modalInfoClientButton: {
+    width: "80%",
+    height: "20%",
+    backgroundColor: '#D0D0D0',
+    borderRadius: 20,
+    margin: "2%",
+    alignItems: "center",
+  },
+  textModal: {
+    padding: 12,
+    height: "%10",
+    borderRadius: 15,
+    width: "90%",
+    textAlign: "center"
+  },
+  sectionButtonsModal: {
+    marginTop: "2%",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    flexWrap: "wrap",
+    gap: 10
+  },
+  buttonModal: {
+    width: 100,    
     height: 40,
-    backgroundColor: '#E72929',
+    backgroundColor: "#5B97DC",
     borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5, // Elevación de la sombra (solo para Android)
     marginTop: 10,
-    marginBottom: 10,
+    marginBottom: 10, // Agrega margen inferior para separar los botones
   },
-  closeButtonText: {
-    color: '#fff',
-    fontSize: 18,
+  buttonModalExit: {
+    width: 100,    
+    height: 40,
+    backgroundColor: "#E72929",
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 10,
+    marginBottom: 10, // Agrega margen inferior para separar los botones
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5, // Elevación de la sombra (solo para Android)
   },
+  buttonTextModal: {
+    color: "white",
+    textAlign: "center",
+  },
+  
 });
 
 export default styles;

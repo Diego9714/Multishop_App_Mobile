@@ -1,5 +1,5 @@
 // Dependencies
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View } from 'react-native'; // Importa FlatList en lugar de FlashList
 // Components
 import Navbar from '../../components/Navbar'

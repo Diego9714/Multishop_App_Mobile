@@ -66,7 +66,9 @@ const ListProducts = () => {
             }}
           >
             {/* <Ionicons name="add-outline" size={30} color="black" /> */}
-            <MaterialIcons name="info-outline" size={30} color="black" />
+            {/* <MaterialIcons name="info-outline" size={30} color="black" /> */}
+            {/* <Ionicons name="information-circle-sharp" size={34} color="#515151" /> */}
+            <Ionicons name="information" size={34} color="#515151" />
           </Pressable>
         </View>
       </View>
@@ -74,13 +76,12 @@ const ListProducts = () => {
   }
 
   const renderPaginationButtons = () => {
-    const filteredProducts = products.filter(product =>
-      product.descrip.toLowerCase().includes(searchProduct.toLowerCase()) &&
-      product.ncate.toLowerCase().includes(searchCategory.toLowerCase())
-    )
-    const numberOfPages = Math.ceil(filteredProducts.length / itemsPerPage)
+    const itemsPerPage = 10
+    const totalItems = 50
+    const totalPages = Math.ceil(totalItems / itemsPerPage)
+  
     let buttons = []
-    for (let i = 1; i <= numberOfPages; i++) {
+    for (let i = 1; i <= totalPages; i++) { // Usar totalPages directamente
       buttons.push(
         <Pressable
           key={i}
@@ -92,7 +93,7 @@ const ListProducts = () => {
       );
     }
     return buttons;
-  };
+  }
 
   const openFilterModal = () => {
     setIsFilterModalVisible(true);

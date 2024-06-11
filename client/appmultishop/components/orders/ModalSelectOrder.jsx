@@ -1,28 +1,18 @@
 import React from 'react';
 import { Text, View, Modal, Pressable } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../../styles/ModalSelectOrder.styles';
 
-const ModalSelectOrder = ({ isVisible, onClose, selectedOrder }) => {
+const ModalSelectOrder = ({ isVisible, onClose, onSelect, selectedOrder }) => {
 
   const handleModalSelect = async (action) => {
-    if (action === 'Eliminar') {
-      try {
-        // Eliminar el pedido seleccionado
-        const existingOrdersString = await AsyncStorage.getItem('OrdersClient');
-        let existingOrders = existingOrdersString ? JSON.parse(existingOrdersString) : [];
-        const updatedOrders = existingOrders.filter(order => order.id_order !== selectedOrder.id_order);
-        await AsyncStorage.setItem('OrdersClient', JSON.stringify(updatedOrders));
-        // console.log('Order deleted:', selectedOrder);
-      } catch (error) {
-        console.error('Error deleting order:', error);
-      }
+    if (action === 'Eliminar' && selectedOrder) {
+      // Aquí se maneja la lógica para eliminar el pedido
+      onSelect('Eliminar', selectedOrder);
     } else if (action === 'Editar') {
-      // Abre el componente SaveOrder con el pedido seleccionado
-      onClose(); // Cierra el modal actual
-      setSaveOrderVisible(true); // Activa la visibilidad del modal de SaveOrder
+      // Aquí se maneja la lógica para editar el pedido
+      onSelect('Editar', selectedOrder);
     }
-  
+    
     onClose();
   };
 

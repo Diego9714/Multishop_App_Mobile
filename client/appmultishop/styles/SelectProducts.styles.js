@@ -216,20 +216,22 @@ const styles = StyleSheet.create({
     width: '90%',
     flexDirection: 'row',
     marginHorizontal: '5%',
+    paddingHorizontal: '20%', 
     paddingVertical: 10,
   },
   pageButton: {
-    height: '80%',
-    padding: 7,
-    margin: 7,
+    height: '90%',
+    padding: 10,
+    margin: 5,
     backgroundColor: '#ddd',
-    borderRadius: 5,
+    borderRadius: 100,
   },
   pageButtonActive: {
     backgroundColor: '#5B97DC',
   },
   pageButtonText: {
     color: 'black',
+    textAlign: 'center',
   },
 });
 

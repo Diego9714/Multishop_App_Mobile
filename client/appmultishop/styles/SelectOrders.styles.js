@@ -102,11 +102,6 @@ const styles = StyleSheet.create({
   pagination: {
     marginTop: 0,
   },
-  paginationContainer: {
-    // flexDirection: 'row',
-    // justifyContent: 'center',
-    // alignItems: 'center',
-  },
   buttonsAction: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -127,25 +122,23 @@ const styles = StyleSheet.create({
   paginationContainer: {
     width: '90%',
     flexDirection: 'row',
-    justifyContent: 'center', // Alinea los elementos horizontalmente en el centro
-    alignItems: 'center', // Alinea los elementos verticalmente en el centro
-    // marginHorizontal: '5%',
+    marginHorizontal: '5%',
+    paddingHorizontal: '20%', 
     paddingVertical: 10,
   },
   pageButton: {
-    height: 40, // Altura deseada de los botones de paginación
-    paddingHorizontal: 20, // Ajusta el espaciado horizontal
-    marginHorizontal: 5,
+    height: '22%',
+    padding: 10,
+    margin: 5,
     backgroundColor: '#ddd',
-    borderRadius: 5,
-    justifyContent: 'center', // Alinea el contenido horizontalmente en el centro
-    alignItems: 'center', // Alinea el contenido verticalmente en el centro
+    borderRadius: 100,
   },
   pageButtonActive: {
     backgroundColor: '#5B97DC',
   },
   pageButtonText: {
-    color: 'white',
+    color: 'black',
+    textAlign: 'center',
   },
 });
 
