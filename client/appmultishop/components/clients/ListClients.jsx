@@ -1,41 +1,55 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Text, View, FlatList, Pressable, TextInput, ScrollView } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons'; // Importar FontAwesome5
+import { useFocusEffect } from '@react-navigation/native';
 import styles from '../../styles/ListClients.styles';
 import ClientModal from './ClientModal';
+import {
+  getClientsFromStorage,
+  filterClientsByName,
+  calculateTotalPages,
+  paginateClients
+} from '../../utils/ListClientsUtils';
 
 const ListClients = () => {
   const [clients, setClients] = useState([]);
   const [visibleClients, setVisibleClients] = useState([]);
   const [isClientModalVisible, setIsClientModalVisible] = useState(false);
-  const [searchClient, setSearchClient] = useState("");
-  const [searchText, setSearchText] = useState(""); // New state for search text
+  const [searchText, setSearchText] = useState(''); // New state for search text
   const [page, setPage] = useState(1);
   const [selectedClient, setSelectedClient] = useState(null);
   const itemsPerPage = 10;
 
-  useEffect(() => {
-    const getClients = async () => {
-      const info = await AsyncStorage.getItem('clients');
-      const infoJson = JSON.parse(info);
-      setClients(infoJson || []);
-    };
-    getClients();
-  }, []);
+  const resetStates = () => {
+    setSearchText('');
+    setPage(1);
+    setSelectedClient(null);
+    setIsClientModalVisible(false);
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      resetStates();
+      const fetchData = async () => {
+        const data = await getClientsFromStorage();
+        setClients(data);
+      };
+      fetchData();
+    }, [])
+  );
 
   useEffect(() => {
-    const start = (page - 1) * itemsPerPage;
-    const end = page * itemsPerPage;
-    setVisibleClients(clients.slice(start, end));
-  }, [page, clients]);
+    const filteredClients = filterClientsByName(clients, searchText);
+    const totalPages = calculateTotalPages(filteredClients, itemsPerPage);
+    setVisibleClients(paginateClients(filteredClients, page, itemsPerPage));
+  }, [clients, searchText, page]);
 
   const handleSearch = () => {
     if (searchText.length > 0 && searchText.length < 3) {
       alert('Por favor ingrese al menos tres letras para buscar');
       return;
     }
-    setSearchClient(searchText);
+    // setSearchClient(searchText) // Reemplazar por setSearchText
     const filteredClients = clients.filter(client =>
       client.nom_cli.toLowerCase().includes(searchText.toLowerCase())
     );
@@ -65,10 +79,8 @@ const ListClients = () => {
   };
 
   const renderPaginationButtons = () => {
-    const filteredClients = clients.filter(client =>
-      client.nom_cli.toLowerCase().includes(searchClient.toLowerCase())
-    );
-    const totalPages = Math.ceil(filteredClients.length / itemsPerPage);
+    const filteredClients = filterClientsByName(clients, searchText);
+    const totalPages = calculateTotalPages(filteredClients, itemsPerPage);
 
     let buttons = [];
     let startPage = Math.max(1, page - 2);
@@ -101,10 +113,10 @@ const ListClients = () => {
             placeholder='Buscar'
             style={styles.textInput}
             value={searchText}
-            onChangeText={(text) => setSearchText(text)} // Update searchText instead of searchClient
+            onChangeText={(text) => setSearchText(text)}
           />
           <Pressable style={styles.botonSearch} onPress={handleSearch}>
-            <FontAwesome name="search" size={24} color="#FFF"/>
+            <FontAwesome5 name="search" size={24} color="#FFF"/>
           </Pressable>
         </View>
       </View>
@@ -133,7 +145,10 @@ const ListClients = () => {
         <ClientModal
           isVisibleClientModal={isClientModalVisible}
           selectedClient={selectedClient}
-          onClose={() => setIsClientModalVisible(false)}
+          onClose={() => {
+            setIsClientModalVisible(false);
+            setSelectedClient(null); // Reiniciar selectedClient
+          }}
         />
       )}
     </View>

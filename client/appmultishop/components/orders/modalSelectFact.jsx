@@ -4,7 +4,7 @@ import styles from '../../styles/ModalSelectFact.styles'
 
 const ModalSelectFact = ({ isVisible, onClose, onSelect }) => {
   return (
-    <Modal visible={isVisible} animationType="slide" transparent={true}>
+    <Modal visible={isVisible} animationType="fade" transparent={true}>
       <View style={styles.modalContainer}>
         <View style={styles.container}>
           <Text style={styles.modalTitle}>Seleccionar Tipo de Factura</Text>
