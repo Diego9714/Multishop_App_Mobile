@@ -14,3 +14,4 @@ export const DB_NAME                   = process.env.NAME
 
 // Users
 export const REGISTER_ORDER            = process.env.REGISTER_ORDER
+export const REGISTER_VISIT            = process.env.REGISTER_VISIT

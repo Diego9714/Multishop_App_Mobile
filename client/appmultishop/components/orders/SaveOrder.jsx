@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import ModalSelectFact from './modalSelectFact';
 import ModalEditProd from './modalEditProd';
 import styles from '../../styles/SaveOrder.styles';
-import Orders from '../../app/(tabs)/Orders';
+import Home from '../../app/(tabs)/Home';
 
 const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDeleteProduct }) => {
   const [isProductModalVisible, setIsProductModalVisible] = useState(false);
@@ -112,7 +112,7 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
       orders.push(orderData);
       await AsyncStorage.setItem('OrdersClient', JSON.stringify(orders));
   
-      handlePress(Orders);
+      handlePress(Home);
     } catch (error) {
       console.error('Error saving order:', error);
     }

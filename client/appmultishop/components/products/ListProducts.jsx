@@ -9,6 +9,7 @@ import styles from '../../styles/ListProducts.styles'
 const ListProducts = () => {
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
+  const [brands, setBrands] = useState([])
   const [visibleProducts, setVisibleProducts] = useState([])
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false)
@@ -27,6 +28,10 @@ const ListProducts = () => {
       const categoriesInfo = await AsyncStorage.getItem('categories')
       const categoriesJson = JSON.parse(categoriesInfo)
       setCategories(categoriesJson || [])
+
+      const brandsInfo = await AsyncStorage.getItem('brands')
+      const brandsJson = JSON.parse(brandsInfo)
+      setBrands(brandsJson || [])
     }
     getProductsAndCategories()
   }, [])

@@ -25,6 +25,7 @@ const Home = () => {
           const clientsStored = await AsyncStorage.getItem('clients')
           const productsStored = await AsyncStorage.getItem('products')
           const categoriesStored = await AsyncStorage.getItem('categories')
+          const brandsStored = await AsyncStorage.getItem('brands')
 
           if (!clientsStored) {
             getClients(cod_ven)
@@ -34,6 +35,9 @@ const Home = () => {
           }
           if (!categoriesStored) {
             getCategories()
+          }
+          if (!brandsStored) {
+            getBrands()
           }
         }
       } catch (error) {
@@ -70,6 +74,16 @@ const Home = () => {
       await AsyncStorage.setItem('categories', JSON.stringify(listCategories))
     } catch (error) {
       console.error('Error al obtener las categorías:', error)
+    }
+  }
+
+  const getBrands = async () => {
+    try {
+      const res = await instanceProducts.get(`/api/brands`)
+      let listBrands = res.data.brands
+      await AsyncStorage.setItem('brands', JSON.stringify(listBrands))
+    } catch (error) {
+      console.error('Error al obtener las marcas:', error)
     }
   }
 

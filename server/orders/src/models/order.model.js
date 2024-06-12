@@ -3,66 +3,82 @@ import { pool }   from '../connection/mysql.connect.js'
 export class Orders {
   static async saveOrder(order) {
     try {
-      let msg = {
-        status: false,
-        msg: "This order already exists",
-        code: 400
-      }
-
-      for( const info of order){
-
-        const connection = await pool.getConnection()
-
-        let sql = 'INSERT INTO preorder (cod_cli, cod_ven, fecha, tip_doc) VALUES (? , ? , ? , ?) ;'
-        let [order] = await connection.execute(sql,[cod_cli, cod_ven, fecha, tip_doc])
-
-        const id_order = order.insertId
-
-        for (const pedido of grupoPedido) {
-          const saveArt = `INSERT INTO loatdpedidos (idpedido, codart, canart, preart, monimp, poriva, subtota, fecped, adddat) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-          await connection.execute(saveArt, [idpedido, pedido.codart, pedido.cantidad, pedido.preve1, pedido.iva, pedido.monimp, pedido.factura, fecped, adddat])
-        }
-
-        msg = {
-          code: 200,
-          status: true,
-          msg: 'The Order registered successfully'
-        }
-      }
-
-      // const connection = await pool.getConnection()
-
-      // let sql = 'SELECT ced_ven FROM diariov WHERE user_vend = ?;'
-      // let [user] = await connection.execute(sql,[username])
-      
-      // connection.release()
-
-      // if(user) {        
-      //   let isMatch = await bcrypt.compare(password, user[0].pass_vend)
-
-      //   let userToken = {
-      //     cod_ven : user[0].cod_ven,
-      //     user_ven : user[0].user_ven,
-      //     nom_ven : user[0].nom_ven,
-      //     ced_ven : user[0].ced_ven
-      //   }
-        
-      //   let tokenUser
-
-      //   if(isMatch){
-          
-      //     tokenUser = await createAccessToken(userToken)
-
-      //     msg = {
-      //       status: true,
-      //       msg: "User Found",
-      //       code: 200,
-      //       tokenUser
-      //     } 
-      //   }
-      // }
+      let orderCompleted = []
+      let orderNotCompleted = []
   
-      return msg
+      for (const info of order) {
+        const { id_scli, cod_cli, cod_ven, totalUsd, totalBs, tip_doc, fecha, products } = info
+  
+        const connection = await pool.getConnection()
+  
+        const existingOrder = `SELECT id_order FROM preorder WHERE cod_cli = ? AND cod_ven = ? AND amountUsd = ? AND amountBs = ? AND tip_doc = ?;`
+        const [checkOrder] = await connection.execute(existingOrder, [cod_cli, cod_ven, totalUsd.toFixed(2), totalBs.toFixed(2), tip_doc])
+  
+        if (checkOrder.length > 0) {
+          orderNotCompleted.push(info)
+        } else {
+          let sql = 'INSERT INTO preorder (id_scli, cod_cli, cod_ven, amountUsd, amountBs, tip_doc, date_created) VALUES (?, ?, ?, ?, ?, ?, ?);'
+          let [order] = await connection.execute(sql, [id_scli, cod_cli, cod_ven, totalUsd, totalBs, tip_doc, fecha])
+  
+          const id_order = order.insertId
+  
+          for (const prod of products) {
+            const { codigo, cantidad, descrip, existencia, precioBs, precioUsd } = prod
+  
+            const saveProd = `INSERT INTO prodorder (id_order, codigo, descrip, quantity, priceUsd, priceBs, date_created) VALUES (?, ?, ?, ?, ?, ?, ?)`
+            await connection.execute(saveProd, [id_order, codigo, descrip, cantidad, precioUsd, precioBs, fecha])
+          }
+  
+          orderCompleted.push(info)
+        }
+  
+        connection.release();
+      }
+  
+      return {
+        code: 200,
+        status: true,
+        msg: 'Orders processed',
+        completed: orderCompleted,
+        notCompleted: orderNotCompleted
+      }
+    } catch (error) {
+      return error
+    }
+  }
+
+  static async saveVisits(visits) {
+    try {
+      let visitsCompleted = []
+      let visitsNotCompleted = []
+  
+      for (const info of visits) {
+        const { id_scli, cod_cli, nom_cli, cod_ven, fecha } = info
+  
+        const connection = await pool.getConnection()
+  
+        const existingVisit = `SELECT id_visit FROM visits WHERE id_scli = ? AND cod_cli = ? AND cod_ven = ? AND date_created = ?;`
+        const [checkVisit] = await connection.execute(existingVisit, [id_scli, cod_cli, cod_ven, fecha])
+
+        if (checkVisit.length > 0) {
+          visitsNotCompleted.push(info)
+        } else {
+          let sql = 'INSERT INTO visits (cod_ven, id_scli, cod_cli, nom_cli, date_created) VALUES (?, ?, ?, ?, ?);'
+          await connection.execute(sql, [cod_ven, id_scli, cod_cli, nom_cli, fecha])
+  
+          visitsCompleted.push(info)
+        }
+  
+        connection.release()
+      }
+  
+      return {
+        code: 200,
+        status: true,
+        msg: 'Visits processed',
+        completed: visitsCompleted,
+        notCompleted: visitsNotCompleted
+      }
     } catch (error) {
       return error
     }

@@ -4,7 +4,6 @@ import Navbar           from '../../components/Navbar'
 // Components
 import SelectOrders     from '../../components/orders/SelectOrders'
 
-
 const Orders = () => {
   return (
     <View>
