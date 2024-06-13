@@ -6,31 +6,35 @@ const ModalSelectOrder = ({ isVisible, onClose, onSelect, selectedOrder }) => {
 
   const handleModalSelect = async (action) => {
     if (action === 'Eliminar' && selectedOrder) {
-      // Aquí se maneja la lógica para eliminar el pedido
       onSelect('Eliminar', selectedOrder);
-    } else if (action === 'Editar') {
-      // Aquí se maneja la lógica para editar el pedido
+    } else if (action === 'Editar' && selectedOrder) {
       onSelect('Editar', selectedOrder);
+      console.log(selectedOrder)
     }
     
     onClose();
   };
 
   return (
-    <Modal visible={isVisible} animationType="slide" transparent={true}>
-      <View style={styles.modalContainer}>
-        <View style={styles.container}>
-          <Pressable style={styles.modalButton} onPress={() => handleModalSelect('Eliminar')}>
-            <Text style={styles.modalButtonText}>Eliminar</Text>
-          </Pressable>
-          <Pressable style={styles.modalButton} onPress={() => handleModalSelect('Editar')}>
-            <Text style={styles.modalButtonText}>Editar</Text>
-          </Pressable>
-          <Pressable onPress={onClose} style={styles.closeButton}>
-            <Text style={styles.modalButtonText}>Salir</Text>
-          </Pressable>
+    <Modal visible={isVisible && !!selectedOrder} animationType="slide" transparent={true}>
+      {selectedOrder && (
+        <View style={styles.modalContainer}>
+          <View style={styles.container}>
+            <Text style={styles.modalTitle}>{selectedOrder.nom_cli}</Text>
+            <Text style={styles.modalTitle}>{selectedOrder.totalUsd}$</Text>
+
+            <Pressable style={styles.modalButton} onPress={() => handleModalSelect('Eliminar')}>
+              <Text style={styles.modalButtonText}>Eliminar</Text>
+            </Pressable>
+            <Pressable style={styles.modalButton} onPress={() => handleModalSelect('Editar')}>
+              <Text style={styles.modalButtonText}>Editar</Text>
+            </Pressable>
+            <Pressable onPress={onClose} style={styles.closeButton}>
+              <Text style={styles.modalButtonText}>Salir</Text>
+            </Pressable>
+          </View>
         </View>
-      </View>
+      )}
     </Modal>
   );
 }

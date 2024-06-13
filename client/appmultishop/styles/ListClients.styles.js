@@ -4,28 +4,60 @@ const styles = StyleSheet.create({
   list: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#fff',
-    position: 'relative',
-    zIndex: 1, // Asegura que el componente esté en la capa superior
+    backgroundColor: '#fff'
   },
   titlePage:{
-    height: 150,
     alignItems: "center"
   },
   title: {
     marginTop: 20,
     fontSize: 20,
-    fontWeight: "400",
+    fontWeight: "400"
   },
+
+  finderContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: "90%",
+    backgroundColor: '#5B97DC',
+    paddingRight: 15,
+    borderRadius: 15,
+    margin: 15,
+  },
+  seekerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EFEFEF',
+    width: "75%",
+    borderRadius: 15,
+    paddingHorizontal: 10,
+  },
+  seeker: {
+    padding: 5,
+    height: 50,
+    borderRadius: 15,
+    width: "85%",
+    textAlign: 'justify'
+  },
+  filterContainer:{
+    width: '22%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 5
+  },
+  textFilter:{
+    color:'white'
+  },
+
   ViewTextInput: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: "90%",
     backgroundColor: '#EFEFEF',
-    // paddingVertical: 5,
-    paddingHorizontal: 10,
+    width: "90%",
     borderRadius: 15,
-    margin: '2%',
+    paddingHorizontal: 10,
   },
   textInput: {
     padding: 10,
@@ -35,10 +67,11 @@ const styles = StyleSheet.create({
     textAlign: 'justify'
   },
   botonSearch:{
-    backgroundColor: '#64a8d6',
-    padding: 15,
-    borderTopRightRadius: 20,
-    borderBottomRightRadius: 20,
+    // backgroundColor: '#64a8d6',
+    // padding: 12,
+    // marginRight: 20,
+    // borderTopRightRadius: 20,
+    // borderBottomRightRadius: 20,
   },
   container: {
     backgroundColor: '#EFEFEF',

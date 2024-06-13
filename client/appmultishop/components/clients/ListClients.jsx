@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Text, View, FlatList, Pressable, TextInput, ScrollView } from 'react-native';
-import { FontAwesome5 } from '@expo/vector-icons'; // Importar FontAwesome5
+import { Text, View, FlatList, Pressable, TextInput, ScrollView, TouchableOpacity } from 'react-native';
+import { FontAwesome5 , MaterialIcons } from '@expo/vector-icons'; // Importar FontAwesome5
 import { useFocusEffect } from '@react-navigation/native';
 import styles from '../../styles/ListClients.styles';
 import ClientModal from './ClientModal';
@@ -108,18 +108,39 @@ const ListClients = () => {
     <View style={styles.list}>
       <View style={styles.titlePage}>
         <Text style={styles.title}>Clientes</Text>
-        <View style={styles.ViewTextInput}>
+      </View>
+
+      {/* <View style={styles.ViewTextInput}>
+        <TextInput
+          placeholder='Buscar'
+          style={styles.textInput}
+          value={searchText}
+          onChangeText={(text) => setSearchText(text)}
+        />
+        <Pressable style={styles.botonSearch} onPress={handleSearch}>
+          <FontAwesome5 name="search" size={24} color="#FFF"/>
+        </Pressable>
+      </View> */}
+
+
+      <View style={styles.finderContainer}>
+        <View style={styles.seekerContainer}>
           <TextInput
             placeholder='Buscar'
-            style={styles.textInput}
+            style={styles.seeker}
             value={searchText}
             onChangeText={(text) => setSearchText(text)}
           />
           <Pressable style={styles.botonSearch} onPress={handleSearch}>
-            <FontAwesome5 name="search" size={24} color="#FFF"/>
+            <FontAwesome5 name="search" size={24} color="#8B8B8B"/>
           </Pressable>
         </View>
+        <TouchableOpacity style={styles.filterContainer}>
+          <Text style={styles.textFilter}>Filtrar</Text>
+          <MaterialIcons name="filter-alt" size={28} color="white" />
+        </TouchableOpacity>
       </View>
+
 
       <View style={styles.container}>
         <View style={styles.headerContainer}>

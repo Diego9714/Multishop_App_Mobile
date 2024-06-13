@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Text, View, Pressable, ScrollView } from 'react-native';
+import { Text, View, Pressable, ScrollView, Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import styles from '../../styles/SelectOrders.styles';
 import ModalSelectOrder from './ModalSelectOrder';
+import EditOrder from '../editOrder/EditOrder';
 
 const SelectOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -13,6 +14,7 @@ const SelectOrders = () => {
   const [selectedOrders, setSelectedOrders] = useState({});
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false); // Estado para el modal EditOrder
   const [isLoaded, setIsLoaded] = useState(false);
   const itemsPerPage = 10;
 
@@ -20,8 +22,11 @@ const SelectOrders = () => {
     try {
       const storedOrdersString = await AsyncStorage.getItem('OrdersClient');
       const parsedOrders = storedOrdersString ? JSON.parse(storedOrdersString) : [];
+      console.log("parsedOrders")
+      console.log(parsedOrders)
+      console.log(parsedOrders[0].products)
       setStoredOrders(parsedOrders);
-      setIsLoaded(true); // Marcar como cargado
+      setIsLoaded(true);
     } catch (error) {
       console.error('Error fetching orders:', error);
     }
@@ -42,16 +47,10 @@ const SelectOrders = () => {
       } catch (error) {
         console.error('Error fetching orders:', error);
       }
-    }, 5000); // Check for updates every 5 seconds
+    }, 5000);
 
     return () => clearInterval(intervalId);
-  }, [isLoaded, storedOrders]); // Include isLoaded in the dependency array
-
-  useEffect(() => {
-    if (JSON.stringify(storedOrders) !== JSON.stringify(orders)) {
-      setOrders(storedOrders);
-    }
-  }, [storedOrders]);
+  }, [isLoaded, storedOrders]);
 
   useEffect(() => {
     if (JSON.stringify(storedOrders) !== JSON.stringify(orders)) {
@@ -80,7 +79,7 @@ const SelectOrders = () => {
       delete updatedSelectedOrders[order.cod_cli];
     } else {
       order.selected = true;
-      updatedSelectedOrders[order.cod_cli] = 1; // Establecer cantidad por defecto a 1
+      updatedSelectedOrders[order.cod_cli] = 1;
     }
 
     setSelectedOrders(updatedSelectedOrders);
@@ -92,13 +91,12 @@ const SelectOrders = () => {
   const synchronizeOrders = () => {
     const ordersToSync = orders.filter(order => selectedOrders[order.cod_cli]);
     console.log('Orders to synchronize:', ordersToSync);
-    // Aquí puedes agregar la lógica para sincronizar los pedidos
   };
 
   const renderPaginationButtons = () => {
     const numberOfPages = Math.ceil(orders.length / itemsPerPage);
     let buttons = [];
-    for (let i = 1; i <= numberOfPages; i++) {
+    for (let i = 1 ; i <= numberOfPages ; i++) {
       buttons.push(
         <Pressable
           key={i}
@@ -114,7 +112,7 @@ const SelectOrders = () => {
 
   const handleOrderDetails = (order) => {
     setSelectedOrder(order);
-    setModalVisible(true); // Solo abre el modal cuando se selecciona un pedido
+    setModalVisible(true);
   };
 
   const handleModalSelect = async (action, product) => {
@@ -129,19 +127,15 @@ const SelectOrders = () => {
         console.error('Error deleting order:', error);
       }
     } else if (action === 'Editar') {
-      // Aquí puedes agregar la lógica para editar el pedido
-      console.log('Edit action for order:', selectedOrder);
-      setModalVisible(true); // Abre el modal de edición
-      setSelectedProduct(product); // Establece el producto seleccionado en el estado
+      setModalVisible(false);
+      setEditModalVisible(true); // Abre el modal EditOrder
     }
-  
-    setModalVisible(false);
   };
 
   return (
     <View style={styles.mainContainer}>
-      <View style={styles.mainTitleContainer}>
-        <Text style={styles.mainTitle}>Pedidos por Sincronizar</Text>
+      <View style={styles.titlePage}>
+        <Text style={styles.title}>Pedidos por Sincronizar</Text>
       </View>
 
       <View style={styles.listOrderContainer}>
@@ -169,16 +163,14 @@ const SelectOrders = () => {
                     onPress={() => handleOrderSelection(order)}
                   >
                     {order.selected ? (
-                      // <Ionicons name="remove-outline" size={30} color="black" />
                       <MaterialIcons name="check-box" size={32} color="#7A7A7B" />
                     ) : (
-                      // <Ionicons name="add-outline" size={30} color="black" />
                       <MaterialIcons name="check-box-outline-blank" size={32} color="#7A7A7B" />
                     )}
                   </Pressable>
                   <Pressable
                     style={styles.button}
-                    onPress={() => handleOrderDetails(order)} // Modificación aquí
+                    onPress={() => handleOrderDetails(order)}
                   >
                     <Ionicons name="information-circle-sharp" size={34} color="#7A7A7B" />
                   </Pressable>
@@ -205,7 +197,7 @@ const SelectOrders = () => {
           <MaterialCommunityIcons 
             name="cloud-upload" 
             size={35} 
-                      color="#f1f1f1"
+            color="#f1f1f1"
           />
         </Pressable>
       </View>
@@ -214,8 +206,24 @@ const SelectOrders = () => {
         isVisible={modalVisible} 
         onClose={() => setModalVisible(false)} 
         onSelect={handleModalSelect} 
-        selectedOrder={selectedOrder} // Pasa el pedido seleccionado al modal
+        selectedOrder={selectedOrder} 
       />
+
+      {/* Modal para editar el pedido */}
+      <Modal
+        visible={editModalVisible}
+        onRequestClose={() => setEditModalVisible(false)}
+        animationType="slide"
+      >
+      </Modal>
+      
+      {selectedOrder && (
+        <EditOrder
+          isVisible={editModalVisible}
+          selectedOrder={selectedOrder}
+          onClose={() => setEditModalVisible(false)}
+        />
+    ) }
     </View>
   );
 };

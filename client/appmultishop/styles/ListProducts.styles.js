@@ -172,7 +172,6 @@ const styles = StyleSheet.create({
   },
   textModal: {
     padding: 12,
-    height: "%10",
     borderRadius: 15,
     width: "90%",
     textAlign: "center"

@@ -7,23 +7,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: "center"
   },
-  mainTitleContainer: {
-    width: '100%',
-    height: '7%',
-    alignItems: 'center',
-    marginBottom: 5
+  titlePage: {
+    height: '6%',
+    alignItems: "center",
+    marginBottom: 20
   },
-  mainTitle: {
-    fontSize: 18,
-    color: '#000000',
-    textAlign: 'center',
+  title: {
     marginTop: 20,
-  },
-  finderContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 10,
+    fontSize: 20,
+    fontWeight: "400"
   },
   listOrderContainer: {
     height: "57%",
@@ -38,6 +30,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
     color: '#fff',
+    marginBottom: 20
   },
   titleListContainer: {
     display: "flex",
@@ -51,27 +44,30 @@ const styles = StyleSheet.create({
     color: 'white',
     width: '30%',
     textAlign: 'center',
-    // backgroundColor: 'black'
   },
   titleListPrice: {
     color: 'white',
     width: '30%',
     textAlign: 'center',
-    // backgroundColor: 'black'
+
   },
   titleListActions: {
     color: 'white',
     width: '20%',
     textAlign: 'center',
-    // backgroundColor: 'black'
+  },
+  listContainer: {
+    marginHorizontal: 10,
+    height: '100%',
   },
   orderItem: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     alignItems: 'center',
+    borderBottomColor: "#f1f1f1",
+    borderBottomWidth: 2,
     paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    margin: 1
   },
   nameProd: {
     color: 'white',
@@ -99,9 +95,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     color: '#999',
   },
-  pagination: {
-    marginTop: 0,
-  },
+
   buttonsAction: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -119,6 +113,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginRight: 10,
   },
+  
   paginationContainer: {
     width: '90%',
     flexDirection: 'row',
@@ -127,11 +122,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   pageButton: {
-    height: '22%',
     padding: 10,
     margin: 5,
     backgroundColor: '#ddd',
     borderRadius: 100,
+    color: '#fff'
   },
   pageButtonActive: {
     backgroundColor: '#5B97DC',

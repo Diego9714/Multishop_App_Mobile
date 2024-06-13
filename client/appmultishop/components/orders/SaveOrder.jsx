@@ -95,7 +95,7 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
       products: products.map(product => ({
         codigo: product.codigo,
         descrip: product.descrip,
-        // exists: product.exists - product.quantity, // actualiza existencia (eliminado)
+        exists: product.exists,
         quantity: product.quantity,
         priceUsd: product.priceUsd,
         priceBs: product.priceBs,

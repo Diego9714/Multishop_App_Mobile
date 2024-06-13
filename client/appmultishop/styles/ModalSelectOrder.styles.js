@@ -9,7 +9,6 @@ const styles = StyleSheet.create({
   },
   container: {
     backgroundColor: '#FFFFFF',
-    height: '35%',
     width: '60%',
     borderRadius: 10,
     display: 'flex',
@@ -21,7 +20,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: '#333',
     marginBottom: 10,
-    textAlign: 'center'
+    textAlign: 'center',
+    fontWeight: 'bold'
   },
   modalButton: {
     width: 150,

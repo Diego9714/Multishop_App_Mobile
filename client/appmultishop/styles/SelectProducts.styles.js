@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
   },
   // LISTA DE PRODUCTOS
   productContainer:{
-    height: "60%",
+    height: "56%",
     width: "90%",
     // margin: 50,
     backgroundColor: "#fff",
@@ -185,8 +185,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
   },
   nameProd: {
     width: '45%'
@@ -212,15 +210,13 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   pagination: {
-    height: '8%',
-    width: '90%',
+    // height: '8%',
+    width: '100%',
     flexDirection: 'row',
-    marginHorizontal: '5%',
-    paddingHorizontal: '20%', 
-    paddingVertical: 10,
+    paddingHorizontal: '24%', 
+    paddingVertical: 10
   },
   pageButton: {
-    height: '90%',
     padding: 10,
     margin: 5,
     backgroundColor: '#ddd',
