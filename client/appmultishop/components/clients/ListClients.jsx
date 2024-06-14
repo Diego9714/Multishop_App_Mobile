@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Text, View, FlatList, Pressable, TextInput, ScrollView, TouchableOpacity } from 'react-native';
-import { FontAwesome5 , MaterialIcons } from '@expo/vector-icons'; // Importar FontAwesome5
+import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import styles from '../../styles/ListClients.styles';
 import ClientModal from './ClientModal';
@@ -15,13 +15,16 @@ const ListClients = () => {
   const [clients, setClients] = useState([]);
   const [visibleClients, setVisibleClients] = useState([]);
   const [isClientModalVisible, setIsClientModalVisible] = useState(false);
-  const [searchText, setSearchText] = useState(''); // New state for search text
+  const [searchText, setSearchText] = useState('');
+  const [displaySearchText, setDisplaySearchText] = useState('');
   const [page, setPage] = useState(1);
   const [selectedClient, setSelectedClient] = useState(null);
   const itemsPerPage = 10;
+  const defaultMaxPages = 5;
 
   const resetStates = () => {
     setSearchText('');
+    setDisplaySearchText('');
     setPage(1);
     setSelectedClient(null);
     setIsClientModalVisible(false);
@@ -39,22 +42,17 @@ const ListClients = () => {
   );
 
   useEffect(() => {
-    const filteredClients = filterClientsByName(clients, searchText);
-    const totalPages = calculateTotalPages(filteredClients, itemsPerPage);
+    const filteredClients = filterClientsByName(clients, displaySearchText);
     setVisibleClients(paginateClients(filteredClients, page, itemsPerPage));
-  }, [clients, searchText, page]);
+  }, [clients, displaySearchText, page]);
 
   const handleSearch = () => {
     if (searchText.length > 0 && searchText.length < 3) {
       alert('Por favor ingrese al menos tres letras para buscar');
       return;
     }
-    // setSearchClient(searchText) // Reemplazar por setSearchText
-    const filteredClients = clients.filter(client =>
-      client.nom_cli.toLowerCase().includes(searchText.toLowerCase())
-    );
+    setDisplaySearchText(searchText);
     setPage(1);
-    setVisibleClients(filteredClients.slice(0, itemsPerPage));
   };
 
   const renderElements = ({ item }) => {
@@ -79,12 +77,13 @@ const ListClients = () => {
   };
 
   const renderPaginationButtons = () => {
-    const filteredClients = filterClientsByName(clients, searchText);
+    const filteredClients = filterClientsByName(clients, displaySearchText);
     const totalPages = calculateTotalPages(filteredClients, itemsPerPage);
 
     let buttons = [];
+    let maxPagesToShow = displaySearchText ? totalPages : Math.min(totalPages, defaultMaxPages);
     let startPage = Math.max(1, page - 2);
-    let endPage = Math.min(totalPages, startPage + 4);
+    let endPage = Math.min(maxPagesToShow, startPage + 4);
 
     if (endPage - startPage < 4) {
       startPage = Math.max(1, endPage - 4);
@@ -110,19 +109,6 @@ const ListClients = () => {
         <Text style={styles.title}>Clientes</Text>
       </View>
 
-      {/* <View style={styles.ViewTextInput}>
-        <TextInput
-          placeholder='Buscar'
-          style={styles.textInput}
-          value={searchText}
-          onChangeText={(text) => setSearchText(text)}
-        />
-        <Pressable style={styles.botonSearch} onPress={handleSearch}>
-          <FontAwesome5 name="search" size={24} color="#FFF"/>
-        </Pressable>
-      </View> */}
-
-
       <View style={styles.finderContainer}>
         <View style={styles.seekerContainer}>
           <TextInput
@@ -140,7 +126,6 @@ const ListClients = () => {
           <MaterialIcons name="filter-alt" size={28} color="white" />
         </TouchableOpacity>
       </View>
-
 
       <View style={styles.container}>
         <View style={styles.headerContainer}>
@@ -168,7 +153,7 @@ const ListClients = () => {
           selectedClient={selectedClient}
           onClose={() => {
             setIsClientModalVisible(false);
-            setSelectedClient(null); // Reiniciar selectedClient
+            setSelectedClient(null);
           }}
         />
       )}

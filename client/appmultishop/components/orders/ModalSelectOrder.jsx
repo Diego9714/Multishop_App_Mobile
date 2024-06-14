@@ -21,7 +21,7 @@ const ModalSelectOrder = ({ isVisible, onClose, onSelect, selectedOrder }) => {
         <View style={styles.modalContainer}>
           <View style={styles.container}>
             <Text style={styles.modalTitle}>{selectedOrder.nom_cli}</Text>
-            <Text style={styles.modalTitle}>{selectedOrder.totalUsd}$</Text>
+            <Text style={styles.modalTitle}>{selectedOrder.totalUsd.toFixed(2)}$</Text>
 
             <Pressable style={styles.modalButton} onPress={() => handleModalSelect('Eliminar')}>
               <Text style={styles.modalButtonText}>Eliminar</Text>

@@ -155,7 +155,7 @@ const SelectOrders = () => {
                   <Text>{order.nom_cli}</Text>
                 </View>
                 <View style={styles.priceContainer}>
-                  <Text>{order.totalUsd} $</Text>
+                <Text>{order.totalUsd.toFixed(2)} $</Text>
                 </View>
                 <View style={styles.buttonAction}>
                   <Pressable

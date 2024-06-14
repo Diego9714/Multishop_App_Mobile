@@ -1,47 +1,49 @@
-import React, { useState, useEffect } from 'react'
-import { Text, View, FlatList, Pressable, TextInput, ScrollView, TouchableOpacity } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { AntDesign, MaterialIcons, Ionicons, FontAwesome } from '@expo/vector-icons'
-import ModalProducts from './ModalProducts'
-import FilterCategories from '../FilterCategories'
-import styles from '../../styles/ListProducts.styles'
+import React, { useState, useEffect } from 'react';
+import { Text, View, FlatList, Pressable, TextInput, ScrollView, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AntDesign, MaterialIcons, Ionicons, FontAwesome } from '@expo/vector-icons';
+import ModalProducts from './ModalProducts';
+import FilterCategories from '../FilterCategories';
+import styles from '../../styles/ListProducts.styles';
 
 const ListProducts = () => {
-  const [products, setProducts] = useState([])
-  const [categories, setCategories] = useState([])
-  const [brands, setBrands] = useState([])
-  const [visibleProducts, setVisibleProducts] = useState([])
-  const [isModalVisible, setIsModalVisible] = useState(false)
-  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false)
-  const [searchProduct, setSearchProduct] = useState('')
-  const [searchCategory, setSearchCategory] = useState('')
-  const [page, setPage] = useState(1)
-  const [selectedProduct, setSelectedProduct] = useState(null)
-  const itemsPerPage = 10
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [visibleProducts, setVisibleProducts] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+  const [searchProduct, setSearchProduct] = useState('');
+  const [displaySearchProduct, setDisplaySearchProduct] = useState('');
+  const [searchCategory, setSearchCategory] = useState('');
+  const [page, setPage] = useState(1);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const itemsPerPage = 10;
+  const defaultMaxPages = 5;
 
   useEffect(() => {
     const getProductsAndCategories = async () => {
-      const productsInfo = await AsyncStorage.getItem('products')
-      const productsJson = JSON.parse(productsInfo)
-      setProducts(productsJson || [])
+      const productsInfo = await AsyncStorage.getItem('products');
+      const productsJson = JSON.parse(productsInfo);
+      setProducts(productsJson || []);
 
-      const categoriesInfo = await AsyncStorage.getItem('categories')
-      const categoriesJson = JSON.parse(categoriesInfo)
-      setCategories(categoriesJson || [])
+      const categoriesInfo = await AsyncStorage.getItem('categories');
+      const categoriesJson = JSON.parse(categoriesInfo);
+      setCategories(categoriesJson || []);
 
-      const brandsInfo = await AsyncStorage.getItem('brands')
-      const brandsJson = JSON.parse(brandsInfo)
-      setBrands(brandsJson || [])
-    }
-    getProductsAndCategories()
-  }, [])
+      const brandsInfo = await AsyncStorage.getItem('brands');
+      const brandsJson = JSON.parse(brandsInfo);
+      setBrands(brandsJson || []);
+    };
+    getProductsAndCategories();
+  }, []);
 
   useEffect(() => {
     let filteredProducts = products;
 
-    if (searchProduct.length >= 3) {
+    if (displaySearchProduct.length >= 3) {
       filteredProducts = filteredProducts.filter(product =>
-        product.descrip.toLowerCase().includes(searchProduct.toLowerCase())
+        product.descrip.toLowerCase().includes(displaySearchProduct.toLowerCase())
       );
     }
 
@@ -54,7 +56,16 @@ const ListProducts = () => {
     const start = (page - 1) * itemsPerPage;
     const end = page * itemsPerPage;
     setVisibleProducts(filteredProducts.slice(start, end));
-  }, [page, products, searchProduct, searchCategory]);
+  }, [page, products, displaySearchProduct, searchCategory]);
+
+  const handleSearch = () => {
+    if (searchProduct.length > 0 && searchProduct.length < 3) {
+      alert('Por favor ingrese al menos tres letras para buscar');
+      return;
+    }
+    setDisplaySearchProduct(searchProduct);
+    setPage(1);
+  };
 
   const renderElements = ({ item }) => {
     return (
@@ -66,27 +77,33 @@ const ListProducts = () => {
           <Pressable
             style={styles.button}
             onPress={() => {
-              setSelectedProduct(item)
-              setIsModalVisible(true)
+              setSelectedProduct(item);
+              setIsModalVisible(true);
             }}
           >
-            {/* <Ionicons name="add-outline" size={30} color="black" /> */}
-            {/* <MaterialIcons name="info-outline" size={30} color="black" /> */}
-            {/* <Ionicons name="information-circle-sharp" size={34} color="#515151" /> */}
             <Ionicons name="information" size={34} color="#515151" />
           </Pressable>
         </View>
       </View>
-    )
-  }
+    );
+  };
 
   const renderPaginationButtons = () => {
-    const itemsPerPage = 10
-    const totalItems = 50
-    const totalPages = Math.ceil(totalItems / itemsPerPage)
-  
-    let buttons = []
-    for (let i = 1; i <= totalPages; i++) { // Usar totalPages directamente
+    const filteredProducts = products.filter(product =>
+      product.descrip.toLowerCase().includes(displaySearchProduct.toLowerCase())
+    );
+    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+
+    let buttons = [];
+    let maxPagesToShow = displaySearchProduct ? totalPages : Math.min(totalPages, defaultMaxPages);
+    let startPage = Math.max(1, page - 2);
+    let endPage = Math.min(maxPagesToShow, startPage + 4);
+
+    if (endPage - startPage < 4) {
+      startPage = Math.max(1, endPage - 4);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
       buttons.push(
         <Pressable
           key={i}
@@ -98,7 +115,7 @@ const ListProducts = () => {
       );
     }
     return buttons;
-  }
+  };
 
   const openFilterModal = () => {
     setIsFilterModalVisible(true);
@@ -120,12 +137,11 @@ const ListProducts = () => {
             placeholder='Buscar Producto'
             style={styles.seeker}
             value={searchProduct}
-            onChangeText={(text) => {
-              setSearchProduct(text);
-              setPage(1);
-            }}
+            onChangeText={(text) => setSearchProduct(text)}
           />
-          <FontAwesome name="search" size={28} color="#8B8B8B" />
+          <Pressable onPress={handleSearch}>
+            <FontAwesome name="search" size={28} color="#8B8B8B" />
+          </Pressable>
         </View>
         <TouchableOpacity onPress={openFilterModal} style={styles.filterContainer}>
           <Text style={styles.textFilter}>Filtrar</Text>

@@ -137,8 +137,19 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     // backgroundColor: 'black'
   },
+  containerTitlePrice:{
+    width: '100%',
+    // backgroundColor: 'black',
+    textAlign: 'left'
+  },
+  titelPrice: {
+    marginTop: 10,
+    fontSize: 20,
+    alignItems: 'left',
+  },
   textPrice: {
     marginTop: 10,
+    fontSize: 15,
   },
   containerNote: {
     width: '90%',

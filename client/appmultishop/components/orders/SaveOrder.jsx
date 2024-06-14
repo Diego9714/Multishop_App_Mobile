@@ -182,13 +182,15 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
           </View>
           
           <View style={styles.containerPrice}>
-            <Text style={styles.textPrice}>Total: </Text>
-            <Text style={styles.textPrice}>USD :  {totalPriceUsd}</Text>
-            <Text style={styles.textPrice}>BS : {totalPriceBs}</Text>
+            <View style={styles.containerTitlePrice}>
+              <Text style={styles.titelPrice}>Total</Text>
+            </View>
+            <Text style={styles.textPrice}>USD : {totalPriceUsd}</Text>
+            <Text style={styles.textPrice}>Bs. : {totalPriceBs}</Text>
           </View>
 
           <View style={styles.containerNote}>
-            <Text style={styles.noteOrder}>Nota: Esta pre orden es considerada un presupuesto, por lo tanto los precios estan sujetos a cambios sin previo aviso.</Text>
+            <Text style={styles.noteOrder}>Nota: Esta pre orden es considerada un presupuesto, por lo tanto los precios y las existencias estan sujetas a cambios sin previo aviso.</Text>
           </View>
 
           <View style={styles.containerButton}>

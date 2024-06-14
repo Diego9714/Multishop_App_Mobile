@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, Modal, Pressable, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../../styles/EditOrder.js';
-import ModalEditProd from '../orders/modalEditProd';
+import ModalEditProd from './modalEditProd';
 import EditSelectFact from './EditSelectFact';
 import SelectProducts from './SelectProducts';
 
@@ -158,12 +158,12 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
               </View>
 
               <View style={styles.containerNote}>
-                <Text style={styles.noteOrder}>Nota: Esta pre orden es considerada un presupuesto, por lo tanto los precios están sujetos a cambios sin previo aviso.</Text>
+                <Text style={styles.noteOrder}>Nota: Esta pre orden es considerada un presupuesto, por lo tanto los precios y las existencias estan sujetas a cambios sin previo aviso.</Text>
               </View>
 
               <View style={styles.selectProdContainer}>
                 <Pressable style={styles.otherButton} onPress={() => setIsSelectProductsModalVisible(true)}>
-                  <Text style={styles.buttonText}>Productos</Text>
+                  <Text style={styles.buttonText}>Agregar otros Productos</Text>
                 </Pressable>
               </View>
 
@@ -197,7 +197,7 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
           selectedProduct={selectedProduct}
           onClose={() => setSelectedProduct(null)}
           onQuantityChange={handleProductQuantityChange}
-          onDeleteProduct={handleProductDelete}
+          onDeleteProduct={() => handleProductDelete(selectedProduct.codigo)}
         />
       )}
 
@@ -216,4 +216,3 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
 };
 
 export default EditOrder;
-
