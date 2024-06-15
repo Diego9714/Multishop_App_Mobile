@@ -6,6 +6,10 @@ import ModalSelectFact from './modalSelectFact';
 import ModalEditProd from './modalEditProd';
 import styles from '../../styles/SaveOrder.styles';
 import Orders from '../../app/(tabs)/Orders';
+// JwtDecode
+import  {  jwtDecode  }       from  "jwt-decode"  
+import { decode }             from "base-64"
+global.atob = decode
 
 const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDeleteProduct }) => {
   const [isProductModalVisible, setIsProductModalVisible] = useState(false);
@@ -88,24 +92,36 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
       return;
     }
   
+    if (products.length === 0) {
+      Alert.alert('Error', 'Debe seleccionar al menos un producto');
+      return;
+    }
+
+    let token = await AsyncStorage.getItem('tokenUser')
+    
+    const decodedToken = jwtDecode(token)
+    // let cod_ven = decodedToken.cod_ven
+
     const orderData = {
       id_order: generateRandomProductId(),
+      id_scli: client.id_scli,
       cod_cli: client.cod_cli,
       nom_cli: client.nom_cli,
+      cod_ven : decodedToken.cod_ven,
       products: products.map(product => ({
         codigo: product.codigo,
         descrip: product.descrip,
         exists: product.exists,
         quantity: product.quantity,
         priceUsd: product.priceUsd,
-        priceBs: product.priceBs,
+        priceBs: (product.priceUsd * 36.372).toFixed(2),
       })),
       tipfac: invoiceType,
       totalUsd: totalPriceUsd,
-      totalBs: totalPriceBs,
+      totalBs: (totalPriceUsd * 36.372).toFixed(2),
       fecha: new Date().toISOString(),
     };
-  
+
     try {
       const existingOrders = await AsyncStorage.getItem('OrdersClient');
       const orders = existingOrders ? JSON.parse(existingOrders) : [];
@@ -131,7 +147,7 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
             <View style={styles.infoClientContainer}>
               <Text style={styles.textDetailedClient}>{client.nom_cli}</Text>
             </View>
-            <Text style={styles.nameInputDetailedClient}>Cédula:</Text>
+            <Text style={styles.nameInputDetailedClient}>Rif:</Text>
             <View style={styles.infoClientContainer}>
               <Text style={styles.textDetailedClient}>{client.rif_cli}</Text>
             </View>
@@ -183,10 +199,13 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
           
           <View style={styles.containerPrice}>
             <View style={styles.containerTitlePrice}>
-              <Text style={styles.titelPrice}>Total</Text>
+              <Text style={styles.titlePrice}>Total</Text>
             </View>
             <Text style={styles.textPrice}>USD : {totalPriceUsd}</Text>
-            <Text style={styles.textPrice}>Bs. : {totalPriceBs}</Text>
+            <Text style={styles.textPrice}>Bs. : {(totalPriceUsd * 36.372).toFixed(2)}</Text>
+            <Text style={styles.textPrice}>Pesos : {(totalPriceUsd.toFixed(2) * 3700).toFixed(2)}</Text>
+            {/* <Text style={styles.textPrice}>Bs. : {(totalPriceUsd * 3700).toFixed(2)}</Text> */}
+            {/* <Text style={styles.textModal}>{(totalPriceUsd * 36.372).toFixed(2)}</Text> */}
           </View>
 
           <View style={styles.containerNote}>

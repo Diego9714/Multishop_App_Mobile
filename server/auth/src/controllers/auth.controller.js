@@ -6,8 +6,6 @@ controller.login = async (req, res) => {
   try {
     const { username, password } = req.body
 
-    console.log(username, password)
-
     const filterKeys = Object.keys(req.body)
   
     if (filterKeys.length < 2 || !username || !password) {

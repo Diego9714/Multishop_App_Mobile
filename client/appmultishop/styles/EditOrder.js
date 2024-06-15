@@ -87,6 +87,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderBottomRightRadius: 20,
     borderBottomLeftRadius: 20,
+    margin: 5
   },
   headerProductContainer: {
     width: "100%",
@@ -124,9 +125,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 10,
-    paddingHorizontal: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    paddingHorizontal: 10
   },
   nameProduct: {
     flex: 2,
@@ -145,19 +144,27 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   containerPrice: {
-    // width: '70%',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     marginTop: 10,
-    marginBottom: 10,
-    // backgroundColor: 'black'
+    marginBottom: 10
+  },
+  containerTitlePrice:{
+    width: '80%',
+    textAlign: 'left'
+  },
+  titlePrice: {
+    marginTop: 10,
+    fontSize: 20,
+    alignItems: 'left',
   },
   textPrice: {
     marginTop: 10,
+    fontSize: 15,
   },
   containerNote: {
-    // width: '90%',
+    width: '90%',
     marginTop: 10,
     marginBottom: 10
   },

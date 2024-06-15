@@ -57,6 +57,8 @@ export const UserProvider = ({ children }) => {
       if(token){
         await AsyncStorage.removeItem('tokenUser')
         await AsyncStorage.removeItem('products')
+        await AsyncStorage.removeItem('OrdersClient')
+
         router.replace('/(auth)/Login')
       }
     } catch (error) {

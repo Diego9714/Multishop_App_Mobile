@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     // backgroundColor: 'black',
     textAlign: 'left'
   },
-  titelPrice: {
+  titlePrice: {
     marginTop: 10,
     fontSize: 20,
     alignItems: 'left',

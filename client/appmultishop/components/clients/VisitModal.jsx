@@ -1,4 +1,3 @@
-// Dependencies
 import React, { useEffect, useRef, useState } from 'react'
 import { View, Text, Modal, Pressable, Animated, Easing } from 'react-native'
 import { AntDesign } from '@expo/vector-icons'
@@ -29,8 +28,6 @@ const VisitModal = ({ isVisible, onClose, client }) => {
         }
 
         const existingVisits = await AsyncStorage.getItem('ClientVisits')
-
-        console.log(existingVisits)
 
         const visits = existingVisits ? JSON.parse(existingVisits) : []
 

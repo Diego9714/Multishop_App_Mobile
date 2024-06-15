@@ -209,6 +209,14 @@ const styles = StyleSheet.create({
   button: {
     padding: 5,
   },
+  buttonMore: {
+    padding: 5,
+    marginRight: 15,
+  },
+  centerButtonPlaceholder: {
+    width: 30, // mismo ancho que el icono delete para mantener el espacio consistente
+    height: 30,
+  },
   pagination: {
     // height: '8%',
     width: '100%',

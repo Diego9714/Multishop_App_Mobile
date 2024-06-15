@@ -17,7 +17,7 @@ const ModalProduct = ({ isVisible, onClose, product }) => {
           </View>
           <Text style={styles.subtitleModal}>Precio(Bs)</Text>
           <View style={styles.modalInfoClient}>
-            <Text style={styles.textModal}>{product.precioBs}</Text>
+            <Text style={styles.textModal}>{(product.precioUsd * 36.372).toFixed(2)}</Text>
           </View>
           <Text style={styles.subtitleModal}>Precio(Usd)</Text>
           <View style={styles.modalInfoClient}>

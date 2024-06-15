@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, Modal, Pressable, ScrollView } from 'react-native';
+import { Text, View, Modal, Pressable, ScrollView, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../../styles/EditOrder.js';
 import ModalEditProd from './modalEditProd';
@@ -8,6 +8,7 @@ import SelectProducts from './SelectProducts';
 
 const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
   const [order, setOrder] = useState(null);
+  const [originalOrder, setOriginalOrder] = useState(null); // Mantener una copia del pedido original
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
   const [invoiceType, setInvoiceType] = useState(null);
@@ -18,6 +19,7 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
   useEffect(() => {
     if (selectedOrder) {
       setOrder(selectedOrder);
+      setOriginalOrder(selectedOrder); // Al seleccionar un pedido, actualiza la copia del pedido original
       updateTotal(selectedOrder.products);
     }
   }, [selectedOrder]);
@@ -64,6 +66,16 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
 
   const saveOrder = async () => {
     try {
+      // if (!invoiceType || !order.tipfac) {
+      //   Alert.alert('Selecciona un tipo de factura antes de guardar.');
+      //   return;
+      // }
+      
+      if (!order || !order.products || order.products.length === 0) {
+        Alert.alert('Agrega al menos un producto antes de guardar.');
+        return;
+      }
+
       const jsonValue = await AsyncStorage.getItem('OrdersClient');
       if (jsonValue !== null) {
         let ordersClient = JSON.parse(jsonValue);
@@ -87,6 +99,12 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
       console.error('Error al obtener/modificar el arreglo de OrdersClient:', error);
     }
   };
+
+  const handleCancelEdit = () => {
+    // Restaurar el pedido original cuando se cancela la edición
+    setOrder(originalOrder);
+    onClose();
+  };
   
   const fechaFormateada = order && order.fecha ? new Date(order.fecha).toISOString().split('T')[0] : '';
 
@@ -105,7 +123,7 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
                 <View style={styles.infoClientContainer}>
                   <Text style={styles.textDetailedClient}>{order.nom_cli}</Text>
                 </View>
-                <Text style={styles.nameInputDetailedClient}>Cédula:</Text>
+                <Text style={styles.nameInputDetailedClient}>Rif:</Text>
                 <View style={styles.infoClientContainer}>
                   <Text style={styles.textDetailedClient}>{order.cod_cli}</Text>
                 </View>
@@ -120,9 +138,12 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
               </View>
 
               <View style={styles.detailedClientContainerFac}>
-                <Pressable style={styles.infoClientContainer} onPress={() => setIsInvoiceModalVisible(true)}>
+                <Pressable
+                  style={styles.infoClientContainer}
+                  onPress={() => setIsInvoiceModalVisible(true)}
+                >
                   <Text style={styles.textDetailedClient}>
-                    {invoiceType ? invoiceType : '--- Seleccionar ---'}
+                    {invoiceType ? invoiceType : selectedOrder.tipfac}
                   </Text>
                 </Pressable>
               </View>
@@ -152,29 +173,32 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
               </View>
 
               <View style={styles.containerPrice}>
-                <Text style={styles.textPrice}>Total: </Text>
+                <View style={styles.containerTitlePrice}>
+                  <Text style={styles.titlePrice}>Total: </Text>
+                </View>
                 <Text style={styles.textPrice}>USD : {totalUSD.toFixed(2)}</Text>
-                <Text style={styles.textPrice}>BS : {totalBS.toFixed(2)}</Text>
+                {/* <Text style={styles.textPrice}>Bs. : {totalBS.toFixed(2)}</Text> */}
+                <Text style={styles.textPrice}>Bs. : {(totalUSD.toFixed(2) * 36.372).toFixed(2)}</Text>
+                <Text style={styles.textPrice}>Pesos : {(totalUSD.toFixed(2) * 3700).toFixed(2)}</Text>
               </View>
 
               <View style={styles.containerNote}>
                 <Text style={styles.noteOrder}>Nota: Esta pre orden es considerada un presupuesto, por lo tanto los precios y las existencias estan sujetas a cambios sin previo aviso.</Text>
-              </View>
+                </View>
+                <View style={styles.selectProdContainer}>
+            <Pressable style={styles.otherButton} onPress={() => setIsSelectProductsModalVisible(true)}>
+              <Text style={styles.buttonText}>Agregar otros Productos</Text>
+            </Pressable>
+          </View>
 
-              <View style={styles.selectProdContainer}>
-                <Pressable style={styles.otherButton} onPress={() => setIsSelectProductsModalVisible(true)}>
-                  <Text style={styles.buttonText}>Agregar otros Productos</Text>
-                </Pressable>
-              </View>
-
-              <View style={styles.containerButton}>
-                <Pressable onPress={saveOrder} style={styles.otherButton}>
-                  <Text style={styles.buttonText}>Guardar</Text>
-                </Pressable>
-                <Pressable style={styles.otherButton}>
+          <View style={styles.containerButton}>
+            <Pressable onPress={saveOrder} style={styles.otherButton}>
+              <Text style={styles.buttonText}>Guardar</Text>
+            </Pressable>
+            <Pressable style={styles.otherButton}>
                   <Text style={styles.buttonText}>Pdf</Text>
                 </Pressable>
-                <Pressable onPress={onClose} style={styles.closeButton}>
+                <Pressable onPress={handleCancelEdit} style={styles.closeButton}>
                   <Text style={styles.buttonText}>Salir</Text>
                 </Pressable>
               </View>

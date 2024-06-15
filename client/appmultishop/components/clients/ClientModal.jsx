@@ -1,22 +1,40 @@
-import React, { useState } from 'react'
-import { View, Text, Modal, ScrollView, Pressable } from 'react-native'
+import React, { useState } from 'react';
+import { View, Text, Modal, ScrollView, Pressable } from 'react-native';
 // Components Modal
-import SelectProducts from '../orders/SelectProducts'
-import VisitModal from './VisitModal'
+import SelectProducts from '../orders/SelectProducts';
+import VisitModal from './VisitModal';
+import ConfirmModal from './ConfirmModal';
+import ModalPass from './ModalPass'; // Importa el nuevo componente para el modal de abono
 // Styles
-import styles from '../../styles/ListClients.styles'
+import styles from '../../styles/ListClients.styles';
 
 const ClientModal = ({ isVisibleClientModal, selectedClient, onClose }) => {
   const [isSelectProductsModalVisible, setIsSelectProductsModalVisible] = useState(false);
-  const [isOpenVisitModal , setIsOpenVisitModal] = useState(false)
+  const [isOpenVisitModal, setIsOpenVisitModal] = useState(false);
+  const [isConfirmVisitModalVisible, setIsConfirmVisitModalVisible] = useState(false);
+  const [isModalPassVisible, setIsModalPassVisible] = useState(false); // Nuevo estado para controlar la visibilidad del modal de abono
 
   // Visit Modal
   const openVisitModal = () => {
-    setIsOpenVisitModal(true)
+    setIsConfirmVisitModalVisible(true);
   }
 
   const closeVisitModal = () => {
-    setIsOpenVisitModal(false)
+    setIsOpenVisitModal(false);
+  }
+
+  // Confirm Visit Modal
+  const openConfirmVisitModal = () => {
+    setIsConfirmVisitModalVisible(true);
+  }
+
+  const closeConfirmVisitModal = () => {
+    setIsConfirmVisitModalVisible(false);
+  }
+
+  const handleConfirmVisit = () => {
+    setIsConfirmVisitModalVisible(false);
+    setIsOpenVisitModal(true);
   }
 
   // Select Products Modal
@@ -28,6 +46,15 @@ const ClientModal = ({ isVisibleClientModal, selectedClient, onClose }) => {
     setIsSelectProductsModalVisible(false);
   };
 
+  // Abono Modal
+  const openModalPass = () => {
+    setIsModalPassVisible(true);
+  };
+
+  const closeModalPass = () => {
+    setIsModalPassVisible(false);
+  };
+
   if (!selectedClient) return null;
 
   return (
@@ -36,7 +63,7 @@ const ClientModal = ({ isVisibleClientModal, selectedClient, onClose }) => {
         <View style={styles.modalContent}>
           <Text style={styles.titleModal}>{selectedClient.nom_cli}</Text>
 
-          <Text style={styles.subtitleModal}>Cedula</Text>
+          <Text style={styles.subtitleModal}>Rif</Text>
           <View style={styles.modalInfoClient}>
             <Text style={styles.textModal}>{selectedClient.rif_cli}</Text>
           </View>
@@ -60,7 +87,7 @@ const ClientModal = ({ isVisibleClientModal, selectedClient, onClose }) => {
             <Pressable style={styles.buttonModal} onPress={openVisitModal}>
               <Text style={styles.buttonTextModal}>Registrar Visita</Text>
             </Pressable>
-            <Pressable style={styles.buttonModal}>
+            <Pressable style={styles.buttonModal} onPress={openModalPass}>
               <Text style={styles.buttonTextModal}>Registrar Abono</Text>
             </Pressable>
             <Pressable style={styles.buttonModalExit} onPress={onClose}>
@@ -71,18 +98,34 @@ const ClientModal = ({ isVisibleClientModal, selectedClient, onClose }) => {
       </View>
 
       {selectedClient && (
-        <SelectProducts 
-          isVisible={isSelectProductsModalVisible} 
-          onClose={closeSelectProductsModal} 
-          client={selectedClient} 
+        <SelectProducts
+          isVisible={isSelectProductsModalVisible}
+          onClose={closeSelectProductsModal}
+          client={selectedClient}
         />
       )}
 
       {selectedClient && (
-        <VisitModal 
-          isVisible={isOpenVisitModal} 
-          onClose={closeVisitModal} 
-          client={selectedClient} 
+        <ConfirmModal
+          isVisible={isConfirmVisitModalVisible}
+          onConfirm={handleConfirmVisit}
+          onCancel={closeConfirmVisitModal}
+        />
+      )}
+
+      {selectedClient && (
+        <VisitModal
+          isVisible={isOpenVisitModal}
+          onClose={closeVisitModal}
+          client={selectedClient}
+        />
+      )}
+
+      {selectedClient && (
+        <ModalPass
+          isVisible={isModalPassVisible}
+          onClose={closeModalPass}
+          client={selectedClient}
         />
       )}
     </Modal>

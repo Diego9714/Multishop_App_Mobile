@@ -81,7 +81,8 @@ const ListProducts = () => {
               setIsModalVisible(true);
             }}
           >
-            <Ionicons name="information" size={34} color="#515151" />
+            {/* <Ionicons name="information" size={34} color="#515151" /> */}
+            <MaterialIcons name="more-vert" size={30} color="#7A7A7B" />
           </Pressable>
         </View>
       </View>

@@ -12,6 +12,8 @@ controller.saveOrder = async (req, res) => {
 
     const { order } = req.body
 
+    // console.log(order)
+
     if (!order || order.length === 0) {
       return res.status(400).json({
         status: false,
@@ -24,7 +26,8 @@ controller.saveOrder = async (req, res) => {
 
     const processOrder = {
       completed: result.completed,
-      notCompleted: result.notCompleted
+      notCompleted: result.notCompleted,
+      existing: result.exist
     }
 
     msg = {
