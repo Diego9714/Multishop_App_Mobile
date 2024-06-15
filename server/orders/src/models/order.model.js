@@ -8,44 +8,39 @@ export class Orders {
       let orderExist = []
   
       for (const info of order) {
-        const { id_order , id_scli, cod_cli, cod_ven, totalUsd, totalBs, tipfac, fecha, products } = info
-
+        const { id_order, id_scli, cod_cli, cod_ven, totalUsd, totalBs, tipfac, fecha, products } = info
+  
         const connection = await pool.getConnection()
-
+  
         // Convertir la fecha a un objeto Date
         const dateObj = new Date(fecha);
-
+  
         // Obtener los componentes de la fecha
         const day = dateObj.getDate().toString().padStart(2, '0');
         const month = (dateObj.getMonth() + 1).toString().padStart(2, '0'); // Sumar 1 al mes, ya que en JavaScript los meses van de 0 a 11
         const year = dateObj.getFullYear();
-
+  
         // Formatear la fecha en el formato deseado
         const formattedFecha = `${day}-${month}-${year}`;
-
-        const existingOrder = `SELECT id_order FROM preorder WHERE identifier = ?;`
-        const [checkOrder] = await connection.execute(existingOrder,[id_order])
   
-        console.log(checkOrder)
+        const existingOrder = `SELECT id_order FROM preorder WHERE identifier = ?;`
+        const [checkOrder] = await connection.execute(existingOrder, [id_order])
+  
 
         if (checkOrder.length > 0) {
           orderExist.push(info)
         } else {
           let sql = 'INSERT INTO preorder (identifier, id_scli, cod_cli, cod_ven, amountUsd, amountBs, tip_doc, date_created) VALUES (?, ?, ?, ?, ?, ?, ?, ?);'
-          let [order] = await connection.execute(sql, [id_order,id_scli, cod_cli, cod_ven, totalUsd, parseFloat(totalBs), tipfac, fecha])
+          let [order] = await connection.execute(sql, [id_order, id_scli, cod_cli, cod_ven, totalUsd, parseInt(totalBs), tipfac, fecha])
   
           const id_orderr = order.insertId
   
           for (const prod of products) {
             const { codigo, quantity, descrip, existencia, priceUsd, priceBs } = prod
   
-            console.log("codigo, descrip, quantity, priceUsd, priceBs, fecha")
-            console.log(codigo, descrip, quantity, priceUsd, priceBs, fecha)
-
-
             const saveProd = `INSERT INTO prodorder (id_order, codigo, descrip, quantity, priceUsd, priceBs, date_created) VALUES (?, ?, ?, ?, ?, ?, ?)`
-            await connection.execute(saveProd, [id_orderr, codigo, descrip, quantity, priceUsd, priceBs, fecha])
-          
+            await connection.execute(saveProd, [id_orderr, codigo, descrip, quantity, parseInt(priceUsd), parseInt(priceBs), fecha])
+  
             // console.log(id_order, codigo, descrip, quantity, priceUsd, priceBs, fecha)
           }
   
@@ -67,6 +62,7 @@ export class Orders {
       return error
     }
   }
+  
 
   static async saveVisits(visits) {
     try {

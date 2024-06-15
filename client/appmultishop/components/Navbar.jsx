@@ -49,6 +49,17 @@ const Navbar = () => {
     }
   }
 
+  const getBrands = async () => {
+    try {
+      const res = await instanceProducts.get(`/api/brands`)
+      let listbrands = res.data.brands
+      await AsyncStorage.setItem('brands', JSON.stringify(listbrands))
+    } catch (error) {
+      console.error('Error al obtener las marcas:', error)
+      throw error
+    }
+  }
+
   const getAllInfo = async () => {
     setLoading(true)
     setMessage('')
@@ -63,7 +74,7 @@ const Navbar = () => {
         const decodedToken = jwtDecode(token)
         let cod_ven = decodedToken.cod_ven
 
-        await Promise.all([getClients(cod_ven), getProducts(), getCategories()])
+        await Promise.all([getClients(cod_ven), getProducts(), getCategories(), getBrands()])
         clearTimeout(timeoutId)
         setLoading(false)
         setMessage('Información actualizada correctamente.')

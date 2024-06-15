@@ -22,6 +22,20 @@ const ListProducts = () => {
   const defaultMaxPages = 5;
 
   useEffect(() => {
+    const cleanupProducts = async () => {
+      setProducts([]);
+      setCategories([]);
+      setBrands([]);
+      setVisibleProducts([]);
+      setSearchProduct('');
+      setDisplaySearchProduct('');
+      setSearchCategory('');
+      setPage(1);
+      setSelectedProduct(null);
+    };
+
+    cleanupProducts();
+
     const getProductsAndCategories = async () => {
       const productsInfo = await AsyncStorage.getItem('products');
       const productsJson = JSON.parse(productsInfo);
@@ -81,7 +95,6 @@ const ListProducts = () => {
               setIsModalVisible(true);
             }}
           >
-            {/* <Ionicons name="information" size={34} color="#515151" /> */}
             <MaterialIcons name="more-vert" size={30} color="#7A7A7B" />
           </Pressable>
         </View>
@@ -152,35 +165,35 @@ const ListProducts = () => {
 
       <FilterCategories visible={isFilterModalVisible} onClose={closeFilterModal} />
 
-      <View style={styles.container}>
-        <View style={styles.headerContainer}>
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>Producto</Text>
-            <Text style={styles.headerTitleButton}>Acciones</Text>
-          </View>
-        </View>
-        <View style={styles.listContainer}>
-          <FlatList
-            data={visibleProducts}
-            keyExtractor={(item) => item.codigo}
-            renderItem={renderElements}
-          />
-        </View>
-      </View>
-
-      <ScrollView horizontal style={styles.paginationContainer}>
-        {renderPaginationButtons()}
-      </ScrollView>
-
-      {selectedProduct && (
-        <ModalProducts
-          isVisible={isModalVisible}
-          onClose={() => setIsModalVisible(false)}
-          product={selectedProduct}
-        />
-      )}
+<View style={styles.container}>
+  <View style={styles.headerContainer}>
+    <View style={styles.header}>
+      <Text style={styles.headerTitle}>Producto</Text>
+      <Text style={styles.headerTitleButton}>Acciones</Text>
     </View>
-  );
+  </View>
+  <View style={styles.listContainer}>
+    <FlatList
+      data={visibleProducts}
+      keyExtractor={(item) => item.codigo}
+      renderItem={renderElements}
+    />
+  </View>
+</View>
+
+<ScrollView horizontal style={styles.paginationContainer}>
+  {renderPaginationButtons()}
+</ScrollView>
+
+{selectedProduct && (
+  <ModalProducts
+    isVisible={isModalVisible}
+    onClose={() => setIsModalVisible(false)}
+    product={selectedProduct}
+  />
+)}
+</View>
+);
 };
 
 export default ListProducts;
