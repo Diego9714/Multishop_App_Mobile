@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Text, TextInput, View, Pressable, Modal, TouchableOpacity, Animated, Easing } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { jwtDecode } from 'jwt-decode';
+import { decode } from 'base-64';
+global.atob = decode;
 // Styles
 import styles from '../../styles/ModalPass.styles';
 
@@ -36,16 +39,23 @@ const ModalPass = ({ isVisible, onClose, client }) => {
     }
 
     try {
+      let token = await AsyncStorage.getItem('tokenUser')
+
+      const decodedToken = jwtDecode(token)
+
       const passUser = {
         id_pass: generateRandomProductId(),
         id_scli: client.id_scli,
         cod_cli: client.cod_cli,
         nom_cli: client.nom_cli,
+        cod_ven : decodedToken.cod_ven,
         monto: amount,
         tipoPago: paymentType, // Updated to save payment type
         tasaPago: 3500,
         fecha: new Date().toISOString(), // Guarda la fecha y hora exacta en formato ISO8601
       };
+
+      console.log(passUser)
 
       const existingPass = await AsyncStorage.getItem('ClientPass');
       const pass = existingPass ? JSON.parse(existingPass) : [];

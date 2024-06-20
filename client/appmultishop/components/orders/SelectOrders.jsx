@@ -106,73 +106,70 @@ const SelectOrders = () => {
     ));
   }, [selectedOrders, orders]);
 
-const synchronizeOrders = async () => {
-  const ordersToSync = orders.filter(order => selectedOrders[order.id_order]);
-  console.log('Orders to sync:', ordersToSync[0].products);
+  const synchronizeOrders = async () => {
+    const ordersToSync = orders.filter(order => selectedOrders[order.id_order]);
+    console.log('Orders to sync:', ordersToSync[0].products);
 
-  try {
-    const response = await instanceSincro.post('/api/register/order', { order: ordersToSync });
-    console.log('Synchronization response:', response.data);
+    try {
+      const response = await instanceSincro.post('/api/register/order', { order: ordersToSync });
+      console.log('Synchronization response:', response.data);
 
-    if (response.status === 200) {
-      const { processOrder } = response.data;
-      const completed = processOrder.completed || [];
-      const existing = processOrder.existing || [];
-      const notCompleted = processOrder.notCompleted || [];
+      if (response.status === 200) {
+        const { processOrder } = response.data;
+        const completed = processOrder.completed || [];
+        const existing = processOrder.existing || [];
+        const notCompleted = processOrder.notCompleted || [];
 
-      console.log('Completed orders:', completed);
-      console.log('Existing orders:', existing);
-      console.log('Not completed orders:', notCompleted);
+        console.log('Completed orders:', completed);
+        console.log('Existing orders:', existing);
+        console.log('Not completed orders:', notCompleted);
 
-      // Crear un conjunto de IDs de pedidos que fueron completados o ya existen
-      const processedOrderIds = new Set([
-        ...completed.map(order => order.id_order),
-        ...existing.map(order => order.id_order)
-      ]);
+        // Crear un conjunto de IDs de pedidos que fueron completados o ya existen
+        const processedOrderIds = new Set([
+          ...completed.map(order => order.id_order),
+          ...existing.map(order => order.id_order)
+        ]);
 
-      console.log('Processed order IDs:', processedOrderIds);
+        console.log('Processed order IDs:', processedOrderIds);
 
-      // Filtrar la lista de pedidos para actualizar los estados
-      const updatedOrders = orders.filter(order => !processedOrderIds.has(order.id_order));
-      setOrders(updatedOrders);
-      setStoredOrders(updatedOrders);
+        // Filtrar la lista de pedidos para actualizar los estados
+        const updatedOrders = orders.filter(order => !processedOrderIds.has(order.id_order));
+        setOrders(updatedOrders);
+        setStoredOrders(updatedOrders);
 
-      // Actualizar las listas de pedidos sincronizados y no sincronizados
-      setSynchronizedOrders(completed);
-      setUnsynchronizedOrders(notCompleted);
+        // Actualizar las listas de pedidos sincronizados y no sincronizados
+        setSynchronizedOrders(completed);
+        setUnsynchronizedOrders(notCompleted);
 
-      // Limpiar la selección de pedidos
-      setSelectedOrders({});
+        // Limpiar la selección de pedidos
+        setSelectedOrders({});
 
-      // Obtener los pedidos actuales del almacenamiento local
-      const storedOrders = await AsyncStorage.getItem('OrdersClient');
-      const parsedStoredOrders = storedOrders ? JSON.parse(storedOrders) : [];
+        // Obtener los pedidos actuales del almacenamiento local
+        const storedOrders = await AsyncStorage.getItem('OrdersClient');
+        const parsedStoredOrders = storedOrders ? JSON.parse(storedOrders) : [];
 
-      // Filtrar los pedidos completados y repetidos
-      const remainingStoredOrders = parsedStoredOrders.filter(order => !processedOrderIds.has(order.id_order));
+        // Filtrar los pedidos completados y repetidos
+        const remainingStoredOrders = parsedStoredOrders.filter(order => !processedOrderIds.has(order.id_order));
 
-      // Guardar de nuevo los pedidos no completados en el almacenamiento local
-      await AsyncStorage.setItem('OrdersClient', JSON.stringify(remainingStoredOrders));
+        // Guardar de nuevo los pedidos no completados en el almacenamiento local
+        await AsyncStorage.setItem('OrdersClient', JSON.stringify(remainingStoredOrders));
+      }
+    } catch (error) {
+      console.error('Error synchronizing orders:', error);
+      // Verificar si el error es debido a un status code 500
+      if (error.response && error.response.status === 500) {
+        // Si es un error 500, marcar todos los pedidos como no completados
+        const ordersToMarkAsNotCompleted = ordersToSync.map(order => ({
+          ...order,
+          status: 'Not completed'
+        }));
+        setUnsynchronizedOrders(ordersToMarkAsNotCompleted);
+      }
     }
-  } catch (error) {
-    console.error('Error synchronizing orders:', error);
-    // Verificar si el error es debido a un status code 500
-    if (error.response && error.response.status === 500) {
-      // Si es un error 500, marcar todos los pedidos como no completados
-      const ordersToMarkAsNotCompleted = ordersToSync.map(order => ({
-        ...order,
-        status: 'Not completed'
-      }));
-      setUnsynchronizedOrders(ordersToMarkAsNotCompleted);
-    }
-  }
 
-  // Abrir el modal después de sincronizar
-  setModalSincroVisible(true);
-};
-
-  
-  
+    // Abrir el modal después de sincronizar
+    setModalSincroVisible(true);
+  };
 
   const renderPaginationButtons = () => {
     const numberOfPages = Math.ceil(orders.length / itemsPerPage);
@@ -203,7 +200,7 @@ const synchronizeOrders = async () => {
         setOrders(updatedOrders);
         setStoredOrders(updatedOrders);
         await AsyncStorage.setItem('OrdersClient', JSON.stringify(updatedOrders));
-        console.log('Order deleted:', selectedOrder);
+        // console.log('Order deleted:', selectedOrder);
       } catch (error) {
         console.error('Error deleting order:', error);
       }

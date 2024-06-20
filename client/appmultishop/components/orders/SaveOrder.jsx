@@ -76,6 +76,10 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
     }
   }, [products]);
 
+  const formatNumber = (number) => {
+    return number.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
   const handlePress = (screenName) => {
     navigation.navigate(screenName);
   };
@@ -116,8 +120,8 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
         priceBs: (product.priceUsd * 36.372).toFixed(2),
       })),
       tipfac: invoiceType,
-      totalUsd: totalPriceUsd,
-      totalBs: (totalPriceUsd * 36.372).toFixed(2),
+      totalUsd: parseFloat(totalPriceUsd),
+      totalBs: parseFloat((totalPriceUsd * 36.372).toFixed(2)),
       fecha: new Date().toISOString(),
     };
 
@@ -191,7 +195,7 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
                 <Pressable key={index} style={styles.selectedProductItem} onPress={() => openProductModal(product)}>
                   <Text style={styles.nameProduct}>{product.descrip}</Text>
                   <Text style={styles.quantityProduct}>{product.quantity}</Text>
-                  <Text style={styles.priceProduct}>{(product.quantity * product.priceUsd).toFixed(2)}</Text>
+                  <Text style={styles.priceProduct}>{formatNumber(product.quantity * product.priceUsd)}</Text>
                 </Pressable>
               ))}
             </ScrollView>
@@ -201,9 +205,9 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
             <View style={styles.containerTitlePrice}>
               <Text style={styles.titlePrice}>Total</Text>
             </View>
-            <Text style={styles.textPrice}>USD : {totalPriceUsd}</Text>
-            <Text style={styles.textPrice}>Bs. : {(totalPriceUsd * 36.372).toFixed(2)}</Text>
-            <Text style={styles.textPrice}>Pesos : {(totalPriceUsd.toFixed(2) * 3700).toFixed(2)}</Text>
+            <Text style={styles.textPrice}>USD : {formatNumber(totalPriceUsd)}</Text>
+            <Text style={styles.textPrice}>Bs. : {formatNumber(totalPriceUsd * 36.372)}</Text>
+            <Text style={styles.textPrice}>Pesos : {formatNumber(totalPriceUsd * 3700)}</Text>
           </View>
 
           <View style={styles.containerNote}>

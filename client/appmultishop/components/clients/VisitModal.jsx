@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from 'react'
 import { View, Text, Modal, Pressable, Animated, Easing } from 'react-native'
 import { AntDesign } from '@expo/vector-icons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { jwtDecode } from 'jwt-decode';
+import { decode } from 'base-64';
+global.atob = decode;
 // Styles
 import styles from '../../styles/ModalVisit.styles'
 
@@ -19,11 +22,16 @@ const VisitModal = ({ isVisible, onClose, client }) => {
   useEffect(() => {
     const regVisit = async (client) => {
       try {
+        let token = await AsyncStorage.getItem('tokenUser')
+
+        const decodedToken = jwtDecode(token)
+
         const visit = {
           id_visit: generateRandomProductId(),
           id_scli: client.id_scli,
           cod_cli: client.cod_cli,
           nom_cli: client.nom_cli,
+          cod_ven : decodedToken.cod_ven,
           fecha: new Date().toISOString(), // Guarda la fecha y hora exacta en formato ISO8601
         }
 
