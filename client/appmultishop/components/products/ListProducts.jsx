@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Text, View, FlatList, Pressable, TextInput, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Text, View, FlatList, Pressable, TextInput, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AntDesign, MaterialIcons, Ionicons, FontAwesome } from '@expo/vector-icons';
+import { AntDesign, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import ModalProducts from './ModalProducts';
 import FilterCategories from '../FilterCategories';
 import styles from '../../styles/ListProducts.styles';
@@ -74,9 +74,22 @@ const ListProducts = () => {
 
   const handleSearch = () => {
     if (searchProduct.length > 0 && searchProduct.length < 3) {
-      alert('Por favor ingrese al menos tres letras para buscar');
+      Alert.alert('Por favor ingrese al menos tres letras para buscar');
       return;
     }
+    
+    const filteredProducts = products.filter(product =>
+      product.descrip.toLowerCase().includes(searchProduct.toLowerCase())
+    );
+
+    if (filteredProducts.length === 0) {
+      Alert.alert('Producto no encontrado', 'El producto buscado no existe.');
+      setSearchProduct('');
+      setDisplaySearchProduct('');
+      setPage(1);
+      return;
+    }
+
     setDisplaySearchProduct(searchProduct);
     setPage(1);
   };
@@ -165,35 +178,35 @@ const ListProducts = () => {
 
       <FilterCategories visible={isFilterModalVisible} onClose={closeFilterModal} />
 
-<View style={styles.container}>
-  <View style={styles.headerContainer}>
-    <View style={styles.header}>
-      <Text style={styles.headerTitle}>Producto</Text>
-      <Text style={styles.headerTitleButton}>Acciones</Text>
+      <View style={styles.container}>
+        <View style={styles.headerContainer}>
+          <View style={styles.header}>
+            <Text style={styles.headerTitle}>Producto</Text>
+            <Text style={styles.headerTitleButton}>Acciones</Text>
+          </View>
+        </View>
+        <View style={styles.listContainer}>
+          <FlatList
+            data={visibleProducts}
+            keyExtractor={(item) => item.codigo}
+            renderItem={renderElements}
+          />
+        </View>
+      </View>
+
+      <ScrollView horizontal style={styles.paginationContainer}>
+        {renderPaginationButtons()}
+      </ScrollView>
+
+      {selectedProduct && (
+        <ModalProducts
+          isVisible={isModalVisible}
+          onClose={() => setIsModalVisible(false)}
+          product={selectedProduct}
+        />
+      )}
     </View>
-  </View>
-  <View style={styles.listContainer}>
-    <FlatList
-      data={visibleProducts}
-      keyExtractor={(item) => item.codigo}
-      renderItem={renderElements}
-    />
-  </View>
-</View>
-
-<ScrollView horizontal style={styles.paginationContainer}>
-  {renderPaginationButtons()}
-</ScrollView>
-
-{selectedProduct && (
-  <ModalProducts
-    isVisible={isModalVisible}
-    onClose={() => setIsModalVisible(false)}
-    product={selectedProduct}
-  />
-)}
-</View>
-);
+  );
 };
 
 export default ListProducts;

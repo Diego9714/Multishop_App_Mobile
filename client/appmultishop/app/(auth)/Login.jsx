@@ -1,4 +1,3 @@
-// Dependencies
 import React, { useState, useContext, useEffect } from 'react'
 import { StatusBar } from 'expo-status-bar'
 import {
@@ -9,29 +8,58 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
-  Platform
+  Platform,
+  Alert
 } from 'react-native'
-// Resources
+import { router }               from 'expo-router'
+
 import { images } from '../../constants'
 import { MaterialIcons } from '@expo/vector-icons'
-// Styles
 import styles from '../../styles/Login.styles'
-// Context
 import { UserContext } from '../../context/UserContext'
+import ModalLoaderLogin from '../../components/users/ModalLoaderLogin'
 
 const Login = () => {
-
-  const { signIn, checkLogin, logoutt } = useContext(UserContext)
+  const { signIn, checkLogin } = useContext(UserContext)
 
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
+  const [modalVisible, setModalVisible] = useState(false)
+  const [modalMessage, setModalMessage] = useState("Cargando...")
+  const [modalStatus, setModalStatus] = useState(null)
 
   useEffect(() => {
     checkLogin()
   }, [])
 
   const handleLogin = async () => {
-    signIn(username, password)
+    if (username && password) {
+      setModalVisible(true)
+      setModalMessage("Cargando...")
+      setModalStatus(null)
+
+      const loginPromise = signIn(username, password)
+      const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 10000))
+
+      const response = await Promise.race([loginPromise, timeoutPromise])
+
+      if (response) {
+        setModalMessage(response.message)
+        setModalStatus(response.status)
+      } else {
+        setModalMessage("Tiempo de espera agotado. Inténtelo de nuevo.")
+        setModalStatus(500)
+      }
+
+      setTimeout(() => {
+        setModalVisible(false)
+        if (response && response.status === 200) {
+          router.replace('/(tabs)/Home')
+        }
+      }, 4000)
+    } else {
+      Alert.alert('Error', 'Por favor, complete todos los campos')
+    }
   }
 
   return (
@@ -78,6 +106,8 @@ const Login = () => {
           </View>
         </View>
       </ScrollView>
+
+      <ModalLoaderLogin visible={modalVisible} message={modalMessage} status={modalStatus} />
     </KeyboardAvoidingView>
   )
 }

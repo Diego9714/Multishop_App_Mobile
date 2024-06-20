@@ -108,7 +108,7 @@ const SelectOrders = () => {
 
 const synchronizeOrders = async () => {
   const ordersToSync = orders.filter(order => selectedOrders[order.id_order]);
-  console.log('Orders to sync:', ordersToSync);
+  console.log('Orders to sync:', ordersToSync[0].products);
 
   try {
     const response = await instanceSincro.post('/api/register/order', { order: ordersToSync });

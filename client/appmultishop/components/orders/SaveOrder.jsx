@@ -4,18 +4,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import ModalSelectFact from './modalSelectFact';
 import ModalEditProd from './modalEditProd';
+import ModalOrderSaved from './ModalOrderSaved';
 import styles from '../../styles/SaveOrder.styles';
-import Orders from '../../app/(tabs)/Orders';
-// JwtDecode
-import  {  jwtDecode  }       from  "jwt-decode"  
-import { decode }             from "base-64"
-global.atob = decode
+import { jwtDecode } from 'jwt-decode';
+import { decode } from 'base-64';
+global.atob = decode;
 
 const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDeleteProduct }) => {
   const [isProductModalVisible, setIsProductModalVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [invoiceType, setInvoiceType] = useState(null);
   const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
+  const [isOrderSavedModalVisible, setIsOrderSavedModalVisible] = useState(false);
   const [products, setProducts] = useState([]);
   const [totalPriceUsd, setTotalPriceUsd] = useState(0);
   const [totalPriceBs, setTotalPriceBs] = useState(0);
@@ -100,7 +100,6 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
     let token = await AsyncStorage.getItem('tokenUser')
     
     const decodedToken = jwtDecode(token)
-    // let cod_ven = decodedToken.cod_ven
 
     const orderData = {
       id_order: generateRandomProductId(),
@@ -127,8 +126,9 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
       const orders = existingOrders ? JSON.parse(existingOrders) : [];
       orders.push(orderData);
       await AsyncStorage.setItem('OrdersClient', JSON.stringify(orders));
-  
-      handlePress(Orders);
+      
+      setIsOrderSavedModalVisible(true);  // Mostrar el modal de confirmación
+
     } catch (error) {
       console.error('Error saving order:', error);
     }
@@ -204,8 +204,6 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
             <Text style={styles.textPrice}>USD : {totalPriceUsd}</Text>
             <Text style={styles.textPrice}>Bs. : {(totalPriceUsd * 36.372).toFixed(2)}</Text>
             <Text style={styles.textPrice}>Pesos : {(totalPriceUsd.toFixed(2) * 3700).toFixed(2)}</Text>
-            {/* <Text style={styles.textPrice}>Bs. : {(totalPriceUsd * 3700).toFixed(2)}</Text> */}
-            {/* <Text style={styles.textModal}>{(totalPriceUsd * 36.372).toFixed(2)}</Text> */}
           </View>
 
           <View style={styles.containerNote}>
@@ -239,6 +237,15 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
           isVisible={isInvoiceModalVisible}
           onClose={() => setIsInvoiceModalVisible(false)}
           onSelect={handleInvoiceSelection}
+        />
+
+        <ModalOrderSaved
+          isVisible={isOrderSavedModalVisible}
+          onClose={() => setIsOrderSavedModalVisible(false)}
+          onOrderSaved={() => {
+            setIsOrderSavedModalVisible(false);
+            handlePress('Home');
+          }}
         />
       </View>
     </Modal>

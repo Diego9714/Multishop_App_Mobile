@@ -4,6 +4,8 @@ import AsyncStorage             from '@react-native-async-storage/async-storage'
 import { instanceAuth }         from '../global/api'
 import { Alert }                from 'react-native'
 import { router }               from 'expo-router'
+// Modal Loader
+import { ModalLoaderLogin }     from '../components/users/ModalLoaderLogin'
 
 // Context
 export const UserContext = createContext()
@@ -12,27 +14,24 @@ export const UserProvider = ({ children }) => {
 
   const signIn = async (username, password) => {
     try {
-      const user = {
-        username,
-        password
-      }
-
+      const user = { username, password }
       const res = await instanceAuth.post(`/api/login`, user)
       const token = res.data.tokenUser
       await AsyncStorage.setItem('tokenUser', token)
-      router.replace('/(tabs)/Home')
-
+      return { status: 200, message: "Acceso concedido" }
     } catch (error) {
+      let message = ""
       switch (error.message) {
         case "Request failed with status code 500":
-          Alert.alert("Verifica tu usuario y contraseña", "Usuario o contraseña incorrectos")
+          message = "Usuario o contraseña incorrectos"
           break
         case "Request failed with status code 400":
-          Alert.alert("Verifica tu usuario y contraseña", "Deben tener al menos 6 digitos")
+          message = "Deben tener al menos 6 dígitos"
           break
         default:
-          console.error('Error al iniciar sesión:', error)
+          message = "Error de red"
       }
+      return { status: error.response?.status || 500, message }
     }
   }
 

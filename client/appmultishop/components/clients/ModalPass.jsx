@@ -35,9 +35,6 @@ const ModalPass = ({ isVisible, onClose, client }) => {
       return;
     }
 
-    console.log(!amount)
-    console.log(!paymentType)
-
     try {
       const passUser = {
         id_pass: generateRandomProductId(),
@@ -45,7 +42,7 @@ const ModalPass = ({ isVisible, onClose, client }) => {
         cod_cli: client.cod_cli,
         nom_cli: client.nom_cli,
         monto: amount,
-        tipoPago: paymentType,
+        tipoPago: paymentType, // Updated to save payment type
         tasaPago: 3500,
         fecha: new Date().toISOString(), // Guarda la fecha y hora exacta en formato ISO8601
       };
@@ -56,6 +53,9 @@ const ModalPass = ({ isVisible, onClose, client }) => {
       pass.push(passUser);
       await AsyncStorage.setItem('ClientPass', JSON.stringify(pass));
       setPassStatus('Abono registrado con éxito!');
+      setTimeout(() => {
+        setPassStatus('');
+      }, 3000); // Clear the status message after 3 seconds
     } catch (error) {
       setPassStatus(`Abono no registrado - ${error}`);
     }
@@ -85,7 +85,7 @@ const ModalPass = ({ isVisible, onClose, client }) => {
       // Reset values if modal is not visible
       scaleValue.setValue(0);
       opacityValue.setValue(0);
-      setPassStatus(''); // Resetear el mensaje cuando se cierra el modal
+      setPassStatus(''); // Reset the message when the modal closes
     }
   }, [isVisible]);
 
@@ -119,7 +119,14 @@ const ModalPass = ({ isVisible, onClose, client }) => {
             >
               <Text style={styles.radioText}>Bs</Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.radioButton, paymentType === 'pesos' && styles.radioButtonSelected]}
+              onPress={() => setPaymentType('pesos')}
+            >
+              <Text style={styles.radioText}>Pesos</Text>
+            </TouchableOpacity>
           </View>
+
 
           {passStatus ? (
             <Animated.View style={{ transform: [{ scale: scaleValue }], opacity: opacityValue }}>

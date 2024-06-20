@@ -70,7 +70,7 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
       //   Alert.alert('Selecciona un tipo de factura antes de guardar.');
       //   return;
       // }
-      
+
       if (!order || !order.products || order.products.length === 0) {
         Alert.alert('Agrega al menos un producto antes de guardar.');
         return;
@@ -91,7 +91,7 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
           }
           return orderItem;
         });
-  
+
         await AsyncStorage.setItem('OrdersClient', JSON.stringify(updatedOrders));
         onClose();
       }
@@ -105,7 +105,7 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
     setOrder(originalOrder);
     onClose();
   };
-  
+
   const fechaFormateada = order && order.fecha ? new Date(order.fecha).toISOString().split('T')[0] : '';
 
   return (
@@ -183,19 +183,19 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
               </View>
 
               <View style={styles.containerNote}>
-                <Text style={styles.noteOrder}>Nota: Esta pre orden es considerada un presupuesto, por lo tanto los precios y las existencias estan sujetas a cambios sin previo aviso.</Text>
-                </View>
-                <View style={styles.selectProdContainer}>
-            <Pressable style={styles.otherButton} onPress={() => setIsSelectProductsModalVisible(true)}>
-              <Text style={styles.buttonText}>Agregar otros Productos</Text>
-            </Pressable>
-          </View>
+                <Text style={styles.noteOrder}>Nota: Esta pre orden es considerada un presupuesto, por lo tanto los precios y las existencias están sujetas a cambios sin previo aviso.</Text>
+              </View>
+              <View style={styles.selectProdContainer}>
+                <Pressable style={styles.otherButton} onPress={() => setIsSelectProductsModalVisible(true)}>
+                  <Text style={styles.buttonText}>Agregar otros Productos</Text>
+                </Pressable>
+              </View>
 
-          <View style={styles.containerButton}>
-            <Pressable onPress={saveOrder} style={styles.otherButton}>
-              <Text style={styles.buttonText}>Guardar</Text>
-            </Pressable>
-            <Pressable style={styles.otherButton}>
+              <View style={styles.containerButton}>
+                <Pressable onPress={saveOrder} style={styles.otherButton}>
+                  <Text style={styles.buttonText}>Guardar</Text>
+                </Pressable>
+                <Pressable style={styles.otherButton}>
                   <Text style={styles.buttonText}>Pdf</Text>
                 </Pressable>
                 <Pressable onPress={handleCancelEdit} style={styles.closeButton}>
