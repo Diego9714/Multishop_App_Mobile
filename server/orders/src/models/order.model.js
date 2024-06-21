@@ -7,7 +7,7 @@ export class Orders {
       let ordersNotCompleted = []
   
       for (const info of order) {
-        const { id_order, id_scli, cod_cli, cod_ven, totalUsd, totalBs, tipfac, fecha, products } = info
+        const { id_order, id_scli, cod_cli, nom_cli ,cod_ven, totalUsd, totalBs, tipfac, fecha, products } = info
   
         const dateObj = new Date(fecha);
         const day = dateObj.getDate().toString().padStart(2, '0')
@@ -28,6 +28,12 @@ export class Orders {
         if (checkOrder.length > 0) {
           ordersCompleted.push(info)
         } else {
+
+          // Registramos la visita
+          let sqlVisit = 'INSERT INTO visits (cod_ven, id_scli, cod_cli, nom_cli, date_created) VALUES (?, ?, ?, ?, ?);'
+          await connection.execute(sqlVisit, [cod_ven, id_scli, cod_cli, nom_cli, formattedFecha])
+
+          // Registramos el pedido
           let sql = 'INSERT INTO preorder (id_scli, cod_cli, cod_ven, amountUsd, amountBs, tip_doc, date_created) VALUES (?, ?, ?, ?, ?, ?, ?);'
           let [orderResult] = await connection.execute(sql, [id_scli, cod_cli, cod_ven, totalUsd, totalBs, tipfac, formattedFecha])
   

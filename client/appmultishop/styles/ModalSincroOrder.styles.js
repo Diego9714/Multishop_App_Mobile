@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)'
   },
   modalContent: {
-    width: "80%", // Ancho deseado del modal
+    width: "80%",
     backgroundColor: '#f1f1f1',
     borderRadius: 10,
     padding: 5,
@@ -30,15 +30,19 @@ const styles = StyleSheet.create({
   },
   subtitleModal:{
     textAlign: 'center',
-    // marginTop: '5%',
     marginBottom: '5%',
     fontSize: 17,
-    // width: '90%',
-    // backgroundColor: 'gray'
+  },
+  timerText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginTop: 10,
+    marginBottom: 10,
+    textAlign: 'center'
   },
   orderItem:{
     margin:10,
-    // backgroundColor: 'gray',
     backgroundColor: '#D0D0D0',
     borderRadius: 10,
     padding: 5,
@@ -48,10 +52,9 @@ const styles = StyleSheet.create({
   },
   orderText:{
     margin:5,
-    // backgroundColor: 'gray'
   },
   buttonModalExit: {
-    width: 150, // Ajusta el ancho para que los botones se adapten mejor en diferentes tamaños de pantalla
+    width: 150,
     height: 40,
     backgroundColor: "#E72929",
     borderRadius: 10,
@@ -66,11 +69,19 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    elevation: 5, // Elevación de la sombra (solo para Android)
+    elevation: 5,
   },
   buttonTextModal: {
     color: "white",
     textAlign: "center",
+  },
+  loaderContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 24,
+    color: '#777',
   },
 });
 
