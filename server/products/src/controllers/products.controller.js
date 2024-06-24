@@ -31,3 +31,13 @@ controller.getBrands = async (req, res) => {
     return res.status(500).json({ error: error.message })
   }
 }
+
+controller.getCurrency = async (req, res) => {
+  try {
+    const currency = await Products.currency()
+    res.status(currency.code).json(currency)
+
+  } catch (error) {
+    return res.status(500).json({ error: error.message })
+  }
+}

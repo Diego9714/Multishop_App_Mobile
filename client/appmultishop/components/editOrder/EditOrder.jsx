@@ -8,7 +8,7 @@ import SelectProducts from './SelectProducts';
 
 const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
   const [order, setOrder] = useState(null);
-  const [originalOrder, setOriginalOrder] = useState(null); // Mantener una copia del pedido original
+  const [originalOrder, setOriginalOrder] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isInvoiceModalVisible, setIsInvoiceModalVisible] = useState(false);
   const [invoiceType, setInvoiceType] = useState(null);
@@ -16,10 +16,14 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
   const [totalBS, setTotalBS] = useState(0);
   const [isSelectProductsModalVisible, setIsSelectProductsModalVisible] = useState(false);
 
+  const formatNumber = (number) => {
+    return number.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
   useEffect(() => {
     if (selectedOrder) {
-      setOrder(selectedOrder);
-      setOriginalOrder(selectedOrder); // Al seleccionar un pedido, actualiza la copia del pedido original
+      setOrder({ ...selectedOrder });
+      setOriginalOrder({ ...selectedOrder });
       updateTotal(selectedOrder.products);
     }
   }, [selectedOrder]);
@@ -66,11 +70,6 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
 
   const saveOrder = async () => {
     try {
-      // if (!invoiceType || !order.tipfac) {
-      //   Alert.alert('Selecciona un tipo de factura antes de guardar.');
-      //   return;
-      // }
-
       if (!order || !order.products || order.products.length === 0) {
         Alert.alert('Agrega al menos un producto antes de guardar.');
         return;
@@ -101,8 +100,8 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
   };
 
   const handleCancelEdit = () => {
-    // Restaurar el pedido original cuando se cancela la edición
-    setOrder(originalOrder);
+    setOrder({ ...originalOrder });
+    updateTotal(originalOrder.products);
     onClose();
   };
 
@@ -176,10 +175,9 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
                 <View style={styles.containerTitlePrice}>
                   <Text style={styles.titlePrice}>Total: </Text>
                 </View>
-                <Text style={styles.textPrice}>USD : {totalUSD.toFixed(2)}</Text>
-                {/* <Text style={styles.textPrice}>Bs. : {totalBS.toFixed(2)}</Text> */}
-                <Text style={styles.textPrice}>Bs. : {(totalUSD.toFixed(2) * 36.372).toFixed(2)}</Text>
-                <Text style={styles.textPrice}>Pesos : {(totalUSD.toFixed(2) * 3700).toFixed(2)}</Text>
+                <Text style={styles.textPrice}>USD : {formatNumber(totalUSD)}</Text>
+                <Text style={styles.textPrice}>Bs. : {formatNumber(totalUSD * 36.372)}</Text>
+                <Text style={styles.textPrice}>Pesos : {formatNumber(totalUSD * 3700)}</Text>
               </View>
 
               <View style={styles.containerNote}>
@@ -228,7 +226,7 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
       <SelectProducts
         isVisible={isSelectProductsModalVisible}
         onClose={() => setIsSelectProductsModalVisible(false)}
-        selectedOrder={order} // Pasar el pedido seleccionado a SelectProducts
+        selectedOrder={order}
         onSave={(newProducts) => {
           setOrder({ ...order, products: newProducts });
           updateTotal(newProducts);

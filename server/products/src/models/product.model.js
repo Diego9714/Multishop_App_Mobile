@@ -104,5 +104,35 @@ export class Products {
     }
   }
 
+  static async currency() {
+    try {
+      let msg = {
+        status: false,
+        msg: "Currency not founded",
+        code: 404
+      }
+
+      const connection = await pool.getConnection()
+
+      let sql = `SELECT moneda , cambio FROM tasamoneda;`
+      let [currency] = await connection.execute(sql)
+      
+      connection.release()
+
+      if(currency.length > 0){
+
+        msg = {
+          status: true,
+          msg: "Currency found",
+          code: 200,
+          currency
+        } 
+      }
+  
+      return msg
+    } catch (error) {
+      return error
+    }
+  }
 }
 

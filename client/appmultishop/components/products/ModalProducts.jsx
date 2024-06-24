@@ -1,8 +1,48 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, View, Pressable, Modal } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../../styles/ListProducts.styles';
 
 const ModalProduct = ({ isVisible, onClose, product }) => {
+  const [currency, setCurrency] = useState([]);
+  const [cambioBolivares, setCambioBolivares] = useState(null);
+  const [cambioDolares, setCambioDolares] = useState(null);
+  const [cambioPesos, setCambioPesos] = useState(null);
+
+  useEffect(() => {
+    const fetchCurrency = async () => {
+      try {
+        const storedCurrency = await AsyncStorage.getItem('currency');
+        if (storedCurrency !== null) {
+          const currencyArray = JSON.parse(storedCurrency);
+          setCurrency(currencyArray);
+          console.log('Currency from asyncStorage:', currencyArray);
+
+          // Buscar y almacenar el valor de cambio para cada moneda
+          const bolivares = currencyArray.find(item => item.moneda === 'Bolivares');
+          const dolares = currencyArray.find(item => item.moneda === 'Dolares');
+          const pesos = currencyArray.find(item => item.moneda === 'Pesos');
+
+          if (bolivares) {
+            setCambioBolivares(bolivares.cambio);
+            console.log('Valor de cambio para Bolivares:', bolivares.cambio);
+          }
+          if (dolares) {
+            setCambioDolares(dolares.cambio);
+            console.log('Valor de cambio para Dolares:', dolares.cambio);
+          }
+          if (pesos) {
+            setCambioPesos(pesos.cambio);
+            console.log('Valor de cambio para Pesos:', pesos.cambio);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching currency from asyncStorage', error);
+      }
+    };
+
+    fetchCurrency();
+  }, []);
 
   if (!product) return null;
 
@@ -17,7 +57,7 @@ const ModalProduct = ({ isVisible, onClose, product }) => {
           </View>
           <Text style={styles.subtitleModal}>Precio(Bs)</Text>
           <View style={styles.modalInfoClient}>
-            <Text style={styles.textModal}>{(product.precioUsd * 36.372).toFixed(2)}</Text>
+            <Text style={styles.textModal}>{(product.precioUsd * cambioBolivares).toFixed(2)}</Text>
           </View>
           <Text style={styles.subtitleModal}>Precio(Usd)</Text>
           <View style={styles.modalInfoClient}>
@@ -38,4 +78,4 @@ const ModalProduct = ({ isVisible, onClose, product }) => {
   );
 };
 
-export default ModalProduct
+export default ModalProduct;

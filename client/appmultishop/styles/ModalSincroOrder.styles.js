@@ -78,7 +78,8 @@ const styles = StyleSheet.create({
   loaderContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-  },
+  }
+  ,
   loadingText: {
     fontSize: 24,
     color: '#777',

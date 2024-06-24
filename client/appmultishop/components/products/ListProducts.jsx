@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, View, FlatList, Pressable, TextInput, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AntDesign, MaterialIcons, FontAwesome } from '@expo/vector-icons';
@@ -22,35 +22,28 @@ const ListProducts = () => {
   const defaultMaxPages = 5;
 
   useEffect(() => {
-    const cleanupProducts = async () => {
-      setProducts([]);
-      setCategories([]);
-      setBrands([]);
-      setVisibleProducts([]);
-      setSearchProduct('');
-      setDisplaySearchProduct('');
-      setSearchCategory('');
-      setPage(1);
-      setSelectedProduct(null);
-    };
-
-    cleanupProducts();
-
     const getProductsAndCategories = async () => {
-      const productsInfo = await AsyncStorage.getItem('products');
-      const productsJson = JSON.parse(productsInfo);
-      setProducts(productsJson || []);
+      try {
+        const productsInfo = await AsyncStorage.getItem('products');
+        const productsJson = JSON.parse(productsInfo);
+        setProducts(productsJson || []);
 
-      const categoriesInfo = await AsyncStorage.getItem('categories');
-      const categoriesJson = JSON.parse(categoriesInfo);
-      setCategories(categoriesJson || []);
+        const categoriesInfo = await AsyncStorage.getItem('categories');
+        const categoriesJson = JSON.parse(categoriesInfo);
+        setCategories(categoriesJson || []);
 
-      const brandsInfo = await AsyncStorage.getItem('brands');
-      const brandsJson = JSON.parse(brandsInfo);
-      setBrands(brandsJson || []);
+        const brandsInfo = await AsyncStorage.getItem('brands');
+        const brandsJson = JSON.parse(brandsInfo);
+        setBrands(brandsJson || []);
+      } catch (error) {
+        console.error('Error al obtener datos de AsyncStorage:', error);
+      }
     };
-    getProductsAndCategories();
-  }, []);
+
+    if (visibleProducts.length === 0) {
+      getProductsAndCategories();
+    }
+  }, [visibleProducts]); // Solo se ejecuta si visibleProducts está vacío
 
   useEffect(() => {
     let filteredProducts = products;

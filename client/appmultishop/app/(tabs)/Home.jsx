@@ -26,6 +26,7 @@ const Home = () => {
           const productsStored = await AsyncStorage.getItem('products')
           const categoriesStored = await AsyncStorage.getItem('categories')
           const brandsStored = await AsyncStorage.getItem('brands')
+          const currencyStored = await AsyncStorage.getItem('currency')
 
           if (!clientsStored) {
             getClients(cod_ven)
@@ -38,6 +39,9 @@ const Home = () => {
           }
           if (!brandsStored) {
             getBrands()
+          }
+          if (!currencyStored) {
+            getCurrency()
           }
         }
       } catch (error) {
@@ -84,6 +88,16 @@ const Home = () => {
       await AsyncStorage.setItem('brands', JSON.stringify(listBrands))
     } catch (error) {
       console.error('Error al obtener las marcas:', error)
+    }
+  }
+
+  const getCurrency = async () => {
+    try {
+      const res = await instanceProducts.get(`/api/currency`)
+      let listCurrency = res.data.currency
+      await AsyncStorage.setItem('currency', JSON.stringify(listCurrency))
+    } catch (error) {
+      console.error('Error al obtener el cambio de las monedas:', error)
     }
   }
 
