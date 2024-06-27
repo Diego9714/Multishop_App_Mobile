@@ -15,6 +15,43 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
   const [totalUSD, setTotalUSD] = useState(0);
   const [totalBS, setTotalBS] = useState(0);
   const [isSelectProductsModalVisible, setIsSelectProductsModalVisible] = useState(false);
+  const [cambioBolivares, setCambioBolivares] = useState(null);
+  const [cambioDolares, setCambioDolares] = useState(null);
+  const [cambioPesos, setCambioPesos] = useState(null);
+
+  useEffect(() => {
+    const fetchCurrency = async () => {
+      try {
+        const storedCurrency = await AsyncStorage.getItem('currency');
+        if (storedCurrency !== null) {
+          const currencyArray = JSON.parse(storedCurrency);
+          // console.log('Currency from asyncStorage:', currencyArray);
+
+          // Buscar y almacenar el valor de cambio para cada moneda
+          const bolivares = currencyArray.find(item => item.moneda === 'Bolivares');
+          const dolares = currencyArray.find(item => item.moneda === 'Dolares');
+          const pesos = currencyArray.find(item => item.moneda === 'Pesos');
+
+          if (bolivares) {
+            setCambioBolivares(bolivares.cambio);
+            // console.log('Valor de cambio para Bolivares:', bolivares.cambio);
+          }
+          if (dolares) {
+            setCambioDolares(dolares.cambio);
+            // console.log('Valor de cambio para Dolares:', dolares.cambio);
+          }
+          if (pesos) {
+            setCambioPesos(pesos.cambio);
+            // console.log('Valor de cambio para Pesos:', pesos.cambio);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching currency from asyncStorage', error);
+      }
+    };
+
+    fetchCurrency();
+  }, []);
 
   const formatNumber = (number) => {
     return number.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -170,6 +207,12 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
                   ))}
                 </View>
               </View>
+
+              <View style={styles.exchangeRateContainer}>
+            <Text style={styles.exchangeRateText}>Cambio USD : {cambioDolares}</Text>
+            <Text style={styles.exchangeRateText}>Cambio Bs. : {cambioBolivares}</Text>
+            {/* <Text style={styles.exchangeRateText}>Cambio Pesos: {cambioPesos}</Text> */}
+          </View>
 
               <View style={styles.containerPrice}>
                 <View style={styles.containerTitlePrice}>

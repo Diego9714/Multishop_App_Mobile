@@ -24,19 +24,29 @@ const styles = StyleSheet.create({
   },
   activityIndicatorWrapper: {
     backgroundColor: '#FFFFFF',
-    height: '40%',
-    width: '60%',
+    // height: '40%',
+    width: '80%',
     borderRadius: 10,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 10,
   },
+  messageInfo: {
+    textAlign: 'center',
+    fontSize: 20,
+    color: '#333',
+    marginBottom: 20,
+    paddingBottom: 20,
+    // borderWidth: 2,
+    borderBottomWidth: 2, // Agregando una línea de separación
+    borderBottomColor: 'black' // Color de la línea de separación
+  },  
   message: {
     textAlign: 'center',
     fontSize: 20,
     color: '#333',
-    marginBottom: '20%'
+    marginBottom: 20
   },
   buttonModal: {
     width: 150,

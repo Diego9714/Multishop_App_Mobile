@@ -3,7 +3,8 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
   container: {
     flex: 1, // Utiliza flex para que el contenedor ocupe todo el espacio disponible
-    marginTop: '6%',
+    marginTop: 20,
+    padding: 15,
     backgroundColor: '#EFEFEF',
     justifyContent: 'center',
     alignItems: 'center',
@@ -23,6 +24,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingBottom: 20, // Añade padding inferior para que el último contenido no quede pegado al borde
+
   },
   mainTitleContainer: {
     width: '90%',
@@ -128,6 +130,16 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'flex-end',
   },
+  exchangeRateContainer:{
+    display:'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    gap: 20
+  },
+  exchangeRateText:{
+    color: 'gray'
+  },
   containerPrice: {
     width: '70%',
     display: 'flex',
@@ -163,11 +175,10 @@ const styles = StyleSheet.create({
   containerButton:{
     display: 'flex',
     flexDirection: 'row',
-    justifyContent:'space-between',
+    justifyContent:'space-evenly',
     alignItems: 'center',
-    width: '70%',
-    marginTop: 20,
-    gap: 10
+    width: '100%',
+    marginTop: 20
   },
   otherButton: {
     paddingVertical: 10,

@@ -102,7 +102,7 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
     const product = products.find(p => p.codigo === productId);
 
     if (quantity > product.existencia) {
-      Alert.alert('Cantidad no disponible', 'La cantidad ingresada supera la cantidad existente en el inventario.');
+      Alert.alert('Cantidad no disponible', `La cantidad ingresada: ${quantity} , supera la cantidad existente en el inventario : ${product.existencia}`);
       handleProductDelete(productId); // Deselect the product and clear the quantity if it exceeds the stock
       return;
     }

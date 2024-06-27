@@ -16,7 +16,6 @@ const ModalProduct = ({ isVisible, onClose, product }) => {
         if (storedCurrency !== null) {
           const currencyArray = JSON.parse(storedCurrency);
           setCurrency(currencyArray);
-          console.log('Currency from asyncStorage:', currencyArray);
 
           // Buscar y almacenar el valor de cambio para cada moneda
           const bolivares = currencyArray.find(item => item.moneda === 'Bolivares');
@@ -25,15 +24,15 @@ const ModalProduct = ({ isVisible, onClose, product }) => {
 
           if (bolivares) {
             setCambioBolivares(bolivares.cambio);
-            console.log('Valor de cambio para Bolivares:', bolivares.cambio);
+            // console.log('Valor de cambio para Bolivares:', bolivares.cambio);
           }
           if (dolares) {
             setCambioDolares(dolares.cambio);
-            console.log('Valor de cambio para Dolares:', dolares.cambio);
+            // console.log('Valor de cambio para Dolares:', dolares.cambio);
           }
           if (pesos) {
             setCambioPesos(pesos.cambio);
-            console.log('Valor de cambio para Pesos:', pesos.cambio);
+            // console.log('Valor de cambio para Pesos:', pesos.cambio);
           }
         }
       } catch (error) {
@@ -43,6 +42,10 @@ const ModalProduct = ({ isVisible, onClose, product }) => {
 
     fetchCurrency();
   }, []);
+
+  const formatNumber = (number) => {
+    return new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(number);
+  };
 
   if (!product) return null;
 
@@ -57,11 +60,11 @@ const ModalProduct = ({ isVisible, onClose, product }) => {
           </View>
           <Text style={styles.subtitleModal}>Precio(Bs)</Text>
           <View style={styles.modalInfoClient}>
-            <Text style={styles.textModal}>{(product.precioUsd * cambioBolivares).toFixed(2)}</Text>
+            <Text style={styles.textModal}>{formatNumber(product.precioUsd * cambioBolivares)}</Text>
           </View>
           <Text style={styles.subtitleModal}>Precio(Usd)</Text>
           <View style={styles.modalInfoClient}>
-            <Text style={styles.textModal}>{product.precioUsd}</Text>
+            <Text style={styles.textModal}>{formatNumber(product.precioUsd)}</Text>
           </View>
           <Text style={styles.subtitleModal}>Categoría</Text>
           <View style={styles.modalInfoClient}>

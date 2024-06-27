@@ -3,7 +3,8 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
   container: {
     flex: 1, // Utiliza flex para que el contenedor ocupe todo el espacio disponible
-    marginTop: '6%',
+    marginTop: 20,
+    padding: 15,
     backgroundColor: '#EFEFEF',
     justifyContent: 'center',
     alignItems: 'center',
@@ -143,6 +144,18 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'flex-end',
   },
+  exchangeRateContainer:{
+    display:'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    textAlign: 'center',
+    justifyContent:'center',    
+    marginTop: 10,
+    gap: 20
+  },
+  exchangeRateText:{
+    color: 'gray'
+  },
   containerPrice: {
     display: 'flex',
     flexDirection: 'column',
@@ -164,9 +177,9 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   containerNote: {
-    width: '90%',
+    width: '100%',
     marginTop: 10,
-    marginBottom: 10
+    marginBottom: 10,
   },
   noteOrder:{
     color: 'gray',
@@ -175,12 +188,10 @@ const styles = StyleSheet.create({
   containerButton:{
     display: 'flex',
     flexDirection: 'row',
-    justifyContent:'space-around',
+    justifyContent:'space-evenly',
     alignItems: 'center',
-    // width: '70%',
-    marginTop: 20,
-    marginHorizontal: 50,
-    gap: 10
+    width: '100%',
+    marginTop: 20
   },
   selectProdContainer:{
     marginHorizontal: 50,

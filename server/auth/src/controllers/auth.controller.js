@@ -14,7 +14,7 @@ controller.login = async (req, res) => {
 
     }else{
       const user = await Users.search(username , password)
-      console.log(user)
+
       if(user.code == 200){
         res.cookie('token', user.tokenUser)
         res.json(user)

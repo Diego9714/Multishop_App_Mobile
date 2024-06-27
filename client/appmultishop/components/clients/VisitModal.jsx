@@ -2,9 +2,9 @@ import React, { useEffect, useRef, useState } from 'react'
 import { View, Text, Modal, Pressable, Animated, Easing } from 'react-native'
 import { AntDesign } from '@expo/vector-icons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { jwtDecode } from 'jwt-decode';
-import { decode } from 'base-64';
-global.atob = decode;
+import { jwtDecode } from 'jwt-decode'
+import { decode } from 'base-64'
+global.atob = decode
 // Styles
 import styles from '../../styles/ModalVisit.styles'
 
@@ -23,7 +23,6 @@ const VisitModal = ({ isVisible, onClose, client }) => {
     const regVisit = async (client) => {
       try {
         let token = await AsyncStorage.getItem('tokenUser')
-
         const decodedToken = jwtDecode(token)
 
         const visit = {
@@ -31,18 +30,21 @@ const VisitModal = ({ isVisible, onClose, client }) => {
           id_scli: client.id_scli,
           cod_cli: client.cod_cli,
           nom_cli: client.nom_cli,
-          cod_ven : decodedToken.cod_ven,
-          fecha: new Date().toISOString(), // Guarda la fecha y hora exacta en formato ISO8601
+          cod_ven: decodedToken.cod_ven,
+          fecha: new Date().toISOString(),
+          status: "No sincronizada"
         }
 
         const existingVisits = await AsyncStorage.getItem('ClientVisits')
-
         const visits = existingVisits ? JSON.parse(existingVisits) : []
 
-        // Verificar si ya existe una visita para este cliente en la misma fecha
+        // Verificar si ya existe una visita para este cliente por el mismo vendedor en la misma fecha
         const today = new Date().toISOString().split('T')[0]
         const existingVisit = visits.find(
-          (v) => v.id_scli === client.id_scli && v.fecha.split('T')[0] === today
+          (v) =>
+            v.id_scli === client.id_scli &&
+            v.cod_ven === decodedToken.cod_ven &&
+            v.fecha.split('T')[0] === today
         )
 
         if (existingVisit) {

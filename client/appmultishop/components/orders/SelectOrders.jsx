@@ -1,11 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Text, View, Pressable, ScrollView, Modal, Alert } from 'react-native';
+import { Text, View, Pressable, ScrollView, Modal, Alert, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import styles from '../../styles/SelectOrders.styles';
 import ModalSelectOrder from './ModalSelectOrder';
 import ModalSincroOrder from './ModalSincroOrder';
 import EditOrder from '../editOrder/EditOrder';
+import { jwtDecode } from 'jwt-decode';
+import { decode } from 'base-64';
+global.atob = decode;
+
 // Api
 import { instanceSincro } from '../../global/api';
 
@@ -23,7 +27,9 @@ const SelectOrders = () => {
   const [unsynchronizedOrders, setUnsynchronizedOrders] = useState([]);
   const [modalSincroVisible, setModalSincroVisible] = useState(false); // Variable de estado para controlar la visibilidad del modal
   const [clientsOrder, setClientsOrder] = useState([]); // Define clientsOrder state
+  const [isLoading, setIsLoading] = useState(false);  // Estado del loader
   const itemsPerPage = 10;
+  const [codVen, setCodVen] = useState(null);  // Estado para almacenar el cod_ven del usuario
 
   const formatNumber = (number) => {
     return number.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -32,8 +38,14 @@ const SelectOrders = () => {
   const fetchOrders = async () => {
     try {
       const storedOrdersString = await AsyncStorage.getItem('OrdersClient');
+      const token = await AsyncStorage.getItem('tokenUser');
+      const decodedToken = jwtDecode(token);
+      const cod_ven = decodedToken.cod_ven;
+      setCodVen(cod_ven);  // Guardar cod_ven en el estado
+
       const parsedOrders = storedOrdersString ? JSON.parse(storedOrdersString) : [];
-      setStoredOrders(parsedOrders);
+      const filteredOrders = parsedOrders.filter(order => order.cod_ven === cod_ven); // Filtrar los pedidos
+      setStoredOrders(filteredOrders);
       setIsLoaded(true);
     } catch (error) {
       console.error('Error fetching orders:', error);
@@ -44,6 +56,10 @@ const SelectOrders = () => {
     const fetchClientsOrder = async () => {
       try {
         const storedClientsOrderString = await AsyncStorage.getItem('ClientsOrder');
+        const token = await AsyncStorage.getItem('tokenUser');
+        const decodedToken = jwtDecode(token);
+        const cod_ven = decodedToken.cod_ven;
+
         const parsedClientsOrder = storedClientsOrderString ? JSON.parse(storedClientsOrderString) : [];
         setClientsOrder(parsedClientsOrder);
       } catch (error) {
@@ -52,7 +68,7 @@ const SelectOrders = () => {
     };
 
     fetchClientsOrder();
-  }, []); 
+  }, []);
 
   useEffect(() => {
     if (!isLoaded) {
@@ -64,7 +80,8 @@ const SelectOrders = () => {
         const storedOrdersString = await AsyncStorage.getItem('OrdersClient');
         const parsedOrders = storedOrdersString ? JSON.parse(storedOrdersString) : [];
         if (JSON.stringify(parsedOrders) !== JSON.stringify(storedOrders)) {
-          setStoredOrders(parsedOrders);
+          const filteredOrders = parsedOrders.filter(order => order.cod_ven === codVen); // Filtrar los pedidos
+          setStoredOrders(filteredOrders);
         }
       } catch (error) {
         console.error('Error fetching orders:', error);
@@ -72,7 +89,7 @@ const SelectOrders = () => {
     }, 5000);
 
     return () => clearInterval(intervalId);
-  }, [isLoaded, storedOrders]);
+  }, [isLoaded, storedOrders, codVen]);
 
   useEffect(() => {
     if (JSON.stringify(storedOrders) !== JSON.stringify(orders)) {
@@ -114,21 +131,28 @@ const SelectOrders = () => {
     const ordersToSync = orders.filter(order => selectedOrders[order.id_order]);
     console.log('Orders to sync:', ordersToSync[0].products);
 
+    setIsLoading(true);  // Inicia el loader
+    setModalSincroVisible(true);  // Abre el modal de sincronización
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      setUnsynchronizedOrders(ordersToSync);  // Marca todos los pedidos como no sincronizados
+    }, 10000);  // 10 segundos de espera
+
     try {
       const response = await instanceSincro.post('/api/register/order', { order: ordersToSync });
       console.log('Synchronization response:', response.data);
 
       if (response.status === 200) {
+        clearTimeout(timer);
         const { processOrder } = response.data;
         const completed = processOrder.completed || [];
         const existing = processOrder.existing || [];
         const notCompleted = processOrder.notCompleted || [];
 
-        console.log('Completed orders:', completed);
-        console.log('Existing orders:', existing);
-        console.log('Not completed orders:', notCompleted);
+        // console.log('Completed orders:', completed);
+        // console.log('Existing orders:', existing);
+        // console.log('Not completed orders:', notCompleted);
 
-        // Crear un conjunto de IDs de pedidos que fueron completados o ya existen
         const processedOrderIds = new Set([
           ...completed.map(order => order.id_order),
           ...existing.map(order => order.id_order)
@@ -136,43 +160,33 @@ const SelectOrders = () => {
 
         console.log('Processed order IDs:', processedOrderIds);
 
-        // Filtrar la lista de pedidos para actualizar los estados
         const updatedOrders = orders.filter(order => !processedOrderIds.has(order.id_order));
         setOrders(updatedOrders);
         setStoredOrders(updatedOrders);
 
-        // Actualizar las listas de pedidos sincronizados y no sincronizados
         setSynchronizedOrders(completed);
         setUnsynchronizedOrders(notCompleted);
 
-        // Limpiar la selección de pedidos
         setSelectedOrders({});
 
-        // Obtener los pedidos actuales del almacenamiento local
         const storedOrders = await AsyncStorage.getItem('OrdersClient');
         const parsedStoredOrders = storedOrders ? JSON.parse(storedOrders) : [];
 
-        // Filtrar los pedidos completados y repetidos
         const remainingStoredOrders = parsedStoredOrders.filter(order => !processedOrderIds.has(order.id_order));
-
-        // Guardar de nuevo los pedidos no completados en el almacenamiento local
         await AsyncStorage.setItem('OrdersClient', JSON.stringify(remainingStoredOrders));
       }
     } catch (error) {
       console.error('Error synchronizing orders:', error);
-      // Verificar si el error es debido a un status code 500
       if (error.response && error.response.status === 500) {
-        // Si es un error 500, marcar todos los pedidos como no completados
         const ordersToMarkAsNotCompleted = ordersToSync.map(order => ({
           ...order,
           status: 'Not completed'
         }));
         setUnsynchronizedOrders(ordersToMarkAsNotCompleted);
       }
+    } finally {
+      setIsLoading(false);  // Detiene el loader
     }
-
-    // Abrir el modal después de sincronizar
-    setModalSincroVisible(true);
   };
 
   const renderPaginationButtons = () => {
@@ -204,7 +218,6 @@ const SelectOrders = () => {
         setOrders(updatedOrders);
         setStoredOrders(updatedOrders);
         await AsyncStorage.setItem('OrdersClient', JSON.stringify(updatedOrders));
-        // console.log('Order deleted:', selectedOrder);
       } catch (error) {
         console.error('Error deleting order:', error);
       }
@@ -289,6 +302,7 @@ const SelectOrders = () => {
         onClose={() => setModalSincroVisible(false)} 
         synchronizedOrders={synchronizedOrders} 
         unsynchronizedOrders={unsynchronizedOrders} 
+        isLoading={isLoading}  // Pasar el estado del loader al modal
       />
 
       <ModalSelectOrder 

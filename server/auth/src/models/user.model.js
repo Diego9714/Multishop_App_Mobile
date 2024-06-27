@@ -18,7 +18,6 @@ export class Users {
       
       connection.release()
 
-      
       if(user) {        
         let isMatch = await bcrypt.compare(password, user[0].pass_vend)
 

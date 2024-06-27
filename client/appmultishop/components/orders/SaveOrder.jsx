@@ -19,6 +19,9 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
   const [products, setProducts] = useState([]);
   const [totalPriceUsd, setTotalPriceUsd] = useState(0);
   const [totalPriceBs, setTotalPriceBs] = useState(0);
+  const [cambioBolivares, setCambioBolivares] = useState(null);
+  const [cambioDolares, setCambioDolares] = useState(null);
+  const [cambioPesos, setCambioPesos] = useState(null);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -26,6 +29,40 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
       setProducts(order.products);
     }
   }, [order]);
+
+  useEffect(() => {
+    const fetchCurrency = async () => {
+      try {
+        const storedCurrency = await AsyncStorage.getItem('currency');
+        if (storedCurrency !== null) {
+          const currencyArray = JSON.parse(storedCurrency);
+          // console.log('Currency from asyncStorage:', currencyArray);
+
+          // Buscar y almacenar el valor de cambio para cada moneda
+          const bolivares = currencyArray.find(item => item.moneda === 'Bolivares');
+          const dolares = currencyArray.find(item => item.moneda === 'Dolares');
+          const pesos = currencyArray.find(item => item.moneda === 'Pesos');
+
+          if (bolivares) {
+            setCambioBolivares(bolivares.cambio);
+            // console.log('Valor de cambio para Bolivares:', bolivares.cambio);
+          }
+          if (dolares) {
+            setCambioDolares(dolares.cambio);
+            // console.log('Valor de cambio para Dolares:', dolares.cambio);
+          }
+          if (pesos) {
+            setCambioPesos(pesos.cambio);
+            // console.log('Valor de cambio para Pesos:', pesos.cambio);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching currency from asyncStorage', error);
+      }
+    };
+
+    fetchCurrency();
+  }, []);
 
   const openProductModal = (product) => {
     setSelectedProduct(product);
@@ -117,11 +154,11 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
         exists: product.exists,
         quantity: product.quantity,
         priceUsd: product.priceUsd,
-        priceBs: (product.priceUsd * 36.372).toFixed(2),
+        priceBs: (product.priceUsd * cambioBolivares).toFixed(2),
       })),
       tipfac: invoiceType,
       totalUsd: parseFloat(totalPriceUsd),
-      totalBs: parseFloat((totalPriceUsd * 36.372).toFixed(2)),
+      totalBs: parseFloat((totalPriceUsd * cambioBolivares).toFixed(2)),
       fecha: new Date().toISOString(),
     };
 
@@ -200,14 +237,20 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
               ))}
             </ScrollView>
           </View>
+
+          <View style={styles.exchangeRateContainer}>
+            <Text style={styles.exchangeRateText}>Cambio USD: {cambioDolares}</Text>
+            <Text style={styles.exchangeRateText}>Cambio Bs.: {cambioBolivares}</Text>
+            {/* <Text style={styles.exchangeRateText}>Cambio Pesos: {cambioPesos}</Text> */}
+          </View>
           
           <View style={styles.containerPrice}>
             <View style={styles.containerTitlePrice}>
               <Text style={styles.titlePrice}>Total</Text>
             </View>
             <Text style={styles.textPrice}>USD : {formatNumber(totalPriceUsd)}</Text>
-            <Text style={styles.textPrice}>Bs. : {formatNumber(totalPriceUsd * 36.372)}</Text>
-            <Text style={styles.textPrice}>Pesos : {formatNumber(totalPriceUsd * 3700)}</Text>
+            <Text style={styles.textPrice}>Bs. : {formatNumber(totalPriceUsd * cambioBolivares)}</Text>
+            <Text style={styles.textPrice}>Pesos : {formatNumber(totalPriceUsd * cambioPesos)}</Text>
           </View>
 
           <View style={styles.containerNote}>

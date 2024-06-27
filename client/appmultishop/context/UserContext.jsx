@@ -2,7 +2,6 @@
 import React, { createContext , useState } from 'react'
 import AsyncStorage             from '@react-native-async-storage/async-storage'
 import { instanceAuth }         from '../global/api'
-import { Alert }                from 'react-native'
 import { router }               from 'expo-router'
 // Modal Loader
 import { ModalLoaderLogin }     from '../components/users/ModalLoaderLogin'
@@ -59,7 +58,6 @@ export const UserProvider = ({ children }) => {
         await AsyncStorage.removeItem('categories')
         await AsyncStorage.removeItem('brands')
         await AsyncStorage.removeItem('clients')
-        await AsyncStorage.removeItem('OrdersClient')
         await AsyncStorage.removeItem('currency')
 
         router.replace('/(auth)/Login')

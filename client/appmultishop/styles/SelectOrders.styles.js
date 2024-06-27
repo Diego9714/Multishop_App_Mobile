@@ -99,8 +99,7 @@ const styles = StyleSheet.create({
   buttonsAction: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 20,
-    width: '100%',
+    marginTop: 5,
   },
   buttonSincro: {
     backgroundColor: '#5B97DC',

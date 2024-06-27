@@ -1,118 +1,58 @@
-import React, { useState } from 'react';
-import { View, Image, ActivityIndicator, Modal, Text, Pressable } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Image, ActivityIndicator, Modal, Text, Pressable, FlatList } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from '../styles/Navbar.styles';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-// Api
-import { instanceClient, instanceProducts } from '../global/api';
-// Components
+import { getAllInfo } from '../utils/NavbarUtils'; // Importa la función de utilidad
 import { images } from '../constants';
-// JwtDecode
-import { jwtDecode } from 'jwt-decode';
-import { decode } from 'base-64';
-global.atob = decode;
 
 const Navbar = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [success, setSuccess] = useState(false);
+  const [syncedVisits, setSyncedVisits] = useState([]);
+  const [unsyncedVisits, setUnsyncedVisits] = useState([]);
 
-  const storeData = async (key, value) => {
-    try {
-      await AsyncStorage.setItem(key, JSON.stringify(value));
-    } catch (error) {
-      console.error(`Error storing ${key}:`, error);
-      throw error;
+  useEffect(() => {
+    if (message === 'Información actualizada y visitas sincronizadas.') {
+      setUnsyncedVisits([]); // Limpia las visitas no sincronizadas si todas se sincronizaron
     }
-  };
-
-  const getClients = async (cod_ven) => {
-    try {
-      const res = await instanceClient.get(`/api/clients/${cod_ven}`);
-      const listClients = res.data.clients;
-      await storeData('clients', listClients);
-    } catch (error) {
-      console.error('Error fetching clients:', error);
-      throw error;
-    }
-  };
-
-  const getProducts = async () => {
-    try {
-      const res = await instanceProducts.get(`/api/products`);
-      const listProducts = res.data.products;
-      await storeData('products', listProducts);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      throw error;
-    }
-  };
-
-  const getCategories = async () => {
-    try {
-      const res = await instanceProducts.get(`/api/categories`);
-      const listCategories = res.data.categories;
-      await storeData('categories', listCategories);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      throw error;
-    }
-  };
-
-  const getBrands = async () => {
-    try {
-      const res = await instanceProducts.get(`/api/brands`);
-      const listbrands = res.data.brands;
-      await storeData('brands', listbrands);
-    } catch (error) {
-      console.error('Error fetching brands:', error);
-      throw error;
-    }
-  };
-
-  const getCurrency = async () => {
-    try {
-      const res = await instanceProducts.get(`/api/currency`);
-      const listCurrency = res.data.currency;
-      console.log(listCurrency)
-      await storeData('currency', listCurrency);
-    } catch (error) {
-      console.error('Error fetching brands:', error);
-      throw error;
-    }
-  };
-
-  const getAllInfo = async () => {
-    setLoading(true);
-    setMessage('');
-    const timeoutId = setTimeout(() => {
-      setLoading(false);
-      setMessage('Tiempo de espera agotado. Intenta nuevamente.');
-    }, 5000);
-
-    try {
-      const token = await AsyncStorage.getItem('tokenUser');
-      if (token) {
-        const decodedToken = jwtDecode(token);
-        const cod_ven = decodedToken.cod_ven;
-
-        await Promise.all([getClients(cod_ven), getProducts(), getCategories(), getBrands(), getCurrency()]);
-        clearTimeout(timeoutId);
-        setLoading(false);
-        setMessage('Información actualizada correctamente.');
-      } else {
-        clearTimeout(timeoutId);
-        setLoading(false);
-        setMessage('No se encontró el token del usuario.');
-      }
-    } catch (error) {
-      clearTimeout(timeoutId);
-      setLoading(false);
-      setMessage('Error al actualizar la información.');
-    }
-  };
+  }, [message]);
 
   const handleClose = () => {
     setMessage('');
+  };
+
+  const handleGetAllInfo = async () => {
+    setLoading(true);
+    setMessage('');
+    setSuccess(false);
+    try {
+      await getAllInfo(setLoading, setMessage, handleSyncVisits); // Llama a getAllInfo con handleSyncVisits como callback
+      setSuccess(true); // Indica éxito si la información se actualiza correctamente
+    } catch (error) {
+      setSuccess(false); // Maneja errores en la actualización de información
+    }
+  };
+
+  const handleSyncVisits = async (visitsSynced, syncedVisitsList, unsyncedVisitsList) => {
+    if (visitsSynced) {
+      setMessage('Información actualizada y visitas sincronizadas.');
+      setSyncedVisits(syncedVisitsList); // Actualiza el estado con las visitas sincronizadas
+      setUnsyncedVisits([]); // Limpia las visitas no sincronizadas
+    } else {
+      setMessage('Información actualizada pero las visitas no se sincronizaron.');
+      setSyncedVisits(syncedVisitsList); // Actualiza el estado con las visitas sincronizadas
+      setUnsyncedVisits(unsyncedVisitsList); // Actualiza el estado con las visitas no sincronizadas
+    }
+  };  
+
+  const renderItem = ({ item }) => {
+    return (
+      <View style={styles.visitItem}>
+        <Text style={styles.visitText}>{item.clientName}</Text>
+        {/* Puedes mostrar más detalles de la visita aquí si es necesario */}
+      </View>
+    );
   };
 
   return (
@@ -123,7 +63,7 @@ const Navbar = () => {
         size={35}
         color="#5B97DC"
         style={{ marginLeft: 115 }}
-        onPress={getAllInfo}
+        onPress={handleGetAllInfo}
       />
       <Modal transparent={true} animationType="fade" visible={loading || message !== ''}>
         <View style={styles.modalBackground}>
@@ -132,14 +72,45 @@ const Navbar = () => {
               <ActivityIndicator size="large" color="#0000ff" animating={loading} />
             ) : (
               <>
-                <Text style={styles.message}>{message}</Text>
+                <Text style={styles.messageInfo}>{message}</Text>
+                <Text style={styles.message}>Visitas Sincronizadas</Text>
+                <FlatList
+                  data={syncedVisits}
+                  renderItem={renderItem}
+                  keyExtractor={(item, index) => index.toString()}
+                  ListEmptyComponent={<Text style={styles.message}>No hay visitas sincronizadas</Text>}
+                />
+                {unsyncedVisits.length > 0 && (
+                  <>
+                    <Text style={styles.message}>Visitas No Sincronizadas</Text>
+                    <FlatList
+                      data={unsyncedVisits}
+                      renderItem={({ item }) => (
+                        <View style={styles.visitItem}>
+                          <Text style={styles.visitText}>{item.clientName}</Text>
+                          {/* Puedes mostrar más detalles de la visita aquí si es necesario */}
+                        </View>
+                      )}
+                      keyExtractor={(item, index) => index.toString()}
+                      ListEmptyComponent={<Text style={styles.message}>{item}</Text>}
+                    />
+                  </>
+                )}
                 <View style={styles.buttonContainer}>
-                  <Pressable style={styles.buttonModal} onPress={getAllInfo}>
-                    <Text style={styles.buttonTextModal}>Reintentar</Text>
-                  </Pressable>
-                  <Pressable style={styles.buttonModalExit} onPress={handleClose}>
-                    <Text style={styles.buttonTextModal}>Salir</Text>
-                  </Pressable>
+                  {success ? (
+                    <Pressable style={styles.buttonModalExit} onPress={handleClose}>
+                      <Text style={styles.buttonTextModal}>Salir</Text>
+                    </Pressable>
+                  ) : (
+                    <>
+                      <Pressable style={styles.buttonModal} onPress={handleGetAllInfo}>
+                        <Text style={styles.buttonTextModal}>Reintentar</Text>
+                      </Pressable>
+                      <Pressable style={styles.buttonModalExit} onPress={handleClose}>
+                        <Text style={styles.buttonTextModal}>Salir</Text>
+                      </Pressable>
+                    </>
+                  )}
                 </View>
               </>
             )}
