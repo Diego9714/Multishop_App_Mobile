@@ -156,8 +156,10 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
     }));
 
     const order = {
-      cod_cli: client.cod_cli,
       nom_cli: client.nom_cli,
+      cod_cli: client.cod_cli,
+      tlf_cli: client.tel_cli,
+      dir_cli: client.dir1_cli,
       products: selectedProductsWithQuantities
     };
 

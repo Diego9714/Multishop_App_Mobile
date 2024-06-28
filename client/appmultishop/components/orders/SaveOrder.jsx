@@ -8,6 +8,8 @@ import ModalOrderSaved from './ModalOrderSaved';
 import styles from '../../styles/SaveOrder.styles';
 import { jwtDecode } from 'jwt-decode';
 import { decode } from 'base-64';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
 global.atob = decode;
 
 const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDeleteProduct }) => {
@@ -22,6 +24,7 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
   const [cambioBolivares, setCambioBolivares] = useState(null);
   const [cambioDolares, setCambioDolares] = useState(null);
   const [cambioPesos, setCambioPesos] = useState(null);
+  const [pdfUri, setPdfUri] = useState(null);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -36,24 +39,18 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
         const storedCurrency = await AsyncStorage.getItem('currency');
         if (storedCurrency !== null) {
           const currencyArray = JSON.parse(storedCurrency);
-          // console.log('Currency from asyncStorage:', currencyArray);
-
-          // Buscar y almacenar el valor de cambio para cada moneda
           const bolivares = currencyArray.find(item => item.moneda === 'Bolivares');
           const dolares = currencyArray.find(item => item.moneda === 'Dolares');
           const pesos = currencyArray.find(item => item.moneda === 'Pesos');
 
           if (bolivares) {
             setCambioBolivares(bolivares.cambio);
-            // console.log('Valor de cambio para Bolivares:', bolivares.cambio);
           }
           if (dolares) {
             setCambioDolares(dolares.cambio);
-            // console.log('Valor de cambio para Dolares:', dolares.cambio);
           }
           if (pesos) {
             setCambioPesos(pesos.cambio);
-            // console.log('Valor de cambio para Pesos:', pesos.cambio);
           }
         }
       } catch (error) {
@@ -90,7 +87,7 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
   const handleProductDelete = (productId) => {
     const updatedProducts = products.filter(product => product.codigo !== productId);
     setProducts(updatedProducts);
-  
+
     if (onDeleteProduct) {
       onDeleteProduct(productId);
     }
@@ -132,22 +129,23 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
       Alert.alert('Error', 'Debe seleccionar el tipo de factura');
       return;
     }
-  
+
     if (products.length === 0) {
       Alert.alert('Error', 'Debe seleccionar al menos un producto');
       return;
     }
 
-    let token = await AsyncStorage.getItem('tokenUser')
-    
-    const decodedToken = jwtDecode(token)
+    let token = await AsyncStorage.getItem('tokenUser');
+    const decodedToken = jwtDecode(token);
 
     const orderData = {
       id_order: generateRandomProductId(),
       id_scli: client.id_scli,
       cod_cli: client.cod_cli,
       nom_cli: client.nom_cli,
-      cod_ven : decodedToken.cod_ven,
+      tlf_cli: client.tel_cli,
+      dir_cli: client.dir1_cli,
+      cod_ven: decodedToken.cod_ven,
       products: products.map(product => ({
         codigo: product.codigo,
         descrip: product.descrip,
@@ -167,11 +165,245 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
       const orders = existingOrders ? JSON.parse(existingOrders) : [];
       orders.push(orderData);
       await AsyncStorage.setItem('OrdersClient', JSON.stringify(orders));
-      
-      setIsOrderSavedModalVisible(true);  // Mostrar el modal de confirmación
 
+      setIsOrderSavedModalVisible(true); // Mostrar el modal de confirmación
     } catch (error) {
       console.error('Error saving order:', error);
+    }
+  };
+
+  const handleGenerateAndSharePdf = async () => {
+    if (!invoiceType) {
+      Alert.alert('Error', 'Debe seleccionar el tipo de factura');
+      return;
+    }
+
+    if (products.length === 0) {
+      Alert.alert('Error', 'Debe seleccionar al menos un producto');
+      return;
+    }
+
+    const htmlContent = `
+    <html>
+    <head>
+      <style>
+        *{
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        body {
+          font-family: Arial, sans-serif;
+          background-color: #EFEFEF;
+          padding: 15px;
+        }
+        .container {
+          margin-top: 20px;
+          padding: 20px;
+        }
+        .mainTitle {
+          font-size: 22px;
+          font-weight: bold;
+          color: #373A40;
+          text-align: center;
+          margin-top: 10px;
+          margin-bottom: 10px;
+        }
+        .detailedClientContainer {
+          margin-top: 20px;
+          margin-bottom: 20px;
+          padding: 20px;
+          background-color: #798CA0;
+          border-radius: 20px;
+          box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        .nameInputDetailedClient{
+          color: #FFFFFF;
+          margin-left: 20px;
+        }
+        .infoClientContainer {
+          margin: 10px;
+          padding: 10px;
+          background-color: #EFEFEF;
+          border-radius: 20px;
+          box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        .textDetailedClient {
+          color: #373A40;
+        }
+        .ProductContainer {
+          background-color: #FFFFFF;
+          border-radius: 20px;
+          margin-top: 20px;
+        }
+        .headerProductContainer {
+          background-color: #64a8d6;
+          border-top-left-radius: 20px;
+          border-top-right-radius: 20px;
+          padding: 15px;
+          margin-bottom: 10px;
+        }
+        .titleListContainer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 15px;
+        }
+        .titleListProduct{
+          width: 50%;
+          text-align: center;
+          color: #FFFFFF;
+        }
+        .titleListQuantity{
+          width: 25%;
+          text-align: center;
+          color: #FFFFFF;
+        }
+        .titleListPrice{
+          width: 25%;
+          text-align: center;
+          color: #FFFFFF;
+        }
+        .selectedProductItem {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 20px;
+          border-bottom-width: 1px;
+          border-bottom-color: #ddd;
+        }
+        .nameProduct {
+          width: 50%;
+          text-align: center;
+        }
+        .quantityProduct, .priceProduct {
+          width: 25%;
+          text-align: center;
+        }
+        .exchangeRateContainer {
+          display: flex;
+          width: 100%;
+          flex-direction: row;
+          justify-content: center;
+          margin-top: 35px;
+          margin-bottom: 35px;
+          gap: 20px;
+        }
+        .exchangeRateText {
+          color: gray;
+        }
+        .containerPrice {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin-top: 10px;
+          margin-bottom: 10px;
+        }
+        .containerTitlePrice {
+          width: 25%;
+          text-align: left;
+        }
+        .titlePrice {
+          font-size: 20px;
+          margin-top: 10px;
+        }
+        .textPrice {
+          font-size: 15px;
+          margin-top: 10px;
+        }
+        .containerNote {
+          width: 100%;
+          margin-top: 30px;
+        }
+        .noteOrder {
+          color: gray;
+          text-align: justify;
+        }      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="mainTitle">Datos del Cliente</div>
+        <div class="detailedClientContainer">
+          <a class="nameInputDetailedClient">Nombre:</a>
+          <div class="infoClientContainer">
+            <div class="textDetailedClient">${client.nom_cli}</div>
+          </div>
+          <a class="nameInputDetailedClient">Rif:</a>
+          <div class="infoClientContainer">
+            <div class="textDetailedClient">${client.rif_cli}</div>
+          </div>
+          <a class="nameInputDetailedClient">Teléfono:</a>
+          <div class="infoClientContainer">
+            <div class="textDetailedClient">${client.tel_cli}</div>
+          </div>
+          <a class="nameInputDetailedClient">Dirección:</a>
+          <div class="infoClientContainer">
+            <div class="textDetailedClient">${client.dir1_cli}</div>
+          </div>
+        </div>
+        <div class="mainTitle">Tipo de Factura</div>
+        <div class="detailedClientContainer">
+          <div class="infoClientContainer">
+            <div class="textDetailedClient">${invoiceType ? invoiceType : '--- Seleccionar ---'}</div>
+          </div>
+        </div>
+        <div class="mainTitle">Productos Seleccionados</div>
+        <div class="ProductContainer">
+          <div class="headerProductContainer">
+            <div class="titleListContainer">
+              <div class="titleListProduct">Producto</div>
+              <div class="titleListQuantity">Cantidad</div>
+              <div class="titleListPrice">Precio</div>
+            </div>
+          </div>
+          ${products.map(product => `
+            <div class="selectedProductItem">
+              <div class="nameProduct">${product.descrip}</div>
+              <div class="quantityProduct">${product.quantity}</div>
+              <div class="priceProduct">${formatNumber(product.quantity * product.priceUsd)}</div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="exchangeRateContainer">
+          <div class="exchangeRateText">Cambio USD: ${cambioDolares}</div>
+          <div class="exchangeRateText">Cambio Bs.: ${cambioBolivares}</div>
+        </div>
+        <div class="containerPrice">
+          <div class="containerTitlePrice">
+            <div class="titlePrice">Total</div>
+          </div>
+          <div class="textPrice">USD : ${formatNumber(totalPriceUsd)}</div>
+          <div class="textPrice">Bs. : ${formatNumber(totalPriceUsd * cambioBolivares)}</div>
+          <div class="textPrice">Pesos : ${formatNumber(totalPriceUsd * cambioPesos)}</div>
+        </div>
+        <div class="containerNote">
+          <div class="noteOrder">Nota: Esta pre orden es considerada un presupuesto, por lo tanto los precios y las existencias están sujetas a cambios sin previo aviso.</div>
+        </div>
+      </div>
+    </body>
+    </html>`;
+    
+    try {
+      const { uri } = await Print.printToFileAsync({ html: htmlContent });
+      setPdfUri(uri);
+      await Sharing.shareAsync(uri, { mimeType: 'application/pdf', UTI: '.pdf' });
+    } catch (error) {
+      console.error('Error generando o compartiendo el PDF:', error);
+    }
+  };
+  
+
+  const handleSharePdf = async () => {
+    if (!pdfUri) {
+      console.error('No hay un archivo PDF para compartir.');
+      return;
+    }
+
+    try {
+      await Sharing.shareAsync(pdfUri, { mimeType: 'application/pdf', UTI: '.pdf' });
+    } catch (error) {
+      console.error('Error al compartir el PDF:', error);
     }
   };
 
@@ -217,7 +449,7 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
           <View style={styles.mainTitleContainer}>
             <Text style={styles.mainTitle}>Productos Seleccionados</Text>
           </View>
-          
+
           <View style={styles.ProductContainer}>
             <View style={styles.headerProductContainer}>
               <View style={styles.titleListContainer}>
@@ -241,9 +473,8 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
           <View style={styles.exchangeRateContainer}>
             <Text style={styles.exchangeRateText}>Cambio USD: {cambioDolares}</Text>
             <Text style={styles.exchangeRateText}>Cambio Bs.: {cambioBolivares}</Text>
-            {/* <Text style={styles.exchangeRateText}>Cambio Pesos: {cambioPesos}</Text> */}
           </View>
-          
+
           <View style={styles.containerPrice}>
             <View style={styles.containerTitlePrice}>
               <Text style={styles.titlePrice}>Total</Text>
@@ -254,16 +485,18 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
           </View>
 
           <View style={styles.containerNote}>
-            <Text style={styles.noteOrder}>Nota: Esta pre orden es considerada un presupuesto, por lo tanto los precios y las existencias estan sujetas a cambios sin previo aviso.</Text>
+            <Text style={styles.noteOrder}>Nota: Esta pre orden es considerada un presupuesto, por lo tanto los precios y las existencias están sujetas a cambios sin previo aviso.</Text>
           </View>
 
           <View style={styles.containerButton}>
             <Pressable onPress={handleSaveOrder} style={styles.otherButton}>
               <Text style={styles.buttonText}>Guardar</Text>
             </Pressable>
-            <Pressable style={styles.otherButton}>
-              <Text style={styles.buttonText}>Pdf</Text>
+
+            <Pressable onPress={handleGenerateAndSharePdf} style={styles.otherButton}>
+              <Text style={styles.buttonText}>PDF</Text>
             </Pressable>
+
             <Pressable onPress={onClose} style={styles.closeButton}>
               <Text style={styles.buttonText}>Regresar</Text>
             </Pressable>

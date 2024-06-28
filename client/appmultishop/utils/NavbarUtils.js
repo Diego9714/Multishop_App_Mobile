@@ -69,38 +69,43 @@ const getCurrency = async () => {
 const getVisits = async () => {
   try {
     const token = await AsyncStorage.getItem('tokenUser');
-    if (!token) {
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      const cod_ven = decodedToken.cod_ven;
+
+      const visits = await AsyncStorage.getItem('ClientVisits');
+      if (visits) {
+        const visitsArray = JSON.parse(visits);
+        const filteredVisits = visitsArray.filter(visit => visit.cod_ven === cod_ven);
+
+        // Send filtered visits to the server
+        try {
+          const response = await instanceSincro.post('/api/register/visit', { visits: filteredVisits });
+          console.log('Visits sent successfully:', response.data);
+
+          // Guarda las visitas sincronizadas y no sincronizadas
+          const { completed, notCompleted } = response.data;
+          await storeData('syncedVisits', completed);
+          await storeData('unsyncedVisits', notCompleted);
+
+          return { success: true, completed, notCompleted };
+        } catch (error) {
+          console.error('Error sending visits:', error);
+          return { success: false, error };
+        }
+      } else {
+        console.log('No visits found');
+        return { success: false, error: 'No visits found' };
+      }
+    } else {
       console.log('No token found');
-      return false;
-    }
-
-    const decodedToken = jwtDecode(token);
-    const cod_ven = decodedToken.cod_ven;
-    
-    const visits = await AsyncStorage.getItem('ClientVisits');
-    if (!visits) {
-      console.log('No visits found');
-      return false;
-    }
-
-    const visitsArray = JSON.parse(visits);
-    const filteredVisits = visitsArray.filter(visit => visit.cod_ven === cod_ven && visit.status !== 200); // Filtra las visitas no sincronizadas
-
-    // Send filtered visits to the server
-    try {
-      const response = await instanceSincro.post('/api/register/visit', { visits: filteredVisits });
-      console.log('Visits sent successfully:', response.data);
-      return true; // Retorna true si las visitas se sincronizaron correctamente
-    } catch (error) {
-      console.error('Error sending visits:', error);
-      return false; // Retorna false si hubo un error al enviar las visitas
+      return { success: false, error: 'No token found' };
     }
   } catch (err) {
     console.error('Error retrieving visits:', err);
-    throw err;
+    return { success: false, error: err };
   }
 };
-
 
 const getAllInfo = async (setLoading, setMessage, callback) => {
   setLoading(true);
@@ -112,42 +117,33 @@ const getAllInfo = async (setLoading, setMessage, callback) => {
 
   try {
     const token = await AsyncStorage.getItem('tokenUser');
-    if (!token) {
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      const cod_ven = decodedToken.cod_ven;
+
+      await Promise.all([
+        getClients(cod_ven),
+        getProducts(),
+        getCategories(),
+        getBrands(),
+        getCurrency()
+      ]);
+
+      clearTimeout(timeoutId);
+      setLoading(false);
+      setMessage('Información actualizada correctamente.');
+
+      // Realiza la sincronización de visitas
+      const visitsResult = await getVisits();
+      if (visitsResult.success) {
+        callback(visitsResult.success, visitsResult.completed, visitsResult.notCompleted);
+      } else {
+        setMessage('Información actualizada pero las visitas no se sincronizaron.');
+      }
+    } else {
       clearTimeout(timeoutId);
       setLoading(false);
       setMessage('No se encontró el token del usuario.');
-      return;
-    }
-
-    const decodedToken = jwtDecode(token);
-    const cod_ven = decodedToken.cod_ven;
-
-    await Promise.all([
-      getClients(cod_ven),
-      getProducts(),
-      getCategories(),
-      getBrands(),
-      getCurrency()
-    ]);
-
-    clearTimeout(timeoutId);
-    setLoading(false);
-    setMessage('Información actualizada correctamente.');
-
-    // Realiza la sincronización de visitas
-    const visitsSynced = await syncVisits();
-    if (!visitsSynced) {
-      // Marca todas las visitas como no sincronizadas si no se sincronizan correctamente
-      const visits = await AsyncStorage.getItem('ClientVisits');
-      if (visits) {
-        const visitsArray = JSON.parse(visits);
-        const unsyncedVisits = visitsArray.filter(visit => visit.cod_ven === cod_ven && visit.status !== 200);
-        console.log('Visitas no sincronizadas:', unsyncedVisits); // Muestra por consola las visitas no sincronizadas
-        callback(visitsSynced, visitsArray, unsyncedVisits); // Llama al callback con el estado de la sincronización de visitas y las visitas no sincronizadas
-      }
-      setMessage('Información actualizada pero las visitas no se sincronizaron.');
-    } else {
-      callback(visitsSynced); // Llama al callback con el estado de la sincronización de visitas
     }
   } catch (error) {
     clearTimeout(timeoutId);
@@ -155,6 +151,8 @@ const getAllInfo = async (setLoading, setMessage, callback) => {
     setMessage('Error al actualizar la información.');
   }
 };
+
+
 
 const syncVisits = async () => {
   try {

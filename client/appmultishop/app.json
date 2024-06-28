@@ -2,7 +2,6 @@
   "expo": {
     "name": "appmultishop",
     "slug": "appmultishop",
-    "scheme": "appmultishop",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -23,7 +22,11 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.diego9714.appmultishop"
+      "package": "com.diego9714.appmultishop",
+      "permissions": [
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
