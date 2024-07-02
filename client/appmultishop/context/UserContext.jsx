@@ -3,8 +3,6 @@ import React, { createContext , useState } from 'react'
 import AsyncStorage             from '@react-native-async-storage/async-storage'
 import { instanceAuth }         from '../global/api'
 import { router }               from 'expo-router'
-// Modal Loader
-import { ModalLoaderLogin }     from '../components/users/ModalLoaderLogin'
 
 // Context
 export const UserContext = createContext()

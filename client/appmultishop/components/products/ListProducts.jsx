@@ -49,8 +49,9 @@ const ListProducts = () => {
     let filteredProducts = products;
 
     if (displaySearchProduct.length >= 3) {
+      const searchTerms = displaySearchProduct.toLowerCase().split(' ').filter(term => term.length > 0);
       filteredProducts = filteredProducts.filter(product =>
-        product.descrip.toLowerCase().includes(displaySearchProduct.toLowerCase())
+        searchTerms.every(term => product.descrip.toLowerCase().includes(term))
       );
     }
 
@@ -71,10 +72,12 @@ const ListProducts = () => {
       return;
     }
     
-    const filteredProducts = products.filter(product =>
-      product.descrip.toLowerCase().includes(searchProduct.toLowerCase())
+    const searchTerms = searchProduct.toLowerCase().split(' ').filter(term => term.length > 0);
+  
+    const filteredProducts = products.filter(product => 
+      searchTerms.every(term => product.descrip.toLowerCase().includes(term))
     );
-
+  
     if (filteredProducts.length === 0) {
       Alert.alert('Producto no encontrado', 'El producto buscado no existe.');
       setSearchProduct('');
@@ -82,7 +85,7 @@ const ListProducts = () => {
       setPage(1);
       return;
     }
-
+  
     setDisplaySearchProduct(searchProduct);
     setPage(1);
   };
@@ -109,8 +112,9 @@ const ListProducts = () => {
   };
 
   const renderPaginationButtons = () => {
+    const searchTerms = displaySearchProduct.toLowerCase().split(' ').filter(term => term.length > 0);
     const filteredProducts = products.filter(product =>
-      product.descrip.toLowerCase().includes(displaySearchProduct.toLowerCase())
+      searchTerms.every(term => product.descrip.toLowerCase().includes(term))
     );
     const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 

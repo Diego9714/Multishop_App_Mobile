@@ -33,8 +33,9 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
     let filteredProducts = products;
 
     if (displaySearchProduct.length >= 3) {
+      const searchWords = displaySearchProduct.toLowerCase().split(' ');
       filteredProducts = filteredProducts.filter(product =>
-        product.descrip.toLowerCase().includes(displaySearchProduct.toLowerCase())
+        searchWords.every(word => product.descrip.toLowerCase().includes(word))
       );
     }
 
@@ -56,9 +57,10 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
       Alert.alert('Por favor ingrese al menos tres letras para buscar');
       return;
     }
-    
+
+    const searchWords = searchProduct.toLowerCase().split(' ');
     const filteredProducts = products.filter(product =>
-      product.descrip.toLowerCase().includes(searchProduct.toLowerCase())
+      searchWords.every(word => product.descrip.toLowerCase().includes(word))
     );
 
     if (filteredProducts.length === 0) {
@@ -178,8 +180,9 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
   };
 
   const renderPaginationButtonsProducts = () => {
+    const searchWords = displaySearchProduct.toLowerCase().split(' ');
     const filteredProducts = products.filter(product =>
-      product.descrip.toLowerCase().includes(displaySearchProduct.toLowerCase())
+      searchWords.every(word => product.descrip.toLowerCase().includes(word))
     );
     const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 

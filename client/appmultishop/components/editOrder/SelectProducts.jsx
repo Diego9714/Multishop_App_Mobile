@@ -1,10 +1,10 @@
 // SelectProducts.js
 import React, { useState, useEffect, useCallback } from 'react';
 import { Text, View, Pressable, Modal, TextInput, ScrollView, Alert } from 'react-native';
-import { AntDesign, FontAwesome, MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { AntDesign, FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../../styles/SelectProducts.styles';
-import ModalProduct from '../products/ModalProducts';
+import ModalProduct from '../products/ModalProducts'; // Adjust path as necessary
 
 const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
   const [selectedProductsCount, setSelectedProductsCount] = useState(0);
@@ -13,7 +13,7 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
   const [searchProduct, setSearchProduct] = useState('');
   const [displaySearchProduct, setDisplaySearchProduct] = useState('');
   const [productQuantities, setProductQuantities] = useState({});
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1); // Changed from `page` to `currentPage`
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isProductModalVisible, setIsProductModalVisible] = useState(false);
   const itemsPerPage = 10;
@@ -44,37 +44,46 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
     let filteredProducts = products;
 
     if (displaySearchProduct.length >= 3) {
+      const searchWords = displaySearchProduct.toLowerCase().split(' ');
       filteredProducts = filteredProducts.filter(product =>
-        product.descrip.toLowerCase().includes(displaySearchProduct.toLowerCase())
+        searchWords.every(word => product.descrip.toLowerCase().includes(word))
       );
     }
 
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = currentPage * itemsPerPage;
+    const paginatedProducts = filteredProducts.slice(start, end);
 
     const updatedVisibleProducts = paginatedProducts.map(product => ({
       ...product,
       quantity: productQuantities[product.codigo] || 0,
-      selected: productQuantities.hasOwnProperty(product.codigo)
+      selected: product.codigo in productQuantities
     }));
 
-    if (displaySearchProduct.length >= 3 && filteredProducts.length === 0) {
-      Alert.alert('No se encontró ningún producto', 'No se encontraron productos que coincidan con la búsqueda.');
-      setSearchProduct('');
-      setDisplaySearchProduct('');
-    }
-
     setVisibleProducts(updatedVisibleProducts);
-  }, [products, displaySearchProduct, currentPage, productQuantities]);
+  }, [currentPage, products, displaySearchProduct, productQuantities]);
 
   const handleSearch = () => {
     if (searchProduct.length > 0 && searchProduct.length < 3) {
       Alert.alert('Por favor ingrese al menos tres letras para buscar');
       return;
     }
+
+    const searchWords = searchProduct.toLowerCase().split(' ');
+    const filteredProducts = products.filter(product =>
+      searchWords.every(word => product.descrip.toLowerCase().includes(word))
+    );
+
+    if (filteredProducts.length === 0) {
+      Alert.alert('Producto no encontrado', 'El producto buscado no existe.');
+      setSearchProduct('');
+      setDisplaySearchProduct('');
+      setCurrentPage(1); // Changed from `setPage(1)` to `setCurrentPage(1)`
+      return;
+    }
+
     setDisplaySearchProduct(searchProduct);
-    setCurrentPage(1);
+    setCurrentPage(1); // Changed from `setPage(1)` to `setCurrentPage(1)`
   };
 
   const handleProductSelection = useCallback((product) => {
@@ -120,9 +129,11 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
   }, [productQuantities]);
 
   const renderPaginationButtons = () => {
-    const totalPages = Math.ceil(products.filter(product =>
-      product.descrip.toLowerCase().includes(displaySearchProduct.toLowerCase())
-    ).length / itemsPerPage);
+    const searchWords = displaySearchProduct.toLowerCase().split(' ');
+    const filteredProducts = products.filter(product =>
+      searchWords.every(word => product.descrip.toLowerCase().includes(word))
+    );
+    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
     let buttons = [];
     let maxPagesToShow = displaySearchProduct ? totalPages : Math.min(totalPages, defaultMaxPages);
@@ -138,7 +149,7 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
         <Pressable
           key={i}
           style={[styles.pageButton, currentPage === i && styles.pageButtonActive]}
-          onPress={() => setCurrentPage(i)}
+          onPress={() => setCurrentPage(i)} // Changed from `setPage(i)` to `setCurrentPage(i)`
         >
           <Text style={styles.pageButtonText}>{i}</Text>
         </Pressable>
@@ -214,21 +225,21 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
                   {productQuantities[product.codigo] > 0 && (
                     <Pressable
                       style={styles.button}
-                      onPress={() =>  handleProductDelete(product.codigo)}
-                      >
-                        <MaterialIcons name="delete" size={30} color="#7A7A7B" />
-                      </Pressable>
-                    )}
-                    <Pressable
-                      style={styles.buttonMore}
-                      onPress={() => {
-                        setSelectedProduct(product);
-                        setIsProductModalVisible(true);
-                      }}
+                      onPress={() => handleProductDelete(product.codigo)}
                     >
-                      <MaterialIcons name="more-vert" size={30} color="#7A7A7B" />
+                      <MaterialIcons name="delete" size={30} color="#7A7A7B" />
                     </Pressable>
-                  </View>
+                  )}
+                  <Pressable
+                    style={styles.buttonMore}
+                    onPress={() => {
+                      setSelectedProduct(product);
+                      setIsProductModalVisible(true);
+                    }}
+                  >
+                    <MaterialIcons name="more-vert" size={30} color="#7A7A7B" />
+                  </Pressable>
+                </View>
               </View>
             ))}
           </ScrollView>
