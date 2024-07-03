@@ -1,42 +1,164 @@
-import React, { useState , useEffect } from 'react'
-import { Text, View, Modal, Button , ScrollView , Pressable} from 'react-native'
-import { AntDesign, MaterialIcons, Ionicons, FontAwesome6 } from '@expo/vector-icons'
-// Styles
-import styles from '../styles/FilterProducts.styles'
+import React, { useState } from 'react';
+import { Text, View, Modal, Pressable } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import styles from '../styles/FilterProducts.styles';
 
-const FilterCategories = ({ visible, onClose }) => {
+const FilterCategories = ({ visible, onClose, onSave }) => {
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedBrand, setSelectedBrand] = useState(null);
+  const [selectedPriceOrder, setSelectedPriceOrder] = useState(null);
+
+  const [selectedCategoryTemp, setSelectedCategoryTemp] = useState(null);
+  const [selectedBrandTemp, setSelectedBrandTemp] = useState(null);
+  const [selectedPriceOrderTemp, setSelectedPriceOrderTemp] = useState(null);
+
+  const handleCategorySelect = () => {
+    if (selectedCategoryTemp === 'Categoria') {
+      setSelectedCategoryTemp(null);
+    } else {
+      setSelectedCategoryTemp('Categoria');
+      setSelectedBrandTemp(null);
+    }
+  };
+
+  const handleBrandSelect = () => {
+    if (selectedBrandTemp === 'Marca') {
+      setSelectedBrandTemp(null);
+    } else {
+      setSelectedBrandTemp('Marca');
+      setSelectedCategoryTemp(null);
+    }
+  };
+
+  const handlePriceOrderSelect = (order) => {
+    if (selectedPriceOrderTemp === order) {
+      setSelectedPriceOrderTemp(null);
+    } else {
+      setSelectedPriceOrderTemp(order);
+    }
+  };
+
+  const handleSave = () => {
+    setSelectedCategory(selectedCategoryTemp);
+    setSelectedBrand(selectedBrandTemp);
+    setSelectedPriceOrder(selectedPriceOrderTemp);
+
+    onSave({
+      selectedCategory: selectedCategoryTemp,
+      selectedBrand: selectedBrandTemp,
+      selectedPriceOrder: selectedPriceOrderTemp,
+    });
+
+    onClose();
+  };
+
+  const handleClose = () => {
+    setSelectedCategoryTemp(selectedCategory);
+    setSelectedBrandTemp(selectedBrand);
+    setSelectedPriceOrderTemp(selectedPriceOrder);
+    onClose();
+  };
+
   return (
-    <Modal transparent={true} animationType="fade" visible={visible} onRequestClose={onClose}>
+    <Modal transparent={true} animationType="fade" visible={visible} onRequestClose={handleClose}>
       <View style={styles.mainContainer}>
         <View style={styles.container}>
           <Text style={styles.titleContainer}>Filtrar por</Text>
 
-          <Pressable style={styles.filterContainer}>
-            <MaterialIcons name="filter-1" size={24} color="black" />
-            <Text>Categoria</Text>
+          <Pressable
+            style={[
+              styles.filterContainer,
+              selectedCategoryTemp === 'Categoria' && styles.selectedFilter,
+            ]}
+            onPress={handleCategorySelect}
+          >
+            <MaterialIcons
+              name="filter-1"
+              size={24}
+              color={selectedCategoryTemp === 'Categoria' ? '#5B97DC' : 'black'}
+            />
+            <Text
+              style={[
+                styles.filterText,
+                selectedCategoryTemp === 'Categoria' && { color: '#5B97DC' },
+              ]}
+            >
+              Categoria
+            </Text>
           </Pressable>
 
-          <Pressable style={styles.filterContainer}>
-            <MaterialIcons name="filter-2" size={24} color="black" />
-            <Text>Marca</Text>
+          <Pressable
+            style={[
+              styles.filterContainer,
+              selectedBrandTemp === 'Marca' && styles.selectedFilter,
+            ]}
+            onPress={handleBrandSelect}
+          >
+            <MaterialIcons
+              name="filter-2"
+              size={24}
+              color={selectedBrandTemp === 'Marca' ? '#5B97DC' : 'black'}
+            />
+            <Text
+              style={[
+                styles.filterText,
+                selectedBrandTemp === 'Marca' && { color: '#5B97DC' },
+              ]}
+            >
+              Marca
+            </Text>
           </Pressable>
 
-          <Pressable style={styles.filterContainer}>
-            <MaterialIcons name="filter-3" size={24} color="black" />
-            <Text>Precio</Text>
+          <Pressable
+            style={[
+              styles.filterContainer,
+              selectedPriceOrderTemp === 'menor-mayor' && styles.selectedFilter,
+            ]}
+            onPress={() => handlePriceOrderSelect('menor-mayor')}
+          >
+            <MaterialIcons
+              name="filter-3"
+              size={24}
+              color={selectedPriceOrderTemp === 'menor-mayor' ? '#5B97DC' : 'black'}
+            />
+            <Text
+              style={[
+                styles.filterText,
+                selectedPriceOrderTemp === 'menor-mayor' && { color: '#5B97DC' },
+              ]}
+            >
+              Precio Menor a Mayor
+            </Text>
           </Pressable>
 
-          <Pressable style={styles.filterContainer}>
-            <MaterialIcons name="filter-4" size={24} color="black" />
-            <Text>Código</Text>
+          <Pressable
+            style={[
+              styles.filterContainer,
+              selectedPriceOrderTemp === 'mayor-menor' && styles.selectedFilter,
+            ]}
+            onPress={() => handlePriceOrderSelect('mayor-menor')}
+          >
+            <MaterialIcons
+              name="filter-4"
+              size={24}
+              color={selectedPriceOrderTemp === 'mayor-menor' ? '#5B97DC' : 'black'}
+            />
+            <Text
+              style={[
+                styles.filterText,
+                selectedPriceOrderTemp === 'mayor-menor' && { color: '#5B97DC' },
+              ]}
+            >
+              Precio Mayor a Menor
+            </Text>
           </Pressable>
 
           <View style={styles.sectionButtonsModal}>
-            <Pressable style={styles.buttonModal} >
-                <Text style={styles.buttonTextModal}>Guardar</Text>
+            <Pressable style={styles.buttonModal} onPress={handleSave}>
+              <Text style={styles.buttonTextModal}>Guardar</Text>
             </Pressable>
-            <Pressable style={styles.buttonModalExit} onPress={onClose}>
-                <Text style={styles.buttonTextModal}>Salir</Text>
+            <Pressable style={styles.buttonModalExit} onPress={handleClose}>
+              <Text style={styles.buttonTextModal}>Salir</Text>
             </Pressable>
           </View>
         </View>
@@ -44,6 +166,5 @@ const FilterCategories = ({ visible, onClose }) => {
     </Modal>
   );
 };
-
 
 export default FilterCategories;

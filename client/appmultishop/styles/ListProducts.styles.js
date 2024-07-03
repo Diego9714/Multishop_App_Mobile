@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   title: {
-    marginTop: 20,
+    marginTop: 15,
     fontSize: 20,
     fontWeight: "400"
   },
@@ -69,19 +69,19 @@ const styles = StyleSheet.create({
   },
   headerTitleButton: {
     color: '#fff',
-    width: '20%',
+    // width: '20%',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginHorizontal: 20,
-    marginTop: 20,
-    marginBottom: 10,
+    marginTop: 15,
+    marginBottom: 15,
   },
   listContainer: {
     marginHorizontal: 10,
-    height: '87%',
+    height: '85%',
   },
   productItem: {
     flexDirection: 'row',
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: "80%",
-    height: "70%",
+    padding: 15,
     backgroundColor: '#f1f1f1',
     borderRadius: 10,
     justifyContent: 'center',
@@ -230,7 +230,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   pageButton: {
-    height: '20%',
+    // height: '20%',
+    height: 40,
     padding: 10,
     margin: 5,
     backgroundColor: '#ddd',

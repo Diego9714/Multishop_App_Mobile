@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#EFEFEF',
     marginHorizontal: 10,
-    height: "55%",
+    height: "54%",
     borderRadius: 20,
   },
   headerContainer: {
@@ -173,7 +173,6 @@ const styles = StyleSheet.create({
   },
   modalInfoClientButton: {
     width: "80%",
-    height: "20%",
     backgroundColor: '#D0D0D0',
     borderRadius: 20,
     margin: "2%",
@@ -245,7 +244,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   pageButton: {
-    height: '22%',
+    // height: '22%',
+    height: 40,
     padding: 10,
     margin: 5,
     backgroundColor: '#ddd',

@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   titlePage: {
-    height: '6%',
+    // height: '6%',
     alignItems: "center",
     marginBottom: 20
   },
@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     fontWeight: "400"
   },
   listOrderContainer: {
-    height: "57%",
+    height: "55%",
     width: "90%",
     backgroundColor: "#f1f1f1",
     borderRadius: 15,

@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     width: "85%",
     backgroundColor: '#DCDCDC',
-    gap: 40
+    gap: 10
   },
   sectionButtonsModal: {
     marginTop: "2%",

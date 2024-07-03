@@ -70,6 +70,10 @@ const ModalProduct = ({ isVisible, onClose, product }) => {
           <View style={styles.modalInfoClient}>
             <Text style={styles.textModal}>{product.ncate}</Text>
           </View>
+          <Text style={styles.subtitleModal}>Marca</Text>
+          <View style={styles.modalInfoClient}>
+            <Text style={styles.textModal}>{product.nmarca}</Text>
+          </View>
           <View style={styles.sectionButtonsModal}>
             <Pressable style={styles.buttonModalExit} onPress={onClose}>
               <Text style={styles.buttonTextModal}>Salir</Text>
