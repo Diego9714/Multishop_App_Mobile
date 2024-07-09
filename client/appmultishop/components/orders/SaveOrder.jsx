@@ -149,7 +149,7 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
       products: products.map(product => ({
         codigo: product.codigo,
         descrip: product.descrip,
-        exists: product.exists,
+        exists: product.quantity, // Recalcular la existencia
         quantity: product.quantity,
         priceUsd: product.priceUsd,
         priceBs: (product.priceUsd * cambioBolivares).toFixed(2),
@@ -166,11 +166,32 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
       orders.push(orderData);
       await AsyncStorage.setItem('OrdersClient', JSON.stringify(orders));
 
+      // Actualizar existencias en la lista de productos
+      const productsInfo = await AsyncStorage.getItem('products');
+      const productList = productsInfo ? JSON.parse(productsInfo) : [];
+
+      const updatedProductList = productList.map(prod => {
+        const orderedProduct = products.find(p => p.codigo === prod.codigo);
+        // console.log(orderedProduct)
+        if (orderedProduct) {
+
+          // console.log(prod.existencia - orderedProduct.quantity)
+
+          // console.log(`Producto encontrado y actualizado: ${prod.descrip}, Existencia actual: ${prod.exists}, Cantidad ordenada: ${orderedProduct.quantity}`);
+          return { ...prod, existencia: prod.existencia - orderedProduct.quantity };
+
+        }
+        return prod;
+      });
+
+      await AsyncStorage.setItem('products', JSON.stringify(updatedProductList));
+
       setIsOrderSavedModalVisible(true); // Mostrar el modal de confirmación
     } catch (error) {
       console.error('Error saving order:', error);
     }
   };
+
 
   const handleGenerateAndSharePdf = async () => {
     if (!invoiceType) {

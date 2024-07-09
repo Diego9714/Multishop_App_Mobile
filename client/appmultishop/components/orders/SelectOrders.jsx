@@ -309,13 +309,14 @@ const SelectOrders = () => {
         isVisible={modalVisible} 
         onClose={() => setModalVisible(false)} 
         onSelect={handleModalSelect} 
-        selectedOrder={selectedOrder} 
+        selectedOrder={selectedOrder}
+        animationType="fade"
       />
 
       <Modal
         visible={editModalVisible}
         onRequestClose={() => setEditModalVisible(false)}
-        animationType="slide"
+        animationType="fade"
       >
       </Modal>
       
@@ -324,6 +325,8 @@ const SelectOrders = () => {
           isVisible={editModalVisible}
           selectedOrder={selectedOrder}
           onClose={() => setEditModalVisible(false)}
+          animationType="fade"
+
         />
       )}
     </View>

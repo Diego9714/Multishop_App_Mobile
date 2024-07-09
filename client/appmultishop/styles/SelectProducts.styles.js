@@ -67,6 +67,13 @@ const styles = StyleSheet.create({
     width: "85%",
     textAlign: 'justify'
   },
+  filterContainer:{
+    width: '22%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 5
+  },
   textFilter:{
     color:'white'
   },

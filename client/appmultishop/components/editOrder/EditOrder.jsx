@@ -84,7 +84,7 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
   const handleProductQuantityChange = (productId, newQuantity) => {
     if (order && order.products) {
       const updatedProducts = order.products.map(product =>
-        product.codigo === productId ? { ...product, quantity: newQuantity } : product
+        product.codigo === productId ? { ...product, quantity: newQuantity} : product
       );
       setOrder({ ...order, products: updatedProducts });
       updateTotal(updatedProducts);
@@ -114,7 +114,7 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
         Alert.alert('Agrega al menos un producto antes de guardar.');
         return;
       }
-
+  
       const jsonValue = await AsyncStorage.getItem('OrdersClient');
       if (jsonValue !== null) {
         let ordersClient = JSON.parse(jsonValue);
@@ -130,14 +130,55 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
           }
           return orderItem;
         });
-
+  
         await AsyncStorage.setItem('OrdersClient', JSON.stringify(updatedOrders));
+  
+        // Actualizar existencias en la lista de productos
+        const productsInfo = await AsyncStorage.getItem('products');
+        const productList = productsInfo ? JSON.parse(productsInfo) : [];
+  
+        const updatedProductList = productList.map(prod => {
+          const orderedProduct = order.products.find(p => p.codigo === prod.codigo);
+          if (orderedProduct) {
+            // console.log(`Existencia ${prod.existencia}`);
+            // console.log(`Exists ${orderedProduct.exists}`);
+            // console.log(`Cant seleccionada ${orderedProduct.quantity}`);
+  
+            return { ...prod, existencia: (orderedProduct.exists + prod.existencia) - orderedProduct.quantity };
+          }
+          return prod;
+        });
+  
+        await AsyncStorage.setItem('products', JSON.stringify(updatedProductList));
+  
+        // Actualizar existencias en los productos del pedido
+        const updatedOrderProducts = order.products.map(product => {
+          const prodInStorage = productList.find(p => p.codigo === product.codigo);
+          if (prodInStorage) {
+            return { ...product, exists: product.quantity };
+          }
+          return product;
+        });
+  
+        const finalUpdatedOrders = updatedOrders.map(orderItem => {
+          if (orderItem.id_order === order.id_order) {
+            return {
+              ...orderItem,
+              products: updatedOrderProducts
+            };
+          }
+          return orderItem;
+        });
+  
+        await AsyncStorage.setItem('OrdersClient', JSON.stringify(finalUpdatedOrders));
+  
         onClose();
       }
     } catch (error) {
       console.error('Error al obtener/modificar el arreglo de OrdersClient:', error);
     }
   };
+  
 
   const handleCancelEdit = () => {
     setOrder({ ...originalOrder });
