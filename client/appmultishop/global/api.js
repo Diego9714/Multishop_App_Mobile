@@ -18,7 +18,7 @@ export const instanceClient = axios.create({
 
 export const instanceProducts = axios.create({
   baseURL: `https://multishop-app-mobile-products.onrender.com/`,
-  // baseURL: 'http://192.168.0.109:6000',
+  // baseURL: 'http://192.168.1.102:6000',
   headers: {
     Accept: "application/json"
   }

@@ -137,19 +137,41 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
         const productsInfo = await AsyncStorage.getItem('products');
         const productList = productsInfo ? JSON.parse(productsInfo) : [];
   
+        // Obtener la lista original de productos del pedido
+        const originalOrder = ordersClient.find(orderItem => orderItem.id_order === order.id_order);
+
+        // Comparar productos eliminados
+        const deletedProducts = originalOrder.products.filter(
+          origProd => !order.products.find(newProd => newProd.codigo === origProd.codigo)
+        );
+
+        // Actualizar existencias en la lista de productos
         const updatedProductList = productList.map(prod => {
           const orderedProduct = order.products.find(p => p.codigo === prod.codigo);
           if (orderedProduct) {
-            // console.log(`Existencia ${prod.existencia}`);
-            // console.log(`Exists ${orderedProduct.exists}`);
-            // console.log(`Cant seleccionada ${orderedProduct.quantity}`);
-  
-            return { ...prod, existencia: (orderedProduct.exists + prod.existencia) - orderedProduct.quantity };
+
+            return {
+              ...prod,
+              existencia: (orderedProduct.exists + prod.existencia) - orderedProduct.quantity
+            };
+          } else {
+            // Si el producto fue eliminado, restaurar la existencia
+            const isDeleted = deletedProducts.some(delProd => delProd.codigo === prod.codigo);
+            if (isDeleted) {
+
+              // console.log(prod.existencia + originalOrder.products.find(p => p.codigo === prod.codigo).quantity)
+
+              return {
+                ...prod,
+                existencia: prod.existencia + originalOrder.products.find(p => p.codigo === prod.codigo).quantity
+              };
+            }
           }
           return prod;
         });
-  
+
         await AsyncStorage.setItem('products', JSON.stringify(updatedProductList));
+
   
         // Actualizar existencias en los productos del pedido
         const updatedOrderProducts = order.products.map(product => {
