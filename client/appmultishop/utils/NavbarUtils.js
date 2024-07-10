@@ -75,26 +75,50 @@ const getVisits = async () => {
 
       const visits = await AsyncStorage.getItem('ClientVisits');
       if (visits) {
-        const visitsArray = JSON.parse(visits);
-        const filteredVisits = visitsArray.filter(visit => visit.cod_ven === cod_ven);
+        let visitsArray = JSON.parse(visits);
+        
+        // Filtrar solo las visitas no sincronizadas del vendedor actual
+        const filteredVisits = visitsArray.filter(visit => visit.cod_ven === cod_ven && visit.status === "No sincronizada");
 
-        // Send filtered visits to the server
-        try {
-          const response = await instanceSincro.post('/api/register/visit', { visits: filteredVisits });
-          console.log('Visits sent successfully:', response.data);
+        // Verificar si hay visitas para sincronizar
+        if (filteredVisits.length > 0) {
+          try {
+            // Enviar las visitas filtradas al servidor
+            const response = await instanceSincro.post('/api/register/visit', { visits: filteredVisits });
+            // console.log('Visits sent successfully:', response.data);
 
-          // Guarda las visitas sincronizadas y no sincronizadas
-          const { completed, notCompleted } = response.data;
-          await storeData('syncedVisits', completed);
-          await storeData('unsyncedVisits', notCompleted);
+            if (response.status === 200) {
+              // Actualizar el estado de las visitas sincronizadas solo la primera vez
+              const syncedVisits = response.data.processVisits.completed;
 
-          return { success: true, completed, notCompleted };
-        } catch (error) {
-          console.error('Error sending visits:', error);
-          return { success: false, error };
+              visitsArray = visitsArray.map(visit => {
+                const syncedVisit = syncedVisits.find(syncedVisit => syncedVisit.id_visit === visit.id_visit);
+                if (syncedVisit && visit.status !== 'sincronizada') {
+                  visit.status = 'sincronizada';
+                }
+                return visit;
+              });
+
+              // Guardar las visitas actualizadas de vuelta en AsyncStorage
+              await AsyncStorage.setItem('ClientVisits', JSON.stringify(visitsArray));
+
+              // Devolver éxito junto con las visitas sincronizadas y no sincronizadas
+              const { completed, notCompleted } = response.data.processVisits;
+              return { success: true, completed, notCompleted };
+            } else {
+              console.log('Unexpected response status:', response.status);
+              return { success: false, error: 'Unexpected response status' };
+            }
+          } catch (error) {
+            // console.error('Error sending visits:', error);
+            return { success: false, error };
+          }
+        } else {
+          // console.log('No unsynchronized visits found');
+          return { success: false, error: 'No unsynchronized visits found' };
         }
       } else {
-        console.log('No visits found');
+        // console.log('No visits found');
         return { success: false, error: 'No visits found' };
       }
     } else {
@@ -106,6 +130,7 @@ const getVisits = async () => {
     return { success: false, error: err };
   }
 };
+
 
 const getAllInfo = async (setLoading, setMessage, callback) => {
   setLoading(true);
@@ -138,7 +163,7 @@ const getAllInfo = async (setLoading, setMessage, callback) => {
       if (visitsResult.success) {
         callback(visitsResult.success, visitsResult.completed, visitsResult.notCompleted);
       } else {
-        setMessage('Información actualizada pero las visitas no se sincronizaron.');
+        setMessage('Información actualizada.');
       }
     } else {
       clearTimeout(timeoutId);
@@ -151,8 +176,6 @@ const getAllInfo = async (setLoading, setMessage, callback) => {
     setMessage('Error al actualizar la información.');
   }
 };
-
-
 
 const syncVisits = async () => {
   try {

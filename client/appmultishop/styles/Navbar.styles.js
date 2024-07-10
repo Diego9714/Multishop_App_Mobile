@@ -48,6 +48,18 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 20
   },
+  orderItem:{
+    margin:10,
+    backgroundColor: '#D0D0D0',
+    borderRadius: 10,
+    padding: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: 'black',
+  },
+  orderText:{
+    margin:5,
+  },
   buttonModal: {
     width: 150,
     height: 40,

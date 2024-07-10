@@ -20,7 +20,10 @@ const Navbar = () => {
 
   const handleClose = () => {
     setMessage('');
+    setSyncedVisits([]); // Vacía el estado de visitas sincronizadas al cerrar el modal
+    setUnsyncedVisits([]); // Vacía el estado de visitas no sincronizadas al cerrar el modal
   };
+  
 
   const handleGetAllInfo = async () => {
     setLoading(true);
@@ -37,20 +40,19 @@ const Navbar = () => {
   const handleSyncVisits = async (visitsSynced, syncedVisitsList, unsyncedVisitsList) => {
     if (visitsSynced) {
       setMessage('Información actualizada y visitas sincronizadas.');
-      setSyncedVisits(syncedVisitsList); // Actualiza el estado con las visitas sincronizadas
-      setUnsyncedVisits([]); // Limpia las visitas no sincronizadas
     } else {
-      setMessage('Información actualizada pero las visitas no se sincronizaron.');
-      setSyncedVisits(syncedVisitsList); // Actualiza el estado con las visitas sincronizadas
-      setUnsyncedVisits(unsyncedVisitsList); // Actualiza el estado con las visitas no sincronizadas
+      setMessage('Información actualizada.');
     }
-  };  
+    setSyncedVisits(syncedVisitsList); // Actualiza el estado con las visitas sincronizadas
+    setUnsyncedVisits(unsyncedVisitsList); // Actualiza el estado con las visitas no sincronizadas
+  };
 
   const renderItem = ({ item }) => {
+    const fechaFormateada = item.fecha ? new Date(item.fecha).toLocaleString() : '';
     return (
-      <View style={styles.visitItem}>
-        <Text style={styles.visitText}>{item.clientName}</Text>
-        {/* Puedes mostrar más detalles de la visita aquí si es necesario */}
+      <View style={styles.orderItem}>
+        <Text style={styles.orderText}>{item.nom_cli}</Text>
+        <Text style={styles.orderText}>{fechaFormateada}</Text>
       </View>
     );
   };
@@ -73,29 +75,28 @@ const Navbar = () => {
             ) : (
               <>
                 <Text style={styles.messageInfo}>{message}</Text>
-                <Text style={styles.message}>Visitas Sincronizadas</Text>
-                <FlatList
-                  data={syncedVisits}
-                  renderItem={renderItem}
-                  keyExtractor={(item, index) => index.toString()}
-                  ListEmptyComponent={<Text style={styles.message}>No hay visitas sincronizadas</Text>}
-                />
-                {unsyncedVisits.length > 0 && (
+                {syncedVisits.length > 0 ? (
+                  <>
+                    <Text style={styles.message}>Visitas Sincronizadas</Text>
+                    <FlatList
+                      data={syncedVisits}
+                      renderItem={renderItem}
+                      keyExtractor={(item, index) => index.toString()}
+                      ListEmptyComponent={<Text style={styles.message}>No hay visitas sincronizadas</Text>}
+                    />
+                  </>
+                ) : null}
+                {unsyncedVisits.length > 0 ? (
                   <>
                     <Text style={styles.message}>Visitas No Sincronizadas</Text>
                     <FlatList
                       data={unsyncedVisits}
-                      renderItem={({ item }) => (
-                        <View style={styles.visitItem}>
-                          <Text style={styles.visitText}>{item.clientName}</Text>
-                          {/* Puedes mostrar más detalles de la visita aquí si es necesario */}
-                        </View>
-                      )}
+                      renderItem={renderItem}
                       keyExtractor={(item, index) => index.toString()}
-                      ListEmptyComponent={<Text style={styles.message}>{item}</Text>}
+                      ListEmptyComponent={<Text style={styles.message}>No hay visitas no sincronizadas</Text>}
                     />
                   </>
-                )}
+                ) : null}
                 <View style={styles.buttonContainer}>
                   {success ? (
                     <Pressable style={styles.buttonModalExit} onPress={handleClose}>
