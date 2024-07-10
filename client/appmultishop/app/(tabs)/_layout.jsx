@@ -8,7 +8,7 @@ const Layout = () => {
 
   const settingsNav = {
     headerShown: false,
-    tabBarActiveTintColor: '#5B97DC',
+    tabBarActiveTintColor: '#38B0DB',
     tabBarStyle:{
       borderTopWidth: 1,
       borderTopColor: '#CDCDE0',

@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
   modalContent: {
     width: "80%",
     padding: 20,
-    backgroundColor: '#f1f1f1',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
@@ -27,14 +27,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
     width: '80%',
+    color: '#4D4D4D'
   },
   subtitleModal:{
     marginTop: '2%',
     width: '80%',
+    color: '#4D4D4D'
   },
   modalInfoClient: {
     width: "80%",
-    backgroundColor: '#D0D0D0',
+    backgroundColor: '#FFF',
     borderRadius: 20,
     margin: "2%",
     alignItems: "center",
@@ -52,7 +54,8 @@ const styles = StyleSheet.create({
     height: "%10",
     borderRadius: 15,
     width: "90%",
-    textAlign: "center"
+    textAlign: "center",
+    color: '#4D4D4D'
   },
   sectionButtonsModal: {
     marginTop: "2%",
@@ -64,7 +67,7 @@ const styles = StyleSheet.create({
   buttonModal: {
     width: 100,    
     height: 40,
-    backgroundColor: "#5B97DC",
+    backgroundColor: '#38B0DB',
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",

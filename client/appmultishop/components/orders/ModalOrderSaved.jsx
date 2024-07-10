@@ -35,7 +35,7 @@ const ModalOrderSaved = ({ isVisible, onClose, onOrderSaved }) => {
           <Text style={styles.titleModal}>Pedido Guardado con Éxito!</Text>
 
           <Animated.View style={{ transform: [{ scale: scaleValue }], opacity: opacityValue }}>
-            <AntDesign name="checkcircle" size={48} color="#06D001" />
+            <AntDesign name="checkcircle" size={48} color="#38B0DB" />
           </Animated.View>
 
           <Text style={styles.subtitleModal}>Su pedido ha sido guardado correctamente.</Text>

@@ -1,5 +1,7 @@
+// Dependencies
 import React from 'react';
 import { Text, View, Modal, Pressable } from 'react-native';
+// Styles
 import styles from '../../styles/ModalSelectOrder.styles';
 
 const ModalSelectOrder = ({ isVisible, onClose, onSelect, selectedOrder }) => {
@@ -19,7 +21,7 @@ const ModalSelectOrder = ({ isVisible, onClose, onSelect, selectedOrder }) => {
   };
 
   return (
-    <Modal visible={isVisible && !!selectedOrder} animationType="slide" transparent={true}>
+    <Modal visible={isVisible && !!selectedOrder} animationType="fade" transparent={true}>
       {selectedOrder && (
         <View style={styles.modalContainer}>
           <View style={styles.container}>

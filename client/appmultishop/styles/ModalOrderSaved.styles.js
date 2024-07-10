@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: "80%", // Ancho deseado del modal
-    backgroundColor: '#f1f1f1',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderRadius: 10,
     padding: 5,
     justifyContent: 'center',

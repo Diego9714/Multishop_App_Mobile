@@ -98,7 +98,7 @@ const VisitModal = ({ isVisible, onClose, client }) => {
 
           <Animated.View style={{ transform: [{ scale: scaleValue }], opacity: opacityValue }}>
             {visitStatus === 'Visita registrada con éxito!' ? (
-              <AntDesign name="checkcircle" size={48} color="#06D001" />
+              <AntDesign name="checkcircle" size={48} color="#38B0DB" />
             ) : (
               <AntDesign name="closecircle" size={48} color="#E72929" />
             )}

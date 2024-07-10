@@ -1,6 +1,9 @@
+// Dependencies
 import React, { useEffect, useRef, useState } from 'react';
-import { Text, TextInput, View, Pressable, Modal, TouchableOpacity, Animated, Easing } from 'react-native';
+import { Text, TextInput, View, Pressable,
+Modal, TouchableOpacity, Animated, Easing } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+// Token - JWT 
 import { jwtDecode } from 'jwt-decode';
 import { decode } from 'base-64';
 global.atob = decode;

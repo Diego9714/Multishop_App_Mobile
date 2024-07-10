@@ -1,13 +1,19 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Text, View, Pressable, ScrollView, Modal, Alert, ActivityIndicator } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Ionicons, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import styles from '../../styles/SelectOrders.styles';
-import ModalSelectOrder from './ModalSelectOrder';
-import ModalSincroOrder from './ModalSincroOrder';
-import EditOrder from '../editOrder/EditOrder';
-import { jwtDecode } from 'jwt-decode';
-import { decode } from 'base-64';
+// Dependencies
+import React, { useState, useEffect, useCallback }          from 'react';
+import { Text, View, Pressable, ScrollView, 
+Modal, Alert, ActivityIndicator }                           from 'react-native';
+import AsyncStorage                                         from '@react-native-async-storage/async-storage';
+import { Ionicons, MaterialIcons, MaterialCommunityIcons }  from '@expo/vector-icons';
+import { LinearGradient }                                   from 'expo-linear-gradient';
+// Styles
+import styles                                               from '../../styles/SelectOrders.styles';
+// Modals And Components
+import ModalSelectOrder                                     from './ModalSelectOrder';
+import ModalSincroOrder                                     from './ModalSincroOrder';
+import EditOrder                                            from '../editOrder/EditOrder';
+// JWT - Token
+import { jwtDecode }                                        from 'jwt-decode';
+import { decode }                                           from 'base-64';
 global.atob = decode;
 
 // Api
@@ -199,7 +205,9 @@ const SelectOrders = () => {
           style={[styles.pageButton, page === i && styles.pageButtonActive]}
           onPress={() => setPage(i)}
         >
-          <Text style={styles.pageButtonText}>{i}</Text>
+          <Text style={[styles.pageButtonText, page === i && styles.pageButtonTextActive]}>
+            {i}
+          </Text>
         </Pressable>
       );
     }
@@ -215,6 +223,28 @@ const SelectOrders = () => {
     if (action === 'Eliminar') {
       try {
         const updatedOrders = orders.filter(o => o.id_order !== selectedOrder.id_order);
+  
+        // Recuperar el pedido eliminado y sus productos
+        const deletedOrder = orders.find(o => o.id_order === selectedOrder.id_order);
+        
+        // Actualizar existencias en la lista de productos
+        const productsInfo = await AsyncStorage.getItem('products');
+        const productList = productsInfo ? JSON.parse(productsInfo) : [];
+  
+        const updatedProductList = productList.map(prod => {
+          const deletedProduct = deletedOrder.products.find(p => p.codigo === prod.codigo);
+          if (deletedProduct) {
+            return {
+              ...prod,
+              existencia: prod.existencia + deletedProduct.quantity
+            };
+          }
+          return prod;
+        });
+  
+        await AsyncStorage.setItem('products', JSON.stringify(updatedProductList));
+
+        // Actualizar los pedidos almacenados
         setOrders(updatedOrders);
         setStoredOrders(updatedOrders);
         await AsyncStorage.setItem('OrdersClient', JSON.stringify(updatedOrders));
@@ -226,110 +256,115 @@ const SelectOrders = () => {
       setEditModalVisible(true);
     }
   };
+  
 
   return (
-    <View style={styles.mainContainer}>
-      <View style={styles.titlePage}>
-        <Text style={styles.title}>Pedidos por Sincronizar</Text>
-      </View>
-
-      <View style={styles.listOrderContainer}>
-        <View style={styles.headerProductContainer}>
-          <View style={styles.titleListContainer}>
-            <Text style={styles.titleListClient}>Cliente</Text>
-            <Text style={styles.titleListPrice}>Total a pagar</Text>
-            <Text style={styles.titleListActions}>Acciones</Text>
-          </View>
+    <LinearGradient
+    colors={['#ffff', '#9bdef6', '#ffffff', '#9bdef6']}
+    style={styles.gradientBackground}
+    >
+      <View style={styles.mainContainer}>
+        <View style={styles.titlePage}>
+          <Text style={styles.title}>Pedidos por Sincronizar</Text>
         </View>
 
-        <ScrollView contentContainerStyle={styles.scrollViewContent}>
-          {visibleOrders.length > 0 ? (
-            visibleOrders.map((order, index) => (
-              <View key={index} style={styles.orderItem}>
-                <View style={styles.nameProd}>
-                  <Text>{order.nom_cli}</Text>
+        <View style={styles.listOrderContainer}>
+          <View style={styles.headerProductContainer}>
+            <View style={styles.titleListContainer}>
+              <Text style={styles.titleListClient}>Cliente</Text>
+              <Text style={styles.titleListPrice}>Total a pagar</Text>
+              <Text style={styles.titleListActions}>Acciones</Text>
+            </View>
+          </View>
+
+          <ScrollView contentContainerStyle={styles.scrollViewContent}>
+            {visibleOrders.length > 0 ? (
+              visibleOrders.map((order, index) => (
+                <View key={index} style={styles.orderItem}>
+                  <View style={styles.nameProd}>
+                    <Text>{order.nom_cli}</Text>
+                  </View>
+                  <View style={styles.priceContainer}>
+                    <Text>{formatNumber(order.totalUsd)} $</Text>
+                  </View>
+                  <View style={styles.buttonAction}>
+                    <Pressable
+                      style={styles.button}
+                      onPress={() => handleOrderSelection(order)}
+                    >
+                      {order.selected ? (
+                        <MaterialIcons name="check-box" size={32} color="#7A7A7B" />
+                      ) : (
+                        <MaterialIcons name="check-box-outline-blank" size={32} color="#7A7A7B" />
+                      )}
+                    </Pressable>
+                    <Pressable
+                      style={styles.button}
+                      onPress={() => handleOrderDetails(order)}
+                    >
+                      <MaterialIcons name="more-vert" size={30} color="#7A7A7B" />
+                    </Pressable>
+                  </View>
                 </View>
-                <View style={styles.priceContainer}>
-                  <Text>{formatNumber(order.totalUsd)} $</Text>
-                </View>
-                <View style={styles.buttonAction}>
-                  <Pressable
-                    style={styles.button}
-                    onPress={() => handleOrderSelection(order)}
-                  >
-                    {order.selected ? (
-                      <MaterialIcons name="check-box" size={32} color="#7A7A7B" />
-                    ) : (
-                      <MaterialIcons name="check-box-outline-blank" size={32} color="#7A7A7B" />
-                    )}
-                  </Pressable>
-                  <Pressable
-                    style={styles.button}
-                    onPress={() => handleOrderDetails(order)}
-                  >
-                    <MaterialIcons name="more-vert" size={30} color="#7A7A7B" />
-                  </Pressable>
-                </View>
-              </View>
-            ))
-          ) : (
-            <Text style={styles.noOrdersText}>No hay pedidos disponibles</Text>
-          )}
-        </ScrollView>
-      </View>
+              ))
+            ) : (
+              <Text style={styles.noOrdersText}>No hay pedidos disponibles</Text>
+            )}
+          </ScrollView>
+        </View>
 
-      <View style={styles.paginationContainer}>
-        {renderPaginationButtons()}
-      </View>
+        <View style={styles.paginationContainer}>
+          {renderPaginationButtons()}
+        </View>
 
-      <View style={styles.buttonsAction}>
-        <Pressable
-          style={styles.buttonSincro}
-          onPress={synchronizeOrders}
-          disabled={Object.keys(selectedOrders).length === 0}
-        >
-          <Text style={styles.textButtonSincro}>Sincronizar</Text>
-          <MaterialCommunityIcons 
-            name="cloud-upload" 
-            size={35} 
-            color="#f1f1f1"
-          />
-        </Pressable>
-      </View>
+        <View style={styles.buttonsAction}>
+          <Pressable
+            style={styles.buttonSincro}
+            onPress={synchronizeOrders}
+            disabled={Object.keys(selectedOrders).length === 0}
+          >
+            <Text style={styles.textButtonSincro}>Sincronizar</Text>
+            <MaterialCommunityIcons 
+              name="cloud-upload" 
+              size={35} 
+              color="#f1f1f1"
+            />
+          </Pressable>
+        </View>
 
-      <ModalSincroOrder 
-        isVisible={modalSincroVisible} 
-        onClose={() => setModalSincroVisible(false)} 
-        synchronizedOrders={synchronizedOrders} 
-        unsynchronizedOrders={unsynchronizedOrders} 
-        isLoading={isLoading}  // Pasar el estado del loader al modal
-      />
-
-      <ModalSelectOrder 
-        isVisible={modalVisible} 
-        onClose={() => setModalVisible(false)} 
-        onSelect={handleModalSelect} 
-        selectedOrder={selectedOrder}
-        animationType="fade"
-      />
-
-      <Modal
-        visible={editModalVisible}
-        onRequestClose={() => setEditModalVisible(false)}
-        animationType="fade"
-      >
-      </Modal>
-      
-      {selectedOrder && (
-        <EditOrder
-          isVisible={editModalVisible}
-          selectedOrder={selectedOrder}
-          onClose={() => setEditModalVisible(false)}
-          animationType="fade"
-
+        <ModalSincroOrder 
+          isVisible={modalSincroVisible} 
+          onClose={() => setModalSincroVisible(false)} 
+          synchronizedOrders={synchronizedOrders} 
+          unsynchronizedOrders={unsynchronizedOrders} 
+          isLoading={isLoading}  // Pasar el estado del loader al modal
         />
-      )}
-    </View>
+
+        <ModalSelectOrder 
+          isVisible={modalVisible} 
+          onClose={() => setModalVisible(false)} 
+          onSelect={handleModalSelect} 
+          selectedOrder={selectedOrder}
+          animationType="fade"
+        />
+
+        <Modal
+          visible={editModalVisible}
+          onRequestClose={() => setEditModalVisible(false)}
+          animationType="fade"
+        >
+        </Modal>
+        
+        {selectedOrder && (
+          <EditOrder
+            isVisible={editModalVisible}
+            selectedOrder={selectedOrder}
+            onClose={() => setEditModalVisible(false)}
+            animationType="fade"
+          />
+        )}
+      </View>
+    </LinearGradient>
   );
 };
 

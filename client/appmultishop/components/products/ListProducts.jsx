@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, FlatList, Pressable, TextInput, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AntDesign, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import ModalProducts from './ModalProducts';
 import FilterCategories from '../FilterCategories';
 import styles from '../../styles/ListProducts.styles';
@@ -188,7 +189,9 @@ const ListProducts = () => {
           style={[styles.pageButton, page === i && styles.pageButtonActive]}
           onPress={() => setPage(i)}
         >
-          <Text style={styles.pageButtonText}>{i}</Text>
+          <Text style={[styles.pageButtonText, page === i && styles.pageButtonTextActive]}>
+            {i}
+          </Text>
         </Pressable>
       );
     }
@@ -205,63 +208,68 @@ const ListProducts = () => {
   };
 
   return (
-    <View style={styles.list}>
-      <View style={styles.titlePage}>
-        <Text style={styles.title}>Inventario</Text>
-      </View>
-
-      <View style={styles.finderContainer}>
-        <View style={styles.seekerContainer}>
-          <TextInput
-            placeholder='Buscar Producto'
-            style={styles.seeker}
-            value={searchProduct}
-            onChangeText={(text) => setSearchProduct(text)}
-          />
-          <Pressable onPress={handleSearch}>
-            <FontAwesome name="search" size={28} color="#8B8B8B" />
-          </Pressable>
+    <LinearGradient
+    colors={['#ffff', '#9bdef6', '#ffffff', '#9bdef6']}
+    style={styles.gradientBackground}
+    >
+      <View style={styles.list}>
+        <View style={styles.titlePage}>
+          <Text style={styles.title}>Inventario</Text>
         </View>
-        <TouchableOpacity onPress={openFilterModal} style={styles.filterContainer}>
-          <Text style={styles.textFilter}>Filtrar</Text>
-          <MaterialIcons name="filter-alt" size={28} color="white" />
-        </TouchableOpacity>
-      </View>
 
-      <FilterCategories
-        visible={isFilterModalVisible}
-        onClose={closeFilterModal}
-        onSave={handleSaveFilters}
-      />
+        <View style={styles.finderContainer}>
+          <View style={styles.seekerContainer}>
+            <TextInput
+              placeholder='Buscar Producto'
+              style={styles.seeker}
+              value={searchProduct}
+              onChangeText={(text) => setSearchProduct(text)}
+            />
+            <Pressable onPress={handleSearch}>
+              <FontAwesome name="search" size={28} color="#8B8B8B" />
+            </Pressable>
+          </View>
+          <TouchableOpacity onPress={openFilterModal} style={styles.filterContainer}>
+            <Text style={styles.textFilter}>Filtrar</Text>
+            <MaterialIcons name="filter-alt" size={28} color="white" />
+          </TouchableOpacity>
+        </View>
 
-      <View style={styles.container}>
-        <View style={styles.headerContainer}>
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>Producto</Text>
-            <Text style={styles.headerTitleButton}>Acciones</Text>
+        <FilterCategories
+          visible={isFilterModalVisible}
+          onClose={closeFilterModal}
+          onSave={handleSaveFilters}
+        />
+
+        <View style={styles.container}>
+          <View style={styles.headerContainer}>
+            <View style={styles.header}>
+              <Text style={styles.headerTitle}>Producto</Text>
+              <Text style={styles.headerTitleButton}>Acciones</Text>
+            </View>
+          </View>
+          <View style={styles.listContainer}>
+            <FlatList
+              data={visibleProducts}
+              keyExtractor={(item) => item.codigo}
+              renderItem={renderElements}
+            />
           </View>
         </View>
-        <View style={styles.listContainer}>
-          <FlatList
-            data={visibleProducts}
-            keyExtractor={(item) => item.codigo}
-            renderItem={renderElements}
+
+        <ScrollView horizontal style={styles.paginationContainer}>
+          {renderPaginationButtons()}
+        </ScrollView>
+
+        {selectedProduct && (
+          <ModalProducts
+            isVisible={isModalVisible}
+            onClose={() => setIsModalVisible(false)}
+            product={selectedProduct}
           />
-        </View>
+        )}
       </View>
-
-      <ScrollView horizontal style={styles.paginationContainer}>
-        {renderPaginationButtons()}
-      </ScrollView>
-
-      {selectedProduct && (
-        <ModalProducts
-          isVisible={isModalVisible}
-          onClose={() => setIsModalVisible(false)}
-          product={selectedProduct}
-        />
-      )}
-    </View>
+    </LinearGradient>
   );
 };
 

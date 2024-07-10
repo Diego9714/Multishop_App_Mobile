@@ -75,12 +75,12 @@ const FilterCategories = ({ visible, onClose, onSave }) => {
             <MaterialIcons
               name="filter-1"
               size={24}
-              color={selectedCategoryTemp === 'Categoria' ? '#5B97DC' : 'black'}
+              color={selectedCategoryTemp === 'Categoria' ? '#38B0DB' : 'black'}
             />
             <Text
               style={[
                 styles.filterText,
-                selectedCategoryTemp === 'Categoria' && { color: '#5B97DC' },
+                selectedCategoryTemp === 'Categoria' && { color: '#38B0DB' },
               ]}
             >
               Categoria
@@ -97,12 +97,12 @@ const FilterCategories = ({ visible, onClose, onSave }) => {
             <MaterialIcons
               name="filter-2"
               size={24}
-              color={selectedBrandTemp === 'Marca' ? '#5B97DC' : 'black'}
+              color={selectedBrandTemp === 'Marca' ? '#38B0DB' : 'black'}
             />
             <Text
               style={[
                 styles.filterText,
-                selectedBrandTemp === 'Marca' && { color: '#5B97DC' },
+                selectedBrandTemp === 'Marca' && { color: '#38B0DB' },
               ]}
             >
               Marca
@@ -119,12 +119,12 @@ const FilterCategories = ({ visible, onClose, onSave }) => {
             <MaterialIcons
               name="filter-3"
               size={24}
-              color={selectedPriceOrderTemp === 'menor-mayor' ? '#5B97DC' : 'black'}
+              color={selectedPriceOrderTemp === 'menor-mayor' ? '#38B0DB' : 'black'}
             />
             <Text
               style={[
                 styles.filterText,
-                selectedPriceOrderTemp === 'menor-mayor' && { color: '#5B97DC' },
+                selectedPriceOrderTemp === 'menor-mayor' && { color: '#38B0DB' },
               ]}
             >
               Precio Menor a Mayor
@@ -141,12 +141,12 @@ const FilterCategories = ({ visible, onClose, onSave }) => {
             <MaterialIcons
               name="filter-4"
               size={24}
-              color={selectedPriceOrderTemp === 'mayor-menor' ? '#5B97DC' : 'black'}
+              color={selectedPriceOrderTemp === 'mayor-menor' ? '#38B0DB' : 'black'}
             />
             <Text
               style={[
                 styles.filterText,
-                selectedPriceOrderTemp === 'mayor-menor' && { color: '#5B97DC' },
+                selectedPriceOrderTemp === 'mayor-menor' && { color: '#38B0DB' },
               ]}
             >
               Precio Mayor a Menor

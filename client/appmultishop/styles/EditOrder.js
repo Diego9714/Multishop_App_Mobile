@@ -5,7 +5,7 @@ const styles = StyleSheet.create({
     flex: 1, // Utiliza flex para que el contenedor ocupe todo el espacio disponible
     marginTop: 20,
     padding: 15,
-    backgroundColor: '#EFEFEF',
+    backgroundColor: 'rgba(0, 0, 0, 0.10)',
     justifyContent: 'center',
     alignItems: 'center',
     borderTopRightRadius: 30,
@@ -15,9 +15,13 @@ const styles = StyleSheet.create({
       width: 5,
       height: 5,
     },
-    shadowOpacity: 0.5,
-    shadowRadius: 5,
-    elevation: 10,
+    shadowOpacity: 2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  gradientBackground: {
+    width: '100%',
+    height: '100%',
   },
   scrollContent: {
     flexGrow: 1, // Utiliza flexGrow para que el contenido del ScrollView ocupe todo el espacio disponible
@@ -43,10 +47,8 @@ const styles = StyleSheet.create({
   },
   detailedClientContainer: {
     margin: 25,
-    // marginLeft: 5,
-    // width: '90%',
     padding: 20,
-    backgroundColor: '#798CA0',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
     borderRadius: 20,
     shadowColor: 'black',
     shadowOpacity: 0.3,
@@ -56,8 +58,7 @@ const styles = StyleSheet.create({
   detailedClientContainerFac:{
     margin: 25,
     padding: 20,
-    backgroundColor: '#798CA0',
-    // alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
     borderRadius: 20,
     shadowColor: 'black',
     shadowOpacity: 0.3,
@@ -65,14 +66,14 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
   },
   nameInputDetailedClient:{
-    color: 'white',
+    color: '#4D4D4D',
     marginHorizontal: '8%',
     fontSize: 16
   },
   infoClientContainer:{
     margin: '4%',
     padding: '4%',
-    backgroundColor: '#EFEFEF',
+    backgroundColor: '#FFF',
     borderRadius: 20,
     shadowColor: 'black',
     shadowOpacity: 0.3,
@@ -80,10 +81,10 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
   },
   textDetailedClient:{
-    color: '#373A40'
+    color: '#4D4D4D',
   },
   ProductContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
     borderBottomRightRadius: 20,
@@ -92,7 +93,7 @@ const styles = StyleSheet.create({
   },
   headerProductContainer: {
     width: "100%",
-    backgroundColor: '#64a8d6',
+    backgroundColor: "#38B0DB",
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
   },
@@ -131,14 +132,17 @@ const styles = StyleSheet.create({
   nameProduct: {
     flex: 2,
     textAlign: 'left',
+    color: '#4D4D4D'
   },
   quantityProduct: {
     flex: 1,
     textAlign: 'center',
+    color: '#4D4D4D'
   },
   priceProduct: {
     flex: 1,
     textAlign: 'center',
+    color: '#4D4D4D'
   },
   selectedProductActions: {
     flex: 1,
@@ -199,7 +203,7 @@ const styles = StyleSheet.create({
   otherButton: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    backgroundColor: '#5B97DC',
+    backgroundColor: "#38B0DB",
     borderRadius: 5,
   },
   closeButton: {

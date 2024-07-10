@@ -1,11 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Text, View, Pressable, Modal, TextInput, ScrollView, Alert , TouchableOpacity } from 'react-native';
-import { AntDesign, MaterialIcons, FontAwesome } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import ModalProduct from '../products/ModalProducts';
-import SaveOrder from './SaveOrder';
-import FilterCategories from '../FilterCategories';
-import styles from '../../styles/SelectProducts.styles';
+// Dependencies
+import { Text, View, Pressable, Modal, 
+  TextInput, ScrollView, Alert , TouchableOpacity }     from 'react-native';
+import React, { useState, useEffect, useCallback }      from 'react';
+import { AntDesign, MaterialIcons, FontAwesome }        from '@expo/vector-icons';
+import AsyncStorage                                     from '@react-native-async-storage/async-storage';
+import { LinearGradient }                               from 'expo-linear-gradient';
+// Modals And Components
+import ModalProduct                                     from '../products/ModalProducts';
+import SaveOrder                                        from './SaveOrder';
+import FilterCategories                                 from '../FilterCategories';
+// Styles
+import styles                                           from '../../styles/SelectProducts.styles';
 
 const SelectProducts = ({ isVisible, onClose, client }) => {
   const [selectedProductsCount, setSelectedProductsCount] = useState(0);
@@ -237,7 +242,9 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
           style={[styles.pageButton, page === i && styles.pageButtonActive]}
           onPress={() => setPage(i)}
         >
-          <Text style={styles.pageButtonText}>{i}</Text>
+          <Text style={[styles.pageButtonText, page === i && styles.pageButtonTextActive]}>
+            {i}
+          </Text>
         </Pressable>
       );
     }
@@ -310,131 +317,136 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
 
   return (
     <Modal visible={isVisible} animationType="slide">
-      <View style={styles.container}>
-        <View style={styles.mainTitleContainer}>
-          <Text style={styles.mainTitle}>Seleccionar Productos</Text>
-        </View>
+      <LinearGradient
+      colors={['#ffff', '#9bdef6', '#ffffff', '#9bdef6']}
+      style={styles.gradientBackground}
+      >
+        <View style={styles.container}>
+          <View style={styles.mainTitleContainer}>
+            <Text style={styles.mainTitle}>Seleccionar Productos</Text>
+          </View>
 
-        <View style={styles.mainSubtitleContainer}>
-          <Text style={styles.mainSubtitle}>Cliente: {client.nom_cli}</Text>
-        </View>
+          <View style={styles.mainSubtitleContainer}>
+            <Text style={styles.mainSubtitle}>Cliente: {client.nom_cli}</Text>
+          </View>
 
-        <View style={styles.finderContainer}>
-          <View style={styles.seekerContainer}>
-            <TextInput
-              placeholder='Buscar Producto'
-              style={styles.seeker}
-              value={searchProduct}
-              onChangeText={text => setSearchProduct(text)}
-            />
-            <Pressable onPress={handleSearch}>
-              <FontAwesome name="search" size={28} color="#8B8B8B" />
+          <View style={styles.finderContainer}>
+            <View style={styles.seekerContainer}>
+              <TextInput
+                placeholder='Buscar Producto'
+                style={styles.seeker}
+                value={searchProduct}
+                onChangeText={text => setSearchProduct(text)}
+              />
+              <Pressable onPress={handleSearch}>
+                <FontAwesome name="search" size={28} color="#8B8B8B" />
+              </Pressable>
+            </View>
+            <TouchableOpacity onPress={openFilterModal} style={styles.filterContainer}>
+              <Text style={styles.textFilter}>Filtrar</Text>
+              <MaterialIcons name="filter-alt" size={28} color="white" />
+            </TouchableOpacity>
+          </View>
+
+          <FilterCategories
+            visible={isFilterModalVisible}
+            onClose={closeFilterModal}
+            onSave={handleSaveFilters}
+          />
+
+          <View style={styles.productContainer}>
+            <View style={styles.headerProductContainer}>
+              <View style={styles.titleListContainer}>
+                <Text style={styles.titleListProduct}>Producto</Text>
+                <Text style={styles.titleListCant}>Cantidad</Text>
+                <Text style={styles.titleListActions}>Acciones</Text>
+              </View>
+            </View>
+
+            <ScrollView>
+              {visibleProducts.map((product, index) => (
+                <View key={index} style={styles.productItem}>
+                  <View style={styles.nameProd}>
+                    <Text>{product.descrip}</Text>
+                  </View>
+                  <View style={styles.quantityContainer}>
+                    <TextInput
+                      style={styles.quantityInput}
+                      keyboardType="numeric"
+                      placeholder="Cantidad"
+                      value={String(productQuantities[product.codigo] || '')}
+                      onChangeText={text => handleQuantityChange(product.codigo, text)}
+                    />
+                  </View>
+                  <View style={styles.buttonAction}>
+                    {productQuantities[product.codigo] > 0 && (
+                      <Pressable
+                        style={styles.button}
+                        onPress={() => handleProductDelete(product.codigo)}
+                      >
+                        <MaterialIcons name="delete" size={30} color="#7A7A7B" />
+                      </Pressable>
+                    )}
+                    <Pressable
+                      style={styles.buttonMore}
+                      onPress={() => {
+                        setSelectedProduct(product);
+                        setIsProductModalVisible(true);
+                      }}
+                    >
+                      <MaterialIcons name="more-vert" size={30} color="#7A7A7B" />
+                    </Pressable>
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+
+          <View style={styles.pagination}>
+            <ScrollView horizontal style={styles.paginationContainer}>
+              {renderPaginationButtonsProducts()}
+            </ScrollView>
+          </View>
+
+          <View style={styles.buttonsAction}>
+            <Pressable style={styles.buttonExit} onPress={onClose}>
+              <Text style={styles.buttonText}>Salir</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.buttonModal, { opacity: selectedProductsCount < 1 ? 0.5 : 1 }]}
+              onPress={() => {
+                if (selectedProductsCount >= 1 && validateOrder()) {
+                  setIsSaveOrderModalVisible(true);
+                }
+              }}
+              disabled={selectedProductsCount < 1}
+            >
+              <Text style={styles.buttonTextSave}>Guardar</Text>
+              <AntDesign name="shoppingcart" size={26} color="white" />
+              <View style={styles.counterContainer}>
+                <Text style={styles.counterText}>{selectedProductsCount}</Text>
+              </View>
             </Pressable>
           </View>
-          <TouchableOpacity onPress={openFilterModal} style={styles.filterContainer}>
-            <Text style={styles.textFilter}>Filtrar</Text>
-            <MaterialIcons name="filter-alt" size={28} color="white" />
-          </TouchableOpacity>
-        </View>
 
-        <FilterCategories
-          visible={isFilterModalVisible}
-          onClose={closeFilterModal}
-          onSave={handleSaveFilters}
-        />
+          {selectedProduct && (
+            <ModalProduct
+              isVisible={isProductModalVisible}
+              onClose={() => setIsProductModalVisible(false)}
+              product={selectedProduct}
+            />
+          )}
 
-        <View style={styles.productContainer}>
-          <View style={styles.headerProductContainer}>
-            <View style={styles.titleListContainer}>
-              <Text style={styles.titleListProduct}>Producto</Text>
-              <Text style={styles.titleListCant}>Cantidad</Text>
-              <Text style={styles.titleListActions}>Acciones</Text>
-            </View>
-          </View>
-
-          <ScrollView>
-            {visibleProducts.map((product, index) => (
-              <View key={index} style={styles.productItem}>
-                <View style={styles.nameProd}>
-                  <Text>{product.descrip}</Text>
-                </View>
-                <View style={styles.quantityContainer}>
-                  <TextInput
-                    style={styles.quantityInput}
-                    keyboardType="numeric"
-                    placeholder="Cantidad"
-                    value={String(productQuantities[product.codigo] || '')}
-                    onChangeText={text => handleQuantityChange(product.codigo, text)}
-                  />
-                </View>
-                <View style={styles.buttonAction}>
-                  {productQuantities[product.codigo] > 0 && (
-                    <Pressable
-                      style={styles.button}
-                      onPress={() => handleProductDelete(product.codigo)}
-                    >
-                      <MaterialIcons name="delete" size={30} color="#7A7A7B" />
-                    </Pressable>
-                  )}
-                  <Pressable
-                    style={styles.buttonMore}
-                    onPress={() => {
-                      setSelectedProduct(product);
-                      setIsProductModalVisible(true);
-                    }}
-                  >
-                    <MaterialIcons name="more-vert" size={30} color="#7A7A7B" />
-                  </Pressable>
-                </View>
-              </View>
-            ))}
-          </ScrollView>
-        </View>
-
-        <View style={styles.pagination}>
-          <ScrollView horizontal style={styles.paginationContainer}>
-            {renderPaginationButtonsProducts()}
-          </ScrollView>
-        </View>
-
-        <View style={styles.buttonsAction}>
-          <Pressable style={styles.buttonExit} onPress={onClose}>
-            <Text style={styles.buttonText}>Salir</Text>
-          </Pressable>
-          <Pressable
-            style={[styles.buttonModal, { opacity: selectedProductsCount < 1 ? 0.5 : 1 }]}
-            onPress={() => {
-              if (selectedProductsCount >= 1 && validateOrder()) {
-                setIsSaveOrderModalVisible(true);
-              }
-            }}
-            disabled={selectedProductsCount < 1}
-          >
-            <Text style={styles.buttonTextSave}>Guardar</Text>
-            <AntDesign name="shoppingcart" size={26} color="white" />
-            <View style={styles.counterContainer}>
-              <Text style={styles.counterText}>{selectedProductsCount}</Text>
-            </View>
-          </Pressable>
-        </View>
-
-        {selectedProduct && (
-          <ModalProduct
-            isVisible={isProductModalVisible}
-            onClose={() => setIsProductModalVisible(false)}
-            product={selectedProduct}
+          <SaveOrder
+            isVisible={isSaveOrderModalVisible}
+            onClose={() => setIsSaveOrderModalVisible(false)}
+            client={client}
+            order={generateSelectedProductJSON()}
+            onQuantityChange={handleQuantityChange}
+            onDeleteProduct={handleProductDelete}
           />
-        )}
-
-        <SaveOrder
-          isVisible={isSaveOrderModalVisible}
-          onClose={() => setIsSaveOrderModalVisible(false)}
-          client={client}
-          order={generateSelectedProductJSON()}
-          onQuantityChange={handleQuantityChange}
-          onDeleteProduct={handleProductDelete}
-        />
-      </View>
+        </View>
+      </LinearGradient>
     </Modal>
   );
 };

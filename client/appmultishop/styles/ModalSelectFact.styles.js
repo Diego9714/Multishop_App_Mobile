@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)'
   },
   container: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     height: '40%',
     width: '60%',
     borderRadius: 10,
@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
   modalButton: {
     width: 150,
     height: 40,
-    backgroundColor: "#5B97DC",
+    backgroundColor: '#38B0DB',
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",

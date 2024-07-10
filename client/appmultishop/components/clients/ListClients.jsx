@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Text, View, FlatList, Pressable, TextInput, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
 import styles from '../../styles/ListClients.styles';
 import ClientModal from './ClientModal';
 import {
@@ -104,7 +105,9 @@ const ListClients = () => {
           style={[styles.pageButton, page === i && styles.pageButtonActive]}
           onPress={() => setPage(i)}
         >
-          <Text style={styles.pageButtonText}>{i}</Text>
+          <Text style={[styles.pageButtonText, page === i && styles.pageButtonTextActive]}>
+            {i}
+          </Text>
         </Pressable>
       );
     }
@@ -112,6 +115,10 @@ const ListClients = () => {
   };
 
   return (
+    <LinearGradient
+    colors={['#ffff', '#9bdef6', '#ffffff', '#9bdef6']}
+    style={styles.gradientBackground}
+    >
     <View style={styles.list}>
       <View style={styles.titlePage}>
         <Text style={styles.title}>Clientes</Text>
@@ -166,6 +173,7 @@ const ListClients = () => {
         />
       )}
     </View>
+    </LinearGradient>
   );
 };
 

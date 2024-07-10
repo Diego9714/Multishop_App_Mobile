@@ -10,7 +10,7 @@ export default StyleSheet.create({
   modalContent: {
     width: 300,
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderRadius: 10,
   },
   titleModal: {
@@ -80,7 +80,7 @@ export default StyleSheet.create({
   buttonModal: {
     width: 100,
     height: 40,
-    backgroundColor: "#5B97DC",
+    backgroundColor: '#38B0DB',
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",

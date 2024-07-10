@@ -5,10 +5,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)'
+    backgroundColor: 'rgba(0, 0, 0, 0.6)'
   },
   container: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     width: '70%',
     borderRadius: 10,
     display: 'flex',
@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 15,
     width: "85%",
-    backgroundColor: '#DCDCDC',
+    backgroundColor: '#fff',
     gap: 10
   },
   sectionButtonsModal: {
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
   buttonModal: {
     width: 150, // Ajusta el ancho para que los botones se adapten mejor en diferentes tamaños de pantalla
     height: 40,
-    backgroundColor: "#5B97DC",
+    backgroundColor: "#38B0DB",
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",

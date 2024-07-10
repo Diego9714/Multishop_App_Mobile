@@ -4,8 +4,12 @@ const styles = StyleSheet.create({
   mainContainer: {
     width: "100%",
     height: "100%",
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(0, 0, 0, 0.10)',
     alignItems: "center"
+  },
+  gradientBackground: {
+    width: '100%',
+    height: '100%',
   },
   titlePage: {
     // height: '6%',
@@ -15,18 +19,19 @@ const styles = StyleSheet.create({
   title: {
     marginTop: 20,
     fontSize: 20,
-    fontWeight: "400"
+    fontWeight: "400",
+    color: '#4D4D4D'
   },
   listOrderContainer: {
     height: "55%",
     width: "90%",
-    backgroundColor: "#f1f1f1",
+    backgroundColor: 'rgba(255, 255, 255, 0.70)',
     borderRadius: 15,
     shadowColor: "#000",
   },
   headerProductContainer: {
     width: "100%",
-    backgroundColor: '#64a8d6',
+    backgroundColor: '#38B0DB',
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
     color: '#fff',
@@ -64,8 +69,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     alignItems: 'center',
-    borderBottomColor: "#f1f1f1",
-    borderBottomWidth: 2,
     paddingVertical: 10,
     margin: 1
   },
@@ -102,7 +105,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   buttonSincro: {
-    backgroundColor: '#5B97DC',
+    backgroundColor: '#38B0DB',
     borderRadius: 10,
     flexDirection: 'row',
     alignItems: 'center',
@@ -112,7 +115,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginRight: 10,
   },
-  
   paginationContainer: {
     width: '90%',
     flexDirection: 'row',
@@ -121,19 +123,22 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   pageButton: {
+    height: 40,
     padding: 10,
     margin: 5,
-    backgroundColor: '#ddd',
+    backgroundColor: '#fff',
     borderRadius: 100,
-    color: '#fff'
   },
   pageButtonActive: {
-    backgroundColor: '#5B97DC',
+    backgroundColor: '#38B0DB',
   },
   pageButtonText: {
-    color: 'black',
+    color: '#38B0DB',
     textAlign: 'center',
   },
+  pageButtonTextActive:{
+    color: '#fff',
+  }
 });
 
 export default styles;

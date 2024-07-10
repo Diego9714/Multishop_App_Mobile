@@ -2,9 +2,14 @@ import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
   list: {
-    width: "100%",
-    height: "100%",
-    backgroundColor: '#fff'
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.10)'
+  },
+  gradientBackground: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'space-evenly', // Añadir esto si necesitas que los hijos se centren verticalmente
   },
   titlePage:{
     height: '6%',
@@ -13,14 +18,15 @@ const styles = StyleSheet.create({
   title: {
     marginTop: 15,
     fontSize: 20,
-    fontWeight: "400"
+    fontWeight: "400",
+    color: '#4D4D4D'
   },
   finderContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     width: "90%",
-    backgroundColor: '#5B97DC',
+    backgroundColor: '#38B0DB',
     paddingRight: 15,
     borderRadius: 15,
     margin: 15,
@@ -28,7 +34,7 @@ const styles = StyleSheet.create({
   seekerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EFEFEF',
+    backgroundColor: '#fff',
     width: "75%",
     borderRadius: 15,
     paddingHorizontal: 10,
@@ -51,14 +57,14 @@ const styles = StyleSheet.create({
     color:'white'
   },
   container: {
-    backgroundColor: '#EFEFEF',
+    backgroundColor: 'rgba(255, 255, 255, 0.70)',
     marginHorizontal: 10,
     height: "55%",
     borderRadius: 20,
   },
   headerContainer: {
     width: '100%',
-    backgroundColor: "#64a8d6",
+    backgroundColor: "#38B0DB",
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
   },
@@ -87,8 +93,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderBottomColor: "#f1f1f1",
-    borderBottomWidth: 2,
     paddingVertical: 10,
   },
   nameProd: {
@@ -116,7 +120,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   button: {
-    backgroundColor: "#B9B9B9",
+    backgroundColor: "#fff",
     borderRadius: 10,
     width: "80%",
     padding: 5,
@@ -133,7 +137,7 @@ const styles = StyleSheet.create({
   modalContent: {
     width: "80%",
     padding: 15,
-    backgroundColor: '#f1f1f1',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
@@ -150,14 +154,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
     width: '80%',
+    color:'#4D4D4D'
   },
   subtitleModal:{
     marginTop: '2%',
     width: '80%',
+    color:'#4D4D4D'
   },
   modalInfoClient: {
     width: "80%",
-    backgroundColor: '#D0D0D0',
+    backgroundColor: '#fff',
     borderRadius: 20,
     margin: "2%",
     alignItems: "center",
@@ -174,7 +180,8 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 15,
     width: "90%",
-    textAlign: "center"
+    textAlign: "center",
+    color:'#4D4D4D'
   },
   sectionButtonsModal: {
     marginTop: "2%",
@@ -230,19 +237,23 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   pageButton: {
-    // height: '20%',
+    // height: '22%',
     height: 40,
     padding: 10,
     margin: 5,
-    backgroundColor: '#ddd',
+    backgroundColor: '#fff',
     borderRadius: 100,
   },
   pageButtonActive: {
-    backgroundColor: '#5B97DC',
+    backgroundColor: '#38B0DB',
+    
   },
   pageButtonText: {
-    color: 'black',
+    color: '#38B0DB',
     textAlign: 'center',
+  },
+  pageButtonTextActive:{
+    color: '#fff',
   },
 });
 

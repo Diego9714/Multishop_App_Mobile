@@ -5,7 +5,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     marginTop: '6%',
-    backgroundColor: '#EFEFEF',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -16,9 +15,13 @@ const styles = StyleSheet.create({
       width: 5,
       height: 5,
     },
-    shadowOpacity: 5,
-    shadowRadius: 5,
-    elevation: 10,
+    shadowOpacity: 2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  gradientBackground: {
+    width: '100%',
+    height: '100%',
   },
   mainTitleContainer: {
     width: '90%',
@@ -47,7 +50,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     width: "90%",
-    backgroundColor: '#5B97DC',
+    backgroundColor: '#38B0DB',
     paddingRight: 15,
     borderRadius: 15,
     margin: 15,
@@ -86,7 +89,7 @@ const styles = StyleSheet.create({
   buttonModal: {
     width: 120,
     height: 40,
-    backgroundColor: "#5B97DC",
+    backgroundColor: '#38B0DB',
     borderRadius: 10,
     flexDirection: 'row',
     justifyContent: 'center',
@@ -152,13 +155,12 @@ const styles = StyleSheet.create({
     height: "56%",
     width: "90%",
     // margin: 50,
-    backgroundColor: "#fff",
-    borderRadius: 15,
-    shadowColor: "#000",
+    backgroundColor: 'rgba(255, 255, 255, 0.70)',
+    borderRadius: 20,
   },
   headerProductContainer:{
     width: "100%",
-    backgroundColor: '#64a8d6',
+    backgroundColor: '#38B0DB',
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
     color: '#fff',
@@ -232,17 +234,22 @@ const styles = StyleSheet.create({
     paddingVertical: 10
   },
   pageButton: {
+    // height: '22%',
+    height: 40,
     padding: 10,
     margin: 5,
-    backgroundColor: '#ddd',
+    backgroundColor: '#fff',
     borderRadius: 100,
   },
   pageButtonActive: {
-    backgroundColor: '#5B97DC',
+    backgroundColor: '#38B0DB',
   },
   pageButtonText: {
-    color: 'black',
+    color: '#38B0DB',
     textAlign: 'center',
+  },
+  pageButtonTextActive:{
+    color: '#fff',
   },
 });
 

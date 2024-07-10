@@ -61,7 +61,7 @@ const Navbar = () => {
       <MaterialCommunityIcons
         name="cloud-download"
         size={35}
-        color="#5B97DC"
+        color="#38B0DB"
         style={{ marginLeft: 115 }}
         onPress={handleGetAllInfo}
       />

@@ -1,6 +1,11 @@
 import { StyleSheet} from 'react-native'
 
 const styles = StyleSheet.create({
+  mainContainer:{
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.10)'
+  },
   container: {
     display: "flex",
     flexDirection: 'row',

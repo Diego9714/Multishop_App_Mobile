@@ -1,15 +1,22 @@
+// Dependencies
 import React, { useState, useEffect } from 'react';
-import { Text, View, Modal, Pressable, ScrollView, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
-import ModalSelectFact from './modalSelectFact';
-import ModalEditProd from './modalEditProd';
-import ModalOrderSaved from './ModalOrderSaved';
-import styles from '../../styles/SaveOrder.styles';
-import { jwtDecode } from 'jwt-decode';
-import { decode } from 'base-64';
-import * as Print from 'expo-print';
-import * as Sharing from 'expo-sharing';
+import { Text, View, Modal, 
+Pressable, ScrollView, Alert }        from 'react-native';
+import AsyncStorage                   from '@react-native-async-storage/async-storage';
+import { useNavigation }              from '@react-navigation/native';
+import { LinearGradient }             from 'expo-linear-gradient';
+// Modals And Components
+import ModalSelectFact                from './modalSelectFact';
+import ModalEditProd                  from './modalEditProd';
+import ModalOrderSaved                from './ModalOrderSaved';
+// Styles
+import styles                         from '../../styles/SaveOrder.styles';
+// PDF
+import * as Print                     from 'expo-print';
+import * as Sharing                   from 'expo-sharing';
+// Token - JWT
+import { jwtDecode }                  from 'jwt-decode';
+import { decode }                     from 'base-64';
 global.atob = decode;
 
 const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDeleteProduct }) => {
@@ -192,7 +199,6 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
     }
   };
 
-
   const handleGenerateAndSharePdf = async () => {
     if (!invoiceType) {
       Alert.alert('Error', 'Debe seleccionar el tipo de factura');
@@ -215,7 +221,7 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
         }
         body {
           font-family: Arial, sans-serif;
-          background-color: #EFEFEF;
+          background: linear-gradient(to right, #ffff, #9bdef6, #ffffff, #9bdef6);
           padding: 15px;
         }
         .container {
@@ -234,12 +240,12 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
           margin-top: 20px;
           margin-bottom: 20px;
           padding: 20px;
-          background-color: #798CA0;
+          background-color: rgba(255, 255, 255, 0.5);
           border-radius: 20px;
           box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
         }
         .nameInputDetailedClient{
-          color: #FFFFFF;
+          color: #4d4d4d;
           margin-left: 20px;
         }
         .infoClientContainer {
@@ -253,12 +259,12 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
           color: #373A40;
         }
         .ProductContainer {
-          background-color: #FFFFFF;
+          background-color: rgba(255, 255, 255, 0.5);
           border-radius: 20px;
           margin-top: 20px;
         }
         .headerProductContainer {
-          background-color: #64a8d6;
+          background-color: #38B0DB;
           border-top-left-radius: 20px;
           border-top-right-radius: 20px;
           padding: 15px;
@@ -340,7 +346,8 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
         .noteOrder {
           color: gray;
           text-align: justify;
-        }      </style>
+        }      
+  </style>
     </head>
     <body>
       <div class="container">
@@ -414,7 +421,6 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
     }
   };
   
-
   const handleSharePdf = async () => {
     if (!pdfUri) {
       console.error('No hay un archivo PDF para compartir.');
@@ -430,7 +436,11 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
 
   return (
     <Modal visible={isVisible} animationType="slide">
-      <View style={styles.container}>
+      <LinearGradient
+      colors={['#ffff', '#9bdef6', '#ffffff', '#9bdef6']}
+      style={styles.gradientBackground}
+      >
+        <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.mainTitleContainer}>
             <Text style={styles.mainTitle}>Datos del Cliente</Text>
@@ -548,7 +558,8 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
             handlePress('Home');
           }}
         />
-      </View>
+        </View>
+      </LinearGradient>
     </Modal>
   );
 };

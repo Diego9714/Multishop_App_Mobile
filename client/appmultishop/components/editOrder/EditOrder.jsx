@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, Modal, Pressable, ScrollView, Alert } from 'react-native';
+import { LinearGradient }             from 'expo-linear-gradient';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -225,7 +226,7 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
         }
         body {
           font-family: Arial, sans-serif;
-          background-color: #EFEFEF;
+          background: linear-gradient(to right, #ffff, #9bdef6, #ffffff, #9bdef6);
           padding: 15px;
         }
         .container {
@@ -244,12 +245,12 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
           margin-top: 20px;
           margin-bottom: 20px;
           padding: 20px;
-          background-color: #798CA0;
+          background-color: rgba(255, 255, 255, 0.5);
           border-radius: 20px;
           box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
         }
         .nameInputDetailedClient{
-          color: #FFFFFF;
+          color: #4d4d4d;
           margin-left: 20px;
         }
         .infoClientContainer {
@@ -263,12 +264,12 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
           color: #373A40;
         }
         .ProductContainer {
-          background-color: #FFFFFF;
+          background-color: rgba(255, 255, 255, 0.5);
           border-radius: 20px;
           margin-top: 20px;
         }
         .headerProductContainer {
-          background-color: #64a8d6;
+          background-color: #38B0DB;
           border-top-left-radius: 20px;
           border-top-right-radius: 20px;
           padding: 15px;
@@ -350,7 +351,8 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
         .noteOrder {
           color: gray;
           text-align: justify;
-        }      </style>
+        }
+  </style>
     </head>
     <body>
       <div class="container">
@@ -432,144 +434,150 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
 
   return (
     <Modal visible={isVisible} animationType="slide">
-      <View style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          {order ? (
-            <View style={styles.content}>
-              <View style={styles.mainTitleContainer}>
-                <Text style={styles.mainTitle}>Datos del Cliente</Text>
-              </View>
-
-              <View style={styles.detailedClientContainer}>
-                <Text style={styles.nameInputDetailedClient}>Nombre:</Text>
-                <View style={styles.infoClientContainer}>
-                  <Text style={styles.textDetailedClient}>{order.nom_cli}</Text>
+      <LinearGradient
+      colors={['#ffff', '#9bdef6', '#ffffff', '#9bdef6']}
+      style={styles.gradientBackground}
+      >
+        <View style={styles.container}>
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            {order ? (
+              <View style={styles.content}>
+                <View style={styles.mainTitleContainer}>
+                  <Text style={styles.mainTitle}>Datos del Cliente</Text>
                 </View>
-                <Text style={styles.nameInputDetailedClient}>Rif:</Text>
-                <View style={styles.infoClientContainer}>
-                  <Text style={styles.textDetailedClient}>{order.cod_cli}</Text>
-                </View>
-                <Text style={styles.nameInputDetailedClient}>Teléfono:</Text>
-                <View style={styles.infoClientContainer}>
-                  <Text style={styles.textDetailedClient}>{order.tlf_cli}</Text>
-                </View>
-                <Text style={styles.nameInputDetailedClient}>Dirección:</Text>
-                <View style={styles.infoClientContainer}>
-                  <Text style={styles.textDetailedClient}>{order.dir_cli}</Text>
-                </View>
-                <Text style={styles.nameInputDetailedClient}>Fecha del Pedido:</Text>
-                <View style={styles.infoClientContainer}>
-                  <Text style={styles.textDetailedClient}>{fechaFormateada}</Text>
-                </View>
-              </View>
 
-              <View style={styles.mainTitleContainer}>
-                <Text style={styles.mainTitle}>Tipo de Factura</Text>
-              </View>
-
-              <View style={styles.detailedClientContainerFac}>
-                <Pressable
-                  style={styles.infoClientContainer}
-                  onPress={() => setIsInvoiceModalVisible(true)}
-                >
-                  <Text style={styles.textDetailedClient}>
-                    {invoiceType ? invoiceType : selectedOrder.tipfac}
-                  </Text>
-                </Pressable>
-              </View>
-
-              <View style={styles.mainTitleContainer}>
-                <Text style={styles.mainTitle}>Productos Seleccionados</Text>
-              </View>
-
-              <View style={styles.ProductContainer}>
-                <View style={styles.headerProductContainer}>
-                  <View style={styles.titleListContainer}>
-                    <Text style={styles.titleListProduct}>Producto</Text>
-                    <Text style={styles.titleListQuantity}>Cantidad</Text>
-                    <Text style={styles.titleListPrice}>Precio</Text>
+                <View style={styles.detailedClientContainer}>
+                  <Text style={styles.nameInputDetailedClient}>Nombre:</Text>
+                  <View style={styles.infoClientContainer}>
+                    <Text style={styles.textDetailedClient}>{order.nom_cli}</Text>
+                  </View>
+                  <Text style={styles.nameInputDetailedClient}>Rif:</Text>
+                  <View style={styles.infoClientContainer}>
+                    <Text style={styles.textDetailedClient}>{order.cod_cli}</Text>
+                  </View>
+                  <Text style={styles.nameInputDetailedClient}>Teléfono:</Text>
+                  <View style={styles.infoClientContainer}>
+                    <Text style={styles.textDetailedClient}>{order.tlf_cli}</Text>
+                  </View>
+                  <Text style={styles.nameInputDetailedClient}>Dirección:</Text>
+                  <View style={styles.infoClientContainer}>
+                    <Text style={styles.textDetailedClient}>{order.dir_cli}</Text>
+                  </View>
+                  <Text style={styles.nameInputDetailedClient}>Fecha del Pedido:</Text>
+                  <View style={styles.infoClientContainer}>
+                    <Text style={styles.textDetailedClient}>{fechaFormateada}</Text>
                   </View>
                 </View>
 
-                <View>
-                  {order.products && order.products.map((product, index) => (
-                    <Pressable key={index} style={styles.selectedProductItem} onPress={() => handleEditProduct(product)}>
-                      <Text style={styles.nameProduct}>{product.descrip}</Text>
-                      <Text style={styles.quantityProduct}>{product.quantity}</Text>
-                      <Text style={styles.priceProduct}>{product.priceUsd}</Text>
-                    </Pressable>
-                  ))}
+                <View style={styles.mainTitleContainer}>
+                  <Text style={styles.mainTitle}>Tipo de Factura</Text>
                 </View>
-              </View>
 
-              <View style={styles.exchangeRateContainer}>
-            <Text style={styles.exchangeRateText}>Cambio USD : {cambioDolares}</Text>
-            <Text style={styles.exchangeRateText}>Cambio Bs. : {cambioBolivares}</Text>
-            {/* <Text style={styles.exchangeRateText}>Cambio Pesos: {cambioPesos}</Text> */}
-          </View>
-
-              <View style={styles.containerPrice}>
-                <View style={styles.containerTitlePrice}>
-                  <Text style={styles.titlePrice}>Total: </Text>
+                <View style={styles.detailedClientContainerFac}>
+                  <Pressable
+                    style={styles.infoClientContainer}
+                    onPress={() => setIsInvoiceModalVisible(true)}
+                  >
+                    <Text style={styles.textDetailedClient}>
+                      {invoiceType ? invoiceType : selectedOrder.tipfac}
+                    </Text>
+                  </Pressable>
                 </View>
-                <Text style={styles.textPrice}>USD : {formatNumber(totalUSD)}</Text>
-                <Text style={styles.textPrice}>Bs. : {formatNumber(totalUSD * 36.372)}</Text>
-                <Text style={styles.textPrice}>Pesos : {formatNumber(totalUSD * 3700)}</Text>
-              </View>
 
-              <View style={styles.containerNote}>
-                <Text style={styles.noteOrder}>Nota: Esta pre orden es considerada un presupuesto, por lo tanto los precios y las existencias están sujetas a cambios sin previo aviso.</Text>
-              </View>
-              <View style={styles.selectProdContainer}>
-                <Pressable style={styles.otherButton} onPress={() => setIsSelectProductsModalVisible(true)}>
-                  <Text style={styles.buttonText}>Agregar otros Productos</Text>
-                </Pressable>
-              </View>
+                <View style={styles.mainTitleContainer}>
+                  <Text style={styles.mainTitle}>Productos Seleccionados</Text>
+                </View>
 
-              <View style={styles.containerButton}>
-                <Pressable onPress={saveOrder} style={styles.otherButton}>
-                  <Text style={styles.buttonText}>Guardar</Text>
-                </Pressable>
-                <Pressable onPress={handleGenerateAndSharePdf} style={styles.otherButton}>
-                  <Text style={styles.buttonText}>PDF</Text>
-                </Pressable>
-                <Pressable onPress={handleCancelEdit} style={styles.closeButton}>
-                  <Text style={styles.buttonText}>Salir</Text>
-                </Pressable>
-              </View>
+                <View style={styles.ProductContainer}>
+                  <View style={styles.headerProductContainer}>
+                    <View style={styles.titleListContainer}>
+                      <Text style={styles.titleListProduct}>Producto</Text>
+                      <Text style={styles.titleListQuantity}>Cantidad</Text>
+                      <Text style={styles.titleListPrice}>Precio</Text>
+                    </View>
+                  </View>
+
+                  <View>
+                    {order.products && order.products.map((product, index) => (
+                      <Pressable key={index} style={styles.selectedProductItem} onPress={() => handleEditProduct(product)}>
+                        <Text style={styles.nameProduct}>{product.descrip}</Text>
+                        <Text style={styles.quantityProduct}>{product.quantity}</Text>
+                        <Text style={styles.priceProduct}>{product.priceUsd}</Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                </View>
+
+                <View style={styles.exchangeRateContainer}>
+              <Text style={styles.exchangeRateText}>Cambio USD : {cambioDolares}</Text>
+              <Text style={styles.exchangeRateText}>Cambio Bs. : {cambioBolivares}</Text>
+              {/* <Text style={styles.exchangeRateText}>Cambio Pesos: {cambioPesos}</Text> */}
             </View>
-          ) : (
-            <Text>No se ha seleccionado ningún pedido.</Text>
+
+                <View style={styles.containerPrice}>
+                  <View style={styles.containerTitlePrice}>
+                    <Text style={styles.titlePrice}>Total: </Text>
+                  </View>
+                  <Text style={styles.textPrice}>USD : {formatNumber(totalUSD)}</Text>
+                  <Text style={styles.textPrice}>Bs. : {formatNumber(totalUSD * 36.372)}</Text>
+                  <Text style={styles.textPrice}>Pesos : {formatNumber(totalUSD * 3700)}</Text>
+                </View>
+
+                <View style={styles.containerNote}>
+                  <Text style={styles.noteOrder}>Nota: Esta pre orden es considerada un presupuesto, por lo tanto los precios y las existencias están sujetas a cambios sin previo aviso.</Text>
+                </View>
+                <View style={styles.selectProdContainer}>
+                  <Pressable style={styles.otherButton} onPress={() => setIsSelectProductsModalVisible(true)}>
+                    <Text style={styles.buttonText}>Agregar otros Productos</Text>
+                  </Pressable>
+                </View>
+
+                <View style={styles.containerButton}>
+                  <Pressable onPress={saveOrder} style={styles.otherButton}>
+                    <Text style={styles.buttonText}>Guardar</Text>
+                  </Pressable>
+                  <Pressable onPress={handleGenerateAndSharePdf} style={styles.otherButton}>
+                    <Text style={styles.buttonText}>PDF</Text>
+                  </Pressable>
+                  <Pressable onPress={handleCancelEdit} style={styles.closeButton}>
+                    <Text style={styles.buttonText}>Salir</Text>
+                  </Pressable>
+                </View>
+              </View>
+            ) : (
+              <Text>No se ha seleccionado ningún pedido.</Text>
+            )}
+          </ScrollView>
+
+          <EditSelectFact
+            isVisible={isInvoiceModalVisible}
+            onClose={() => setIsInvoiceModalVisible(false)}
+            onSelect={handleInvoiceSelection}
+          />
+
+          {selectedProduct && (
+            <ModalEditProd
+              isVisible={true}
+              selectedProduct={selectedProduct}
+              onClose={() => setSelectedProduct(null)}
+              onQuantityChange={handleProductQuantityChange}
+              onDeleteProduct={() => handleProductDelete(selectedProduct.codigo)}
+            />
           )}
-        </ScrollView>
-      </View>
 
-      <EditSelectFact
-        isVisible={isInvoiceModalVisible}
-        onClose={() => setIsInvoiceModalVisible(false)}
-        onSelect={handleInvoiceSelection}
-      />
+          <SelectProducts
+            isVisible={isSelectProductsModalVisible}
+            onClose={() => setIsSelectProductsModalVisible(false)}
+            selectedOrder={order}
+            onSave={(newProducts) => {
+              setOrder({ ...order, products: newProducts });
+              updateTotal(newProducts);
+              setIsSelectProductsModalVisible(false);
+            }}
+          />
 
-      {selectedProduct && (
-        <ModalEditProd
-          isVisible={true}
-          selectedProduct={selectedProduct}
-          onClose={() => setSelectedProduct(null)}
-          onQuantityChange={handleProductQuantityChange}
-          onDeleteProduct={() => handleProductDelete(selectedProduct.codigo)}
-        />
-      )}
-
-      <SelectProducts
-        isVisible={isSelectProductsModalVisible}
-        onClose={() => setIsSelectProductsModalVisible(false)}
-        selectedOrder={order}
-        onSave={(newProducts) => {
-          setOrder({ ...order, products: newProducts });
-          updateTotal(newProducts);
-          setIsSelectProductsModalVisible(false);
-        }}
-      />
+        </View>
+      </LinearGradient>
     </Modal>
   );
 };
