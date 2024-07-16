@@ -121,7 +121,7 @@ const ListClients = () => {
     >
     <View style={styles.list}>
       <View style={styles.titlePage}>
-        <Text style={styles.title}>Clientes</Text>
+        <Text style={styles.title}>Seleccione un Cliente</Text>
       </View>
 
       <View style={styles.finderContainer}>

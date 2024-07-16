@@ -323,7 +323,7 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
       >
         <View style={styles.container}>
           <View style={styles.mainTitleContainer}>
-            <Text style={styles.mainTitle}>Seleccionar Productos</Text>
+            <Text style={styles.mainTitle}>Selección de Productos</Text>
           </View>
 
           <View style={styles.mainSubtitleContainer}>

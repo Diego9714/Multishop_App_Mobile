@@ -10,6 +10,6 @@ import {controller} from '../controllers/order.controller.js'
 // Routes
 router.post(REGISTER_ORDER, controller.saveOrder)
 router.post(REGISTER_VISIT, controller.saveVisit)
-router.post(REGISTER_VISIT, controller.savePass)
+router.post(REGISTER_PASS, controller.savePass)
 
 export default router

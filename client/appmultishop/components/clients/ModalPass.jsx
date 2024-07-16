@@ -15,12 +15,42 @@ const ModalPass = ({ isVisible, onClose, client }) => {
   const [paymentType, setPaymentType] = useState('');
   const [passStatus, setPassStatus] = useState('');
   const [isSaveEnabled, setIsSaveEnabled] = useState(false);
+  const [cambioBolivares, setCambioBolivares] = useState(null);
+  const [cambioDolares, setCambioDolares] = useState(null);
+  const [cambioPesos, setCambioPesos] = useState(null);
 
   const scaleValue = useRef(new Animated.Value(0)).current;
   const opacityValue = useRef(new Animated.Value(0)).current;
 
+  useEffect(() => {
+    const fetchCurrency = async () => {
+      try {
+        const storedCurrency = await AsyncStorage.getItem('currency');
+        if (storedCurrency !== null) {
+          const currencyArray = JSON.parse(storedCurrency);
+          const bolivares = currencyArray.find(item => item.moneda === 'Bolivares');
+          const dolares = currencyArray.find(item => item.moneda === 'Dolares');
+          const pesos = currencyArray.find(item => item.moneda === 'Pesos');
+
+          if (bolivares) {
+            setCambioBolivares(bolivares.cambio);
+          }
+          if (dolares) {
+            setCambioDolares(dolares.cambio);
+          }
+          if (pesos) {
+            setCambioPesos(pesos.cambio);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching currency from asyncStorage', error);
+      }
+    };
+
+    fetchCurrency();
+  }, []);
+
   const handleAmountChange = (text) => {
-    // Only allow numbers greater than 0 and no signs
     const numericText = text.replace(/[^0-9]/g, '');
     if (numericText !== '' && numericText !== '0') {
       setAmount(numericText);
@@ -42,23 +72,23 @@ const ModalPass = ({ isVisible, onClose, client }) => {
     }
 
     try {
-      let token = await AsyncStorage.getItem('tokenUser')
-
-      const decodedToken = jwtDecode(token)
+      let token = await AsyncStorage.getItem('tokenUser');
+      const decodedToken = jwtDecode(token);
 
       const passUser = {
         id_pass: generateRandomProductId(),
         id_scli: client.id_scli,
         cod_cli: client.cod_cli,
         nom_cli: client.nom_cli,
-        cod_ven : decodedToken.cod_ven,
+        cod_ven: decodedToken.cod_ven,
         monto: amount,
-        tipoPago: paymentType, // Updated to save payment type
-        tasaPago: 3500,
-        fecha: new Date().toISOString(), // Guarda la fecha y hora exacta en formato ISO8601
+        tipoPago: paymentType,
+        tasaPago: paymentType === 'dollars' ? cambioDolares : (paymentType === 'bs' ? cambioBolivares : cambioPesos),
+        fecha: new Date().toISOString(),
+        status: "No sincronizada"
       };
 
-      console.log(passUser)
+      // console.log(passUser);
 
       const existingPass = await AsyncStorage.getItem('ClientPass');
       const pass = existingPass ? JSON.parse(existingPass) : [];
@@ -66,6 +96,7 @@ const ModalPass = ({ isVisible, onClose, client }) => {
       pass.push(passUser);
       await AsyncStorage.setItem('ClientPass', JSON.stringify(pass));
       setPassStatus('Abono registrado con éxito!');
+      setAmount(''); // Reset the amount input
       setTimeout(() => {
         setPassStatus('');
       }, 3000); // Clear the status message after 3 seconds
@@ -95,7 +126,6 @@ const ModalPass = ({ isVisible, onClose, client }) => {
         }),
       ]).start();
     } else {
-      // Reset values if modal is not visible
       scaleValue.setValue(0);
       opacityValue.setValue(0);
       setPassStatus(''); // Reset the message when the modal closes
@@ -140,7 +170,6 @@ const ModalPass = ({ isVisible, onClose, client }) => {
             </TouchableOpacity>
           </View>
 
-
           {passStatus ? (
             <Animated.View style={{ transform: [{ scale: scaleValue }], opacity: opacityValue }}>
               <Text style={styles.statusMessage}>{passStatus}</Text>
@@ -154,7 +183,7 @@ const ModalPass = ({ isVisible, onClose, client }) => {
               disabled={!isSaveEnabled}
             >
               <Text style={styles.buttonTextModal}>
-              Guardar
+                Guardar
               </Text>
             </Pressable>
 

@@ -3,9 +3,13 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  gradientBackground: {
+    width: '100%',
+    height: '100%',
   },
   imgContainer: {
     width: '100%',
@@ -20,7 +24,8 @@ const styles = StyleSheet.create({
   },
   containerInfo: {
     flex: 1,
-    backgroundColor: '#E8E8E8',
+    // backgroundColor: '#E8E8E8',
+    backgroundColor: 'rgba(0, 0, 0, 0.10)',
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
@@ -42,7 +47,7 @@ const styles = StyleSheet.create({
   },
   textWelcome: {
     fontSize: 25,
-    color: '#5B97DC',
+    color: '#38B0DB',
     fontFamily: "Roboto",
   },
   textDescription: {
@@ -64,14 +69,14 @@ const styles = StyleSheet.create({
     padding: 10,
     height: 60,
     borderRadius: 15,
-    color: '#5B97DC',
+    color: '#38B0DB',
   },
   icon: {
     marginRight: 10,
   },
   button: {
     width: 200,
-    backgroundColor: '#5B97DC',
+    backgroundColor: '#38B0DB',
     borderRadius: 15,
     height: 60,
     alignItems: 'center',
@@ -82,9 +87,9 @@ const styles = StyleSheet.create({
       width: 5,
       height: 5,
     },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.30,
     shadowRadius: 3.84,
-    elevation: 10,
+    elevation: 15,
     marginBottom: 30,
   },
   buttonText: {

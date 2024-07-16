@@ -443,6 +443,7 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
         <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.mainTitleContainer}>
+            <Text style={styles.mainTitleOne}>Finalizar Pedido</Text>
             <Text style={styles.mainTitle}>Datos del Cliente</Text>
           </View>
 
@@ -502,13 +503,13 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
           </View>
 
           <View style={styles.exchangeRateContainer}>
-            <Text style={styles.exchangeRateText}>Cambio USD: {cambioDolares}</Text>
-            <Text style={styles.exchangeRateText}>Cambio Bs.: {cambioBolivares}</Text>
+            <Text style={styles.exchangeRateText}>Tasa COP: {cambioDolares}</Text>
+            <Text style={styles.exchangeRateText}>Tasa USD: {cambioBolivares}</Text>
           </View>
 
           <View style={styles.containerPrice}>
             <View style={styles.containerTitlePrice}>
-              <Text style={styles.titlePrice}>Total</Text>
+              <Text style={styles.titlePrice}>Totales</Text>
             </View>
             <Text style={styles.textPrice}>USD : {formatNumber(totalPriceUsd)}</Text>
             <Text style={styles.textPrice}>Bs. : {formatNumber(totalPriceUsd * cambioBolivares)}</Text>

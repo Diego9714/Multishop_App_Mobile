@@ -9,7 +9,7 @@ const Layout = () => {
   const settingsNav = {
     headerShown: false,
     tabBarActiveTintColor: '#38B0DB',
-    tabBarStyle:{
+    tabBarStyle: {
       borderTopWidth: 1,
       borderTopColor: '#CDCDE0',
       height: 70,
@@ -17,10 +17,11 @@ const Layout = () => {
     tabBarLabelStyle: {
       fontSize: 15,
       fontWeight: '300',
-      marginBottom: 10
+      marginBottom: 10,
+      justifyContent: 'space-between', // Asegura el uso de espacio entre los elementos
     }
-  }
-  
+  };
+
   return (
     <UserProvider>
       <Tabs screenOptions={settingsNav}>
@@ -34,17 +35,17 @@ const Layout = () => {
         />
         <Tabs.Screen name='Clients'
           options={{
-            tabBarLabel: 'Clientes',
+            tabBarLabel: 'Pedidos',
             tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons name='account-group' color={color} size={30} style={{marginTop: 8}} />
+              <MaterialCommunityIcons name='truck' color={color} size={30} style={{marginTop: 8}} />
             ) 
           }}
         />
         <Tabs.Screen name='Orders'
           options={{
-            tabBarLabel: 'Pedidos',
+            tabBarLabel: 'Enviar',
             tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons name='truck' color={color} size={30} style={{marginTop: 8}} />
+            <MaterialCommunityIcons name="cloud-upload" color={color} size={30} style={{marginTop: 8}}/>
             ) 
           }}
         />

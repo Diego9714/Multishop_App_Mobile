@@ -105,23 +105,21 @@ export class Orders {
       let passNotCompleted = []
   
       for (const info of visits) {
-        const { id_scli, cod_cli, nom_cli, cod_ven, fecha } = info
+        const { id_pass, id_scli, cod_cli, nom_cli, cod_ven, monto, tipoPago, tasaPago, fecha } = info
   
         const connection = await pool.getConnection()
   
-        const existingPass = `SELECT id_pass FROM pass WHERE id_scli = ? AND cod_cli = ? AND cod_ven = ? AND date_created = ?;`
-        const [checkPass] = await connection.execute(existingPass, [id_scli, cod_cli, cod_ven, fecha])
+        const existingPass = `SELECT id_pass FROM pass WHERE id_scli = ? AND identifier = ? AND cod_ven = ? AND date_created = ?;`
+        const [checkPass] = await connection.execute(existingPass, [id_scli, id_pass, cod_ven, fecha])
 
-        console.log(checkPass)
-
-        // if (checkVisit.length > 0) {
-        //   visitsCompleted.push(info)
-        // } else {
-        //   let sql = 'INSERT INTO visits (cod_ven, id_scli, cod_cli, nom_cli, date_created) VALUES (?, ?, ?, ?, ?);'
-        //   await connection.execute(sql, [cod_ven, id_scli, cod_cli, nom_cli, fecha])
+        if (checkPass.length > 0) {
+          passCompleted.push(info)
+        } else {
+          let sql = 'INSERT INTO pass (identifier, id_scli, cod_cli, nom_cli, cod_ven, amount, currency_type, currency_rate, date_created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+          await connection.execute(sql, [id_pass, id_scli, cod_cli, nom_cli, cod_ven, monto, tipoPago, tasaPago, fecha])
   
-        //   visitsCompleted.push(info)
-        // }
+          passCompleted.push(info)
+        }
   
         connection.release()
       }
@@ -129,7 +127,7 @@ export class Orders {
       return {
         code: 200,
         status: true,
-        msg: 'Visits processed',
+        msg: 'Pass processed',
         completed: passCompleted,
         notCompleted: passNotCompleted
       }

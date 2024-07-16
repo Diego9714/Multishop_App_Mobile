@@ -36,6 +36,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  mainTitleOne: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#373A40',
+    textAlign: 'center',
+    marginBottom: "10%"
+  },
   mainTitle: {
     fontSize: 22,
     fontWeight: 'bold',
@@ -163,7 +170,7 @@ const styles = StyleSheet.create({
   },
   titlePrice: {
     marginTop: 10,
-    fontSize: 20,
+    fontSize: 18,
     alignItems: 'left',
   },
   textPrice: {

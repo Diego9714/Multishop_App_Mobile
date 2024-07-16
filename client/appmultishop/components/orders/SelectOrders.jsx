@@ -265,7 +265,7 @@ const SelectOrders = () => {
     >
       <View style={styles.mainContainer}>
         <View style={styles.titlePage}>
-          <Text style={styles.title}>Pedidos por Sincronizar</Text>
+          <Text style={styles.title}>Pedidos por Subir</Text>
         </View>
 
         <View style={styles.listOrderContainer}>
@@ -323,7 +323,7 @@ const SelectOrders = () => {
             onPress={synchronizeOrders}
             disabled={Object.keys(selectedOrders).length === 0}
           >
-            <Text style={styles.textButtonSincro}>Sincronizar</Text>
+            <Text style={styles.textButtonSincro}>Subir Datos</Text>
             <MaterialCommunityIcons 
               name="cloud-upload" 
               size={35} 

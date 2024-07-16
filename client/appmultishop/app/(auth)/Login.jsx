@@ -12,6 +12,7 @@ import {
   Alert
 } from 'react-native'
 import { router }               from 'expo-router'
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { images } from '../../constants'
 import { MaterialIcons } from '@expo/vector-icons'
@@ -68,8 +69,14 @@ const Login = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
+
+      
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={styles.container}>
+        <LinearGradient
+        colors={['#ffff','#ffff', '#38B0DB']}
+        style={styles.gradientBackground}
+        >
+          <View style={styles.container}>
           <View style={styles.imgContainer}>
             <Image source={images.logo} resizeMode="contain" style={styles.logo} />
           </View>
@@ -105,6 +112,7 @@ const Login = () => {
             </TouchableOpacity>
           </View>
         </View>
+        </LinearGradient>
       </ScrollView>
 
       <ModalLoaderLogin visible={modalVisible} message={modalMessage} status={modalStatus} />

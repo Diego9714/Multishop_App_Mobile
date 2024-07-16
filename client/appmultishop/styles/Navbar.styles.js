@@ -37,10 +37,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: '#333',
     marginBottom: 20,
-    paddingBottom: 20,
-    // borderWidth: 2,
-    borderBottomWidth: 2, // Agregando una línea de separación
-    borderBottomColor: 'black' // Color de la línea de separación
+    // paddingBottom: 20
   },  
   message: {
     textAlign: 'center',
@@ -84,6 +81,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
+    marginTop: 20,
     marginBottom: 10,
     shadowColor: "#000",
     shadowOffset: {

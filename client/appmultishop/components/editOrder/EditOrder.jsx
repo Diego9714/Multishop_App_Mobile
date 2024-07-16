@@ -509,9 +509,8 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
                 </View>
 
                 <View style={styles.exchangeRateContainer}>
-              <Text style={styles.exchangeRateText}>Cambio USD : {cambioDolares}</Text>
-              <Text style={styles.exchangeRateText}>Cambio Bs. : {cambioBolivares}</Text>
-              {/* <Text style={styles.exchangeRateText}>Cambio Pesos: {cambioPesos}</Text> */}
+              <Text style={styles.exchangeRateText}>Tasa COP: {cambioDolares}</Text>
+              <Text style={styles.exchangeRateText}>Tasa USD: {cambioBolivares}</Text>
             </View>
 
                 <View style={styles.containerPrice}>

@@ -27,13 +27,15 @@ const CardsHome = () => {
     <View style={styles.mainContainer}>
         <View style={styles.container}>
           <TouchableOpacity style={styles.cardContainer} activeOpacity={0.7} useNativeDriver={true} onPress={() => handlePress(Clients)}>
-            <MaterialCommunityIcons name='account-group' color="#38B0DB" size={80} />
-            <Text style={styles.title}>Clientes</Text>
+            {/* <MaterialCommunityIcons name='account-group' color="#38B0DB" size={80} /> */}
+            <MaterialCommunityIcons name='truck' color="#38B0DB" size={80} />
+            <Text style={styles.title}>Pedidos</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.cardContainer} activeOpacity={0.7} useNativeDriver={true} onPress={() => handlePress(Orders)}>
-            <MaterialCommunityIcons name='truck' color="#38B0DB" size={80} />
-            <Text style={styles.title}>Pedidos</Text>
+            {/* <MaterialCommunityIcons name='truck' color="#38B0DB" size={80} /> */}
+            <MaterialCommunityIcons name="cloud-upload" color="#38B0DB" size={80}/>
+            <Text style={styles.title}>Enviar</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.cardContainer} activeOpacity={0.7} useNativeDriver={true} onPress={() => handlePress(Products)}>
@@ -43,7 +45,7 @@ const CardsHome = () => {
 
           <TouchableOpacity style={styles.cardContainer} activeOpacity={0.7} useNativeDriver={true}>
           <MaterialIcons name="query-stats" size={80} color="#38B0DB" />
-            <Text style={styles.title}>Reporte</Text>
+            <Text style={styles.title}>Reportes</Text>
           </TouchableOpacity>
         </View>
     </View>

@@ -74,6 +74,7 @@ const getVisits = async () => {
       const cod_ven = decodedToken.cod_ven;
 
       const visits = await AsyncStorage.getItem('ClientVisits');
+      console.log(visits)
       if (visits) {
         let visitsArray = JSON.parse(visits);
         
@@ -129,8 +130,67 @@ const getVisits = async () => {
     console.error('Error retrieving visits:', err);
     return { success: false, error: err };
   }
-};
+}
 
+const getPayments = async () => {
+  try {
+    const token = await AsyncStorage.getItem('tokenUser')
+    if (token) {
+      const decodedToken = jwtDecode(token)
+      const cod_ven = decodedToken.cod_ven
+
+      const payments = await AsyncStorage.getItem('ClientPass')
+      if (payments) {
+        let paymentsArray = JSON.parse(payments)
+
+        const filteredPayments = paymentsArray.filter(payment => payment.cod_ven === cod_ven && payment.status === "No sincronizada")
+
+        if (filteredPayments.length > 0) {
+          try {
+            const response = await instanceSincro.post('/api/register/pass', { payments: filteredPayments })
+            console.log(response.data.code)
+
+            if (response.data.code === 200) {
+              const syncedPass = response.data.completed
+
+              console.log(syncedPass)
+
+              paymentsArray = paymentsArray.map(payment => {
+                const syncedPayment = syncedPass.find(syncedPayment => syncedPayment.id_pass === payment.id_pass)
+                if (syncedPayment && payment.status !== 'sincronizada') {
+                  payment.status = 'sincronizada'
+                }
+                return payment
+              })
+
+              console.log("paymentsArray")
+              console.log(paymentsArray)
+
+
+              await AsyncStorage.setItem('ClientPass', JSON.stringify(paymentsArray))
+
+              const { completed, notCompleted } = response.data.completed
+              return { success: true, completed, notCompleted }
+            } else {
+              console.log('Unexpected response status:', response.status);
+              return { success: false, error: 'Unexpected response status' };
+            }
+          } catch (error) {
+            // console.error('Error sending visits:', error);
+            return { success: false, error };
+          }
+        } else {
+          // console.log('No unsynchronized visits found');
+          return { success: false, error: 'No unsynchronized visits found' };
+        }
+      }
+    } else {
+      return { success: false, error: 'No token found' };
+    }
+  } catch (err) {
+    return { success: false, error: err };
+  }
+};
 
 const getAllInfo = async (setLoading, setMessage, callback) => {
   setLoading(true);
@@ -151,20 +211,15 @@ const getAllInfo = async (setLoading, setMessage, callback) => {
         getProducts(),
         getCategories(),
         getBrands(),
-        getCurrency()
+        getCurrency(),
+        getVisits(),
+        getPayments()
       ]);
 
       clearTimeout(timeoutId);
       setLoading(false);
-      setMessage('Información actualizada correctamente.');
+      setMessage('Información sincronizada con éxito.');
 
-      // Realiza la sincronización de visitas
-      const visitsResult = await getVisits();
-      if (visitsResult.success) {
-        callback(visitsResult.success, visitsResult.completed, visitsResult.notCompleted);
-      } else {
-        setMessage('Información actualizada.');
-      }
     } else {
       clearTimeout(timeoutId);
       setLoading(false);
@@ -177,14 +232,5 @@ const getAllInfo = async (setLoading, setMessage, callback) => {
   }
 };
 
-const syncVisits = async () => {
-  try {
-    const visitsSynced = await getVisits();
-    return visitsSynced;
-  } catch (error) {
-    console.error('Error syncing visits:', error);
-    return false;
-  }
-};
 
-export { getAllInfo, syncVisits };
+export { getAllInfo };
