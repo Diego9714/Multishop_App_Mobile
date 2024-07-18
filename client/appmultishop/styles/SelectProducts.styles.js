@@ -80,6 +80,15 @@ const styles = StyleSheet.create({
   textFilter:{
     color:'white'
   },
+  filterIndicator: {
+    position: 'absolute',
+    top: -15,
+    right: -15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+    opacity: 0.7
+  },  
   buttonsAction: {
     marginTop: "2%",
     flexDirection: "row",

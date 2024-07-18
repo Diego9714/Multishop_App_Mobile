@@ -6,7 +6,7 @@ import { LinearGradient }                               from 'expo-linear-gradie
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../../styles/SelectProducts.styles';
 import ModalProduct from '../products/ModalProducts'; // Adjust path as necessary
-import FilterCategories from '../FilterCategories';
+import FilterCategories from '../filter/FilterCategories';
 
 
 const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
@@ -16,16 +16,15 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
   const [searchProduct, setSearchProduct] = useState('');
   const [displaySearchProduct, setDisplaySearchProduct] = useState('');
   const [productQuantities, setProductQuantities] = useState({});
-  const [currentPage, setCurrentPage] = useState(1); // Changed from `page` to `currentPage`
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isProductModalVisible, setIsProductModalVisible] = useState(false);
   const itemsPerPage = 10;
-  const defaultMaxPages = 5;
-
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
-  const [searchCategory, setSearchCategory] = useState('');
-  const [searchBrand, setSearchBrand] = useState('');
+  const [searchCategory, setSearchCategory] = useState([]);
+  const [searchBrand, setSearchBrand] = useState([]);
   const [priceOrder, setPriceOrder] = useState('');
+  const [isFiltering, setIsFiltering] = useState(false);
 
 
   useEffect(() => {
@@ -76,6 +75,10 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
     applyFilters();
   }, [currentPage, products, displaySearchProduct, searchCategory, searchBrand, priceOrder]);
 
+  useEffect(() => {
+    setIsFiltering(searchCategory.length > 0 || searchBrand.length > 0 || priceOrder !== '');
+  }, [searchCategory, searchBrand, priceOrder]);
+
 
   const openFilterModal = () => {
     setIsFilterModalVisible(true);
@@ -86,36 +89,19 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
   };
 
   const handleSearch = () => {
-    if (searchProduct.length > 0 && searchProduct.length < 3) {
+    if (searchProduct.length === 0) {
+      setDisplaySearchProduct('');
+      setCurrentPage(1);
+      return;
+    }
+  
+    if (searchProduct.length < 3) {
       Alert.alert('Por favor ingrese al menos tres letras para buscar');
       return;
     }
-
-    // Realizar búsqueda según el texto ingresado
-    const searchTerms = searchProduct.toLowerCase().split(' ').filter(term => term.length > 0);
-
-    if (searchCategory) {
-      setDisplaySearchProduct(searchProduct);
-      setSearchCategory(searchCategory);
-    } else if (searchBrand) {
-      setDisplaySearchProduct(searchProduct);
-      setSearchBrand(searchBrand);
-    } else {
-      const filteredProducts = products.filter(product =>
-        searchTerms.every(term => product.descrip.toLowerCase().includes(term))
-      );
-
-      if (filteredProducts.length === 0) {
-        Alert.alert('Producto no encontrado', 'El producto buscado no existe.');
-        setSearchProduct('');
-        setDisplaySearchProduct('');
-        setCurrentPage(1); // Reiniciar a la primera página si no se encuentran productos
-        return;
-      }
-
-      setDisplaySearchProduct(searchProduct);
-    }
-    setCurrentPage(1); // Reiniciar a la primera página después de la búsqueda
+  
+    setDisplaySearchProduct(searchProduct);
+    setCurrentPage(1);
   };
 
   const handleProductSelection = useCallback((product) => {
@@ -161,37 +147,34 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
   }, [productQuantities]);
 
   const renderPaginationButtons = () => {
-    const searchTerms = displaySearchProduct.toLowerCase().split(' ').filter(term => term.length > 0);
-    let filteredProducts = products.slice(); // Copia de los productos para no modificar el estado original
-  
-    // Aplicar filtros según la búsqueda y categoría o marca seleccionada
+    let filteredProducts = products.slice()
+
     if (displaySearchProduct.length >= 3) {
-      if (searchCategory) {
-        filteredProducts = filteredProducts.filter(product =>
-          searchTerms.every(term => product.ncate.toLowerCase().includes(term))
-        );
-      } else if (searchBrand) {
-        filteredProducts = filteredProducts.filter(product =>
-          searchTerms.every(term => product.nmarca.toLowerCase().includes(term))
-        );
-      } else {
-        filteredProducts = filteredProducts.filter(product =>
-          searchTerms.every(term => product.descrip.toLowerCase().includes(term))
-        );
-      }
+      const searchTerm = displaySearchProduct.toLowerCase();
+      filteredProducts = filteredProducts.filter(product =>
+        product.descrip.toLowerCase().includes(searchTerm)
+      );
     }
-  
+    if (searchCategory.length > 0 || searchBrand.length > 0) {
+      filteredProducts = filteredProducts.filter(product =>
+        searchCategory.some(category => product.ncate.includes(category)) ||
+        searchBrand.some(brand => product.nmarca.includes(brand))
+      );
+    }
+
     const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  
+
+    // Si no hay búsqueda ni filtros, establecer las páginas por defecto en 5
+    const maxPages = (displaySearchProduct.length === 0 && searchCategory.length === 0 && searchBrand.length === 0) ? 5 : totalPages;
+
     let buttons = [];
-    let maxPagesToShow = displaySearchProduct ? totalPages : 5; // Mostrar máximo 5 páginas si no hay búsqueda
     let startPage = Math.max(1, currentPage - 2);
-    let endPage = Math.min(maxPagesToShow, startPage + 4);
-  
+    let endPage = Math.min(maxPages, startPage + 4);
+
     if (endPage - startPage < 4) {
       startPage = Math.max(1, endPage - 4);
     }
-  
+
     for (let i = startPage; i <= endPage; i++) {
       buttons.push(
         <Pressable
@@ -217,25 +200,29 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
   };
 
   const applyFilters = () => {
-    let filteredProducts = products.slice(); // Copia de los productos para no modificar el estado original
+    let filteredProducts = products.slice()
 
-    // Aplicar filtros según la búsqueda y categoría o marca seleccionada
     if (displaySearchProduct.length >= 3) {
-      const searchTerms = displaySearchProduct.toLowerCase().split(' ').filter(term => term.length > 0);
+      const searchTerm = displaySearchProduct.toLowerCase();
+      filteredProducts = filteredProducts.filter(product =>
+        product.descrip.toLowerCase().includes(searchTerm)
+      );
 
-      if (searchCategory) {
-        filteredProducts = filteredProducts.filter(product =>
-          searchTerms.every(term => product.ncate.toLowerCase().includes(term))
-        );
-      } else if (searchBrand) {
-        filteredProducts = filteredProducts.filter(product =>
-          searchTerms.every(term => product.nmarca.toLowerCase().includes(term))
-        );
-      } else {
-        filteredProducts = filteredProducts.filter(product =>
-          searchTerms.every(term => product.descrip.toLowerCase().includes(term))
-        );
+      // Mostrar alerta si no se encontraron productos
+      if (filteredProducts.length === 0) {
+        Alert.alert('Producto no encontrado', 'No se encontró ningún producto con ese nombre.');
+        setSearchProduct('');
+        setDisplaySearchProduct('');
+        setCurrentPage(1);
+        return;
       }
+    }
+
+    if (searchCategory.length > 0 || searchBrand.length > 0) {
+      filteredProducts = filteredProducts.filter(product =>
+        searchCategory.some(category => product.ncate.includes(category)) ||
+        searchBrand.some(brand => product.nmarca.includes(brand))
+      );
     }
 
     // Ordenar según el precio si se selecciona
@@ -249,14 +236,6 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
     setVisibleProducts(filteredProducts.slice(start, end));
-
-    // Mostrar alerta si no hay productos encontrados por marca o categoría
-    if ((searchCategory || searchBrand) && filteredProducts.length === 0) {
-      Alert.alert('Productos no encontrados', 'No se encontraron productos para la categoría o marca seleccionada.');
-      setSearchCategory('');
-      setSearchBrand('');
-      setCurrentPage(1);
-    }
 
     // Ajustar página si se filtra y no hay suficientes productos para la página actual
     if (filteredProducts.length > 0 && currentPage > Math.ceil(filteredProducts.length / itemsPerPage)) {
@@ -306,6 +285,9 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
             <TouchableOpacity onPress={openFilterModal} style={styles.filterContainer}>
               <Text style={styles.textFilter}>Filtrar</Text>
               <MaterialIcons name="filter-alt" size={28} color="white" />
+              {isFiltering && (
+                <FontAwesome name="circle" size={20} color="red" style={styles.filterIndicator} />
+              )}
             </TouchableOpacity>
           </View>
 
