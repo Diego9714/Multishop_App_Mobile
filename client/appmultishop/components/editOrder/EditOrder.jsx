@@ -218,205 +218,153 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
     const htmlContent = `
     <html>
     <head>
-      <style>
-        *{
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-        body {
-          font-family: Arial, sans-serif;
-          background: linear-gradient(to right, #ffff, #9bdef6, #ffffff, #9bdef6);
-          padding: 15px;
-        }
-        .container {
-          margin-top: 20px;
-          padding: 20px;
-        }
-        .mainTitle {
-          font-size: 22px;
-          font-weight: bold;
-          color: #373A40;
-          text-align: center;
-          margin-top: 10px;
-          margin-bottom: 10px;
-        }
-        .detailedClientContainer {
-          margin-top: 20px;
-          margin-bottom: 20px;
-          padding: 20px;
-          background-color: rgba(255, 255, 255, 0.5);
-          border-radius: 20px;
-          box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
-        }
-        .nameInputDetailedClient{
-          color: #4d4d4d;
-          margin-left: 20px;
-        }
-        .infoClientContainer {
-          margin: 10px;
-          padding: 10px;
-          background-color: #EFEFEF;
-          border-radius: 20px;
-          box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-        }
-        .textDetailedClient {
-          color: #373A40;
-        }
-        .ProductContainer {
-          background-color: rgba(255, 255, 255, 0.5);
-          border-radius: 20px;
-          margin-top: 20px;
-        }
-        .headerProductContainer {
-          background-color: #38B0DB;
-          border-top-left-radius: 20px;
-          border-top-right-radius: 20px;
-          padding: 15px;
-          margin-bottom: 10px;
-        }
-        .titleListContainer {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 15px;
-        }
-        .titleListProduct{
-          width: 50%;
-          text-align: center;
-          color: #FFFFFF;
-        }
-        .titleListQuantity{
-          width: 25%;
-          text-align: center;
-          color: #FFFFFF;
-        }
-        .titleListPrice{
-          width: 25%;
-          text-align: center;
-          color: #FFFFFF;
-        }
-        .selectedProductItem {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 20px;
-          border-bottom-width: 1px;
-          border-bottom-color: #ddd;
-        }
-        .nameProduct {
-          width: 50%;
-          text-align: center;
-        }
-        .quantityProduct, .priceProduct {
-          width: 25%;
-          text-align: center;
-        }
-        .exchangeRateContainer {
-          display: flex;
-          width: 100%;
-          flex-direction: row;
-          justify-content: center;
-          margin-top: 35px;
-          margin-bottom: 35px;
-          gap: 20px;
-        }
-        .exchangeRateText {
-          color: gray;
-        }
-        .containerPrice {
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          margin-top: 10px;
-          margin-bottom: 10px;
-        }
-        .containerTitlePrice {
-          width: 25%;
-          text-align: left;
-        }
-        .titlePrice {
-          font-size: 20px;
-          margin-top: 10px;
-        }
-        .textPrice {
-          font-size: 15px;
-          margin-top: 10px;
-        }
-        .containerNote {
-          width: 100%;
-          margin-top: 30px;
-        }
-        .noteOrder {
-          color: gray;
-          text-align: justify;
-        }
-  </style>
+    <style>
+      body {
+        font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
+        text-align: center;
+        background-color: #f0f0f0;
+        padding: 20px;
+        margin: 0;
+      }
+    
+      .invoice-box {
+        max-width: 800px;
+        margin: auto;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        font-size: 16px;
+        line-height: 24px;
+        padding: 30px;
+      }
+    
+      .grid-container {
+        width: 100%;
+        border-collapse: collapse;
+      }
+    
+      .grid-container td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+      }
+    
+      .grid-container .information {
+        background-color: #f2f2f2;
+      }
+    
+      .grid-container .heading {
+        background-color: #f2f2f2;
+        font-weight: bold;
+        text-align: center;
+      }
+    
+      .grid-container .details td:first-child {
+        font-weight: bold;
+      }
+    
+      .grid-container .item td:nth-child(2),
+      .grid-container .total td:nth-child(2) {
+        font-weight: bold;
+      }
+    
+      .grid-container .note {
+        font-style: italic;
+        color: #777;
+        text-align: center;
+      }
+    </style>
     </head>
     <body>
-      <div class="container">
-        <div class="mainTitle">Datos del Cliente</div>
-        <div class="detailedClientContainer">
-          <a class="nameInputDetailedClient">Nombre:</a>
-          <div class="infoClientContainer">
-            <div class="textDetailedClient">${order.nom_cli}</div>
-          </div>
-          <a class="nameInputDetailedClient">Rif:</a>
-          <div class="infoClientContainer">
-            <div class="textDetailedClient">${order.cod_cli}</div>
-          </div>
-          <a class="nameInputDetailedClient">Teléfono:</a>
-          <div class="infoClientContainer">
-            <div class="textDetailedClient">${order.tlf_cli}</div>
-          </div>
-          <a class="nameInputDetailedClient">Dirección:</a>
-          <div class="infoClientContainer">
-            <div class="textDetailedClient">${order.dir_cli}</div>
-          </div>
-          <a class="nameInputDetailedClient">Fecha del Pedido:</a>
-          <div class="infoClientContainer">
-            <div class="textDetailedClient">${fechaFormateada}</div>
-          </div>
-        </div>
-        <div class="mainTitle">Tipo de Factura</div>
-        <div class="detailedClientContainer">
-          <div class="infoClientContainer">
-            <div class="textDetailedClient">${selectedOrder.tipfac}</div>
-          </div>
-        </div>
-        <div class="mainTitle">Productos Seleccionados</div>
-        <div class="ProductContainer">
-          <div class="headerProductContainer">
-            <div class="titleListContainer">
-              <div class="titleListProduct">Producto</div>
-              <div class="titleListQuantity">Cantidad</div>
-              <div class="titleListPrice">Precio</div>
-            </div>
-          </div>
-          ${order.products.map(product => `
-            <div class="selectedProductItem">
-              <div class="nameProduct">${product.descrip}</div>
-              <div class="quantityProduct">${product.quantity}</div>
-              <div class="priceProduct">${formatNumber(product.quantity * product.priceUsd)}</div>
-            </div>
-          `).join('')}
-        </div>
-        <div class="exchangeRateContainer">
-          <div class="exchangeRateText">Cambio USD: ${cambioDolares}</div>
-          <div class="exchangeRateText">Cambio Bs.: ${cambioBolivares}</div>
-        </div>
-        <div class="containerPrice">
-          <div class="containerTitlePrice">
-            <div class="titlePrice">Total</div>
-          </div>
-          <div class="textPrice">USD : ${formatNumber(totalUSD)}</div>
-          <div class="textPrice">Bs. : ${formatNumber(totalUSD * cambioBolivares)}</div>
-          <div class="textPrice">Pesos : ${formatNumber(totalUSD * cambioPesos)}</div>
-        </div>
-        <div class="containerNote">
-          <div class="noteOrder">Nota: Esta pre orden es considerada un presupuesto, por lo tanto los precios y las existencias están sujetas a cambios sin previo aviso.</div>
-        </div>
+      <div class="invoice-box">
+          <table class="grid-container">
+              <tr class="information">
+                  <td colspan="3">
+                      Fecha: ${fechaFormateada}
+                  </td>
+              </tr>
+              
+              <tr class="heading">
+                  <td colspan="3">
+                      Datos del Cliente
+                  </td>
+              </tr>
+              
+              <tr class="details">
+                  <td>Nombre:</td>
+                  <td colspan="2">${order.nom_cli}</td>
+              </tr>
+              <tr class="details">
+                  <td>Rif:</td>
+                  <td colspan="2">${order.cod_cli}</td>
+              </tr>
+              <tr class="details">
+                  <td>Teléfono:</td>
+                  <td colspan="2">${order.tlf_cli}</td>
+              </tr>
+              <tr class="details">
+                  <td>Dirección:</td>
+                  <td colspan="2">${order.dir_cli}</td>
+              </tr>
+    
+              <tr class="heading">
+                  <td colspan="3">
+                      Tipo de Factura
+                  </td>
+              </tr>
+              <tr class="details">
+                  <td colspan="3">${selectedOrder.tipfac}</td>
+              </tr>
+    
+              <tr class="heading">
+                  <td>Producto</td>
+                  <td>Cantidad</td>
+                  <td>Precio</td>
+              </tr>
+              ${order.products.map(product => `
+              <tr class="item">
+                  <td>${product.descrip}</td>
+                  <td>${product.quantity}</td>
+                  <td>${formatNumber(product.priceUsd)}</td>
+              </tr>
+              `).join('')}
+              
+              <tr class="heading">
+                  <td colspan="3">
+                      Tipos de Cambio
+                  </td>
+              </tr>
+              <tr class="details">
+                  <td>Tasa COP:</td>
+                  <td colspan="2">${cambioDolares}</td>
+              </tr>
+              <tr class="details">
+                  <td>Tasa USD:</td>
+                  <td colspan="2">${cambioBolivares}</td>
+              </tr>
+              
+              <tr class="heading">
+                  <td colspan="3">Totales</td>
+              </tr>
+              <tr class="total">
+                  <td>USD:</td>
+                  <td colspan="2">${formatNumber(totalUSD)}</td>
+              </tr>
+              <tr class="total">
+                  <td>Bs.:</td>
+                  <td colspan="2">${formatNumber(totalUSD * cambioBolivares)}</td>
+              </tr>
+              <tr class="total">
+                  <td>Pesos:</td>
+                  <td colspan="2">${formatNumber(totalUSD * cambioPesos)}</td>
+              </tr>
+              
+              <tr class="note">
+                  <td colspan="3">
+                      Nota: Esta pre orden es considerada un presupuesto, por lo tanto los precios y las existencias están sujetas a cambios sin previo aviso.
+                  </td>
+              </tr>
+          </table>
       </div>
     </body>
     </html>`;
