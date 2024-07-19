@@ -14,6 +14,7 @@ import styles                         from '../../styles/SaveOrder.styles';
 // PDF
 import * as Print                     from 'expo-print';
 import * as Sharing                   from 'expo-sharing';
+import * as FileSystem                from 'expo-file-system';
 // Token - JWT
 import { jwtDecode }                  from 'jwt-decode';
 import { decode }                     from 'base-64';
@@ -199,192 +200,197 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
     }
   };
 
+  const generatePdfFileName = () => {
+    return `Pedido_${generateRandomProductId()}.pdf`;
+  };
+  
+
   const handleGenerateAndSharePdf = async () => {
     if (!invoiceType) {
       Alert.alert('Error', 'Debe seleccionar el tipo de factura');
       return;
     }
-
+  
     if (products.length === 0) {
       Alert.alert('Error', 'Debe seleccionar al menos un producto');
       return;
     }
-
+  
     const htmlContent = `
     <html>
     <head>
     <style>
-      body {
-        font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
-        text-align: center;
-        background-color: #f0f0f0;
-        padding: 20px;
-        margin: 0;
-      }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
     
-      .invoice-box {
-        max-width: 800px;
-        margin: auto;
-        background-color: #fff;
-        border: 1px solid #ccc;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        font-size: 16px;
-        line-height: 24px;
-        padding: 30px;
-      }
+    .receipt {
+      max-width: 800px;
+      margin: 20px auto;
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
     
-      .grid-container {
-        width: 100%;
-        border-collapse: collapse;
-      }
+    .date td{
+      text-align: right;
     
-      .grid-container td {
-        padding: 10px;
-        border: 1px solid #ddd;
-        text-align: center;
-      }
+      background-color: #f2f2f2;
+    }
     
-      .grid-container .information {
-        background-color: #f2f2f2;
-      }
+    .clientData{
+      text-align: left;
+      background-color: #f2f2f2;
+    }
     
-      .grid-container .heading {
-        background-color: #f2f2f2;
-        font-weight: bold;
-        text-align: center;
-      }
+    .title{
+      text-align: center;
+      background-color: #f2f2f2;
+    }
     
-      .grid-container .details td:first-child {
-        font-weight: bold;
-      }
+    .title , .orderNro, .tiposCambio , .totales{
+      background-color: #f2f2f2;
+    }
     
-      .grid-container .item td:nth-child(2),
-      .grid-container .total td:nth-child(2) {
-        font-weight: bold;
-      }
+    .orderNro , .tipfac{
+      text-align: right;
+    }
     
-      .grid-container .note {
-        font-style: italic;
-        color: #777;
-        text-align: center;
-      }
+    .item{
+      text-align: center;
+    }
+    
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    
+    .table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+    
+    .table th {
+      background-color: #f2f2f2;
+    }
+    
+    .note {
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+    }
     </style>
     </head>
     <body>
-      <div class="invoice-box">
-          <table class="grid-container">
-              <tr class="information">
-                  <td colspan="3">
-                      Fecha: ${new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}
-                  </td>
+      <div class="receipt">
+        <table class="table">
+          <thead>
+            <tr class="date">
+              <td colspan="2">Fecha: ${new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}</td>
+            </tr>
+            <td colspan="2"/>
+            <tr>
+              <td class="clientData"><strong>Datos del Cliente</strong></td>
+              <td class="orderNro"><strong>Pedido Nro: ${generateRandomProductId()}</strong></td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+                <td><strong>Nombre:</strong> ${client.nom_cli}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><strong>Rif:</strong> ${client.rif_cli}</td>
+                <td></td>
+            </tr>
+            <tr>
+              <td><strong>Teléfono:</strong> ${client.tel_cli}</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td><strong>Dirección:</strong> ${client.dir1_cli}</td>
+              <td class="tipfac"><strong>Tipo de Factura:</strong> ${invoiceType ? invoiceType : '--- Seleccionar ---'}</td>
+            </tr>
               </tr>
-              
-              <tr class="heading">
-                  <td colspan="3">
-                      Datos del Cliente
-                  </td>
-              </tr>
-              
-              <tr class="details">
-                  <td>Nombre:</td>
-                  <td colspan="2">${client.nom_cli}</td>
-              </tr>
-              <tr class="details">
-                  <td>Rif:</td>
-                  <td colspan="2">${client.rif_cli}</td>
-              </tr>
-              <tr class="details">
-                  <td>Teléfono:</td>
-                  <td colspan="2">${client.tel_cli}</td>
-              </tr>
-              <tr class="details">
-                  <td>Dirección:</td>
-                  <td colspan="2">${client.dir1_cli}</td>
-              </tr>
-    
-              <tr class="heading">
-                  <td colspan="3">
-                      Tipo de Factura
-                  </td>
-              </tr>
-              <tr class="details">
-                  <td colspan="3">${invoiceType ? invoiceType : '--- Seleccionar ---'}</td>
-              </tr>
-    
-              <tr class="heading">
-                  <td>Producto</td>
-                  <td>Cantidad</td>
-                  <td>Precio</td>
-              </tr>
+          </tbody>
+        </table>
+        <table class="table">
+            <thead>
+                <tr>
+                    <td class="title"><strong>Producto</strong></td>
+                    <td class="title"><strong>Cantidad</strong></td>
+                    <td class="title"><strong>Precio</strong></td>
+                    <td class="title"><strong>Subtotal</strong></td>
+                </tr>
+            </thead>
+  
+            <tbody>
               ${products.map(product => `
-              <tr class="item">
-                  <td>${product.descrip}</td>
-                  <td>${product.quantity}</td>
-                  <td>${formatNumber(product.priceUsd)}</td>
-              </tr>
-              `).join('')}
-              
-              <tr class="heading">
-                  <td colspan="3">
-                      Tipos de Cambio
-                  </td>
-              </tr>
-              <tr class="details">
-                  <td>Tasa COP:</td>
-                  <td colspan="2">${cambioDolares}</td>
-              </tr>
-              <tr class="details">
-                  <td>Tasa USD:</td>
-                  <td colspan="2">${cambioBolivares}</td>
-              </tr>
-              
-              <tr class="heading">
-                  <td colspan="3">Totales</td>
-              </tr>
-              <tr class="total">
-                  <td>USD:</td>
-                  <td colspan="2">${formatNumber(totalPriceUsd)}</td>
-              </tr>
-              <tr class="total">
-                  <td>Bs.:</td>
-                  <td colspan="2">${formatNumber(totalPriceUsd * cambioBolivares)}</td>
-              </tr>
-              <tr class="total">
-                  <td>Pesos:</td>
-                  <td colspan="2">${formatNumber(totalPriceUsd * cambioPesos)}</td>
-              </tr>
-              
-              <tr class="note">
-                  <td colspan="3">
-                      Nota: Esta pre orden es considerada un presupuesto, por lo tanto los precios y las existencias están sujetas a cambios sin previo aviso.
-                  </td>
-              </tr>
-          </table>
+                <tr>
+                    <td class="item">${product.descrip}</td>
+                    <td class="item">${product.quantity}</td>
+                    <td class="item">${formatNumber(product.priceUsd)}</td>
+                    <td class="item">${formatNumber(product.quantity * product.priceUsd)}</td>
+                </tr>
+                `).join('')}
+                </tr>
+            </tbody>
+        </table>
+        <table class="table">
+            <thead>
+                <tr>
+                    <td class="tiposCambio"><strong>Tipos de Cambio</strong></td>
+                    <td class="totales" colspan="2"><strong>Totales</strong></td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Tasa COP:</strong> ${cambioDolares}</td>
+                    <td class="item">USD:</td>
+                    <td class="item">${formatNumber(totalPriceUsd)}</td>
+                </tr>
+                <tr>
+                    <td><strong>Tasa USD:</strong> ${cambioBolivares}</td>
+                    <td class="item">Bs.:</td>
+                    <td class="item">${formatNumber(totalPriceUsd * cambioBolivares)}</td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td class="item">Pesos:</td>
+                  <td class="item">${formatNumber(totalPriceUsd * cambioPesos)}</td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="note">
+          Nota: Esta pre orden es considerada un presupuesto, por lo tanto los precios y las existencias están sujetas a cambios sin previo aviso.
+        </p>
       </div>
     </body>
     </html>`;
-    
+  
     try {
+      const fileName = generatePdfFileName(); // Obtén el nombre del archivo personalizado
       const { uri } = await Print.printToFileAsync({ html: htmlContent });
-      setPdfUri(uri);
-      await Sharing.shareAsync(uri, { mimeType: 'application/pdf', UTI: '.pdf' });
+      
+      // Renombra el archivo PDF
+      const fileUriWithName = `${uri.substring(0, uri.lastIndexOf('/') + 1)}${fileName}`;
+      await FileSystem.moveAsync({
+        from: uri,
+        to: fileUriWithName,
+      });
+  
+      setPdfUri(fileUriWithName);
+      await Sharing.shareAsync(fileUriWithName, { mimeType: 'application/pdf', UTI: '.pdf' });
     } catch (error) {
       console.error('Error generando o compartiendo el PDF:', error);
     }
   };
   
-  const handleSharePdf = async () => {
-    if (!pdfUri) {
-      console.error('No hay un archivo PDF para compartir.');
-      return;
-    }
-
-    try {
-      await Sharing.shareAsync(pdfUri, { mimeType: 'application/pdf', UTI: '.pdf' });
-    } catch (error) {
-      console.error('Error al compartir el PDF:', error);
-    }
-  };
+  
 
   return (
     <Modal visible={isVisible} animationType="slide">
