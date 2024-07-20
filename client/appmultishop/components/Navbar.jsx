@@ -1,37 +1,49 @@
-// Dependencies
-import React, { useState, useEffect, useRef }     from 'react'
-import { View, Image, ActivityIndicator, Modal, 
-Text, Pressable, Animated, Easing }               from 'react-native'
-import MaterialCommunityIcons                     from 'react-native-vector-icons/MaterialCommunityIcons'
-import { AntDesign }                              from '@expo/vector-icons'
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Image, Modal, Text, Pressable, Animated, Easing, StyleSheet } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { AntDesign, Feather } from '@expo/vector-icons';
 // Components 
-import { getAllInfo }                             from '../utils/NavbarUtils'
+import { getAllInfo } from '../utils/NavbarUtils';
 // Styles
-import styles                                     from '../styles/Navbar.styles'
-import { images }                                 from '../constants'
+import styles from '../styles/Navbar.styles';
+import { images } from '../constants';
 
 const Navbar = () => {
-  const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState('')
-  const [success, setSuccess] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [success, setSuccess] = useState(false);
+  const [retry, setRetry] = useState(false); // Nuevo estado para manejar reintentos
 
-  const scaleValue = useRef(new Animated.Value(0)).current
-  const opacityValue = useRef(new Animated.Value(0)).current
+  const scaleValue = useRef(new Animated.Value(0)).current;
+  const opacityValue = useRef(new Animated.Value(0)).current;
+  const rotateValue = useRef(new Animated.Value(0)).current; // Valor para la animación de rotación
 
   const handleClose = () => {
-    setMessage('')
-  }
+    setMessage('');
+    setSuccess(false);
+    setRetry(false); // Reinicia el estado de reintento al cerrar el modal
+  };
 
   const handleGetAllInfo = async () => {
-    setLoading(true)
-    setMessage('')
-    setSuccess(false)
+    setLoading(true);
+    setMessage('');
+    setSuccess(false);
+    setRetry(false); // Reinicia el estado de reintento
+
     try {
-      await getAllInfo(setLoading, setMessage)
-      setSuccess(true)
-      startAnimation()
+      const { success, error } = await getAllInfo(setLoading, setMessage);
+
+      if (success) {
+        setSuccess(true);
+        setMessage('Información sincronizada con éxito.');
+        startAnimation();
+      } else {
+        setMessage(error || 'Sincronización no exitosa.');
+        setRetry(true); // Establece el estado de reintento si hubo un error
+      }
     } catch (error) {
-      setSuccess(false)
+      setMessage('Error al actualizar la información.');
+      setRetry(true); // Establece el estado de reintento en caso de excepción
     }
   };
 
@@ -49,14 +61,32 @@ const Navbar = () => {
         easing: Easing.linear,
         useNativeDriver: true,
       }),
+      Animated.loop(
+        Animated.timing(rotateValue, {
+          toValue: 1,
+          duration: 1000, // Duración de una rotación completa
+          easing: Easing.linear,
+          useNativeDriver: true,
+        })
+      ).start()
     ]).start();
   };
 
   useEffect(() => {
-    if (success) {
+    if (loading) {
       startAnimation();
+    } else {
+      // Reset values if modal is not visible
+      scaleValue.setValue(0);
+      opacityValue.setValue(0);
+      rotateValue.setValue(0);
     }
-  }, []);
+  }, [loading]);
+
+  const rotate = rotateValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
 
   return (
     <View style={styles.container}>
@@ -72,7 +102,9 @@ const Navbar = () => {
         <View style={styles.modalBackground}>
           <View style={styles.activityIndicatorWrapper}>
             {loading ? (
-              <ActivityIndicator size="large" color="#0000ff" animating={loading} />
+              <Animated.View style={[styles.loaderContainer, { transform: [{ rotate }] }]}>
+                <Feather name="loader" size={40} color="black" style={styles.loadingText} />
+              </Animated.View>
             ) : (
               <>
                 <Text style={styles.messageInfo}>{message}</Text>
@@ -81,7 +113,6 @@ const Navbar = () => {
                     <AntDesign name="checkcircle" size={48} color="#38B0DB" />
                   </Animated.View>
                 )}
-
                 <View style={styles.buttonContainer}>
                   {success ? (
                     <Pressable style={styles.buttonModalExit} onPress={handleClose}>
@@ -89,9 +120,11 @@ const Navbar = () => {
                     </Pressable>
                   ) : (
                     <>
-                      <Pressable style={styles.buttonModal} onPress={handleGetAllInfo}>
-                        <Text style={styles.buttonTextModal}>Reintentar</Text>
-                      </Pressable>
+                      {retry && (
+                        <Pressable style={styles.buttonModal} onPress={handleGetAllInfo}>
+                          <Text style={styles.buttonTextModal}>Reintentar</Text>
+                        </Pressable>
+                      )}
                       <Pressable style={styles.buttonModalExit} onPress={handleClose}>
                         <Text style={styles.buttonTextModal}>Salir</Text>
                       </Pressable>

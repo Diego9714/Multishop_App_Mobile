@@ -16,6 +16,10 @@ const styles = StyleSheet.create({
     width: "50%",
     height: "100%"
   },
+  loaderContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   modalBackground: {
     flex: 1,
     alignItems: 'center',
@@ -24,7 +28,8 @@ const styles = StyleSheet.create({
   },
   activityIndicatorWrapper: {
     backgroundColor: '#FFFFFF',
-    // height: '40%',
+    // width: 300,
+    padding: 20,
     width: '80%',
     borderRadius: 10,
     display: 'flex',

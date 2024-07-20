@@ -17,16 +17,16 @@ export const instanceClient = axios.create({
 })
 
 export const instanceProducts = axios.create({
-  baseURL: `https://multishop-app-mobile-products.onrender.com/`,
-  // baseURL: 'http://192.168.1.102:6000',
+  // baseURL: `https://multishop-app-mobile-products.onrender.com/`,
+  baseURL: 'http://192.168.1.102:6000',
   headers: {
     Accept: "application/json"
   }
 })
 
 export const instanceSincro = axios.create({
-  baseURL: `https://multishop-app-mobile-orders.onrender.com/`,
-  // baseURL: 'http://192.168.1.102:7000',
+  // baseURL: `https://multishop-app-mobile-orders.onrender.com/`,
+  baseURL: 'http://192.168.1.102:7000',
   headers: {
     Accept: "application/json"
   }

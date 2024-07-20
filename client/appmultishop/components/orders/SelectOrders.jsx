@@ -58,23 +58,6 @@ const SelectOrders = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchClientsOrder = async () => {
-      try {
-        const storedClientsOrderString = await AsyncStorage.getItem('ClientsOrder');
-        const token = await AsyncStorage.getItem('tokenUser');
-        const decodedToken = jwtDecode(token);
-        const cod_ven = decodedToken.cod_ven;
-
-        const parsedClientsOrder = storedClientsOrderString ? JSON.parse(storedClientsOrderString) : [];
-        setClientsOrder(parsedClientsOrder);
-      } catch (error) {
-        console.error('Error fetching clientsOrder:', error);
-      }
-    };
-
-    fetchClientsOrder();
-  }, []);
 
   useEffect(() => {
     if (!isLoaded) {

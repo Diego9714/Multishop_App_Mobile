@@ -6,49 +6,75 @@ export class Orders {
       let ordersCompleted = []
       let ordersNotCompleted = []
   
+      const connection = await pool.getConnection()
+  
       for (const info of order) {
-        const { id_order, id_scli, cod_cli, nom_cli ,cod_ven, totalUsd, totalBs, tipfac, fecha, products } = info
+        const { id_order, id_scli, cod_cli, nom_cli, cod_ven, totalUsd, totalBs, tipfac, fecha, products } = info
   
         const dateObj = new Date(fecha);
         const day = dateObj.getDate().toString().padStart(2, '0')
         const month = (dateObj.getMonth() + 1).toString().padStart(2, '0')
         const year = dateObj.getFullYear()
         const formattedFecha = `${year}-${month}-${day}-`
-
-        console.log(formattedFecha)
-
-        const connection = await pool.getConnection()
-        
+  
         const existingOrder = `SELECT id_order FROM preorder WHERE id_scli = ? AND cod_cli = ? AND cod_ven = ? AND amountUsd = ? AND date_created = ?;`
-        const [checkOrder] = await connection.execute(existingOrder, [id_scli, cod_cli, cod_ven , totalUsd , formattedFecha])
-        
-        // console.log(id_scli, cod_cli, cod_ven , totalUsd , formattedFecha)
-        // console.log(checkOrder)
-
+        const [checkOrder] = await connection.execute(existingOrder, [id_scli, cod_cli, cod_ven, totalUsd, formattedFecha])
+  
         if (checkOrder.length > 0) {
           ordersCompleted.push(info)
         } else {
-
           // Registramos la visita
           let sqlVisit = 'INSERT INTO visits (cod_ven, id_scli, cod_cli, nom_cli, date_created) VALUES (?, ?, ?, ?, ?);'
           await connection.execute(sqlVisit, [cod_ven, id_scli, cod_cli, nom_cli, formattedFecha])
-
+  
           // Registramos el pedido
-          let sql = 'INSERT INTO preorder (id_scli, cod_cli, cod_ven, amountUsd, amountBs, tip_doc, date_created) VALUES (?, ?, ?, ?, ?, ?, ?);'
-          let [orderResult] = await connection.execute(sql, [id_scli, cod_cli, cod_ven, totalUsd, totalBs, tipfac, formattedFecha])
+          let sqlOrder = 'INSERT INTO preorder (id_scli, cod_cli, cod_ven, amountUsd, amountBs, tip_doc, date_created) VALUES (?, ?, ?, ?, ?, ?, ?);'
+          let [orderResult] = await connection.execute(sqlOrder, [id_scli, cod_cli, cod_ven, totalUsd, totalBs, tipfac, formattedFecha])
   
           const id_orderr = orderResult.insertId
   
+          let allProductsAvailable = true
+  
+          // Verificamos la existencia de los productos
           for (const prod of products) {
-            const { codigo, quantity, descrip, existencia, priceUsd, priceBs } = prod
-
-            const saveProd = `INSERT INTO prodorder (id_order, codigo, descrip, quantity, priceUsd, priceBs, date_created) VALUES (?, ?, ?, ?, ?, ?, ?);`
-            await connection.execute(saveProd, [id_orderr, codigo, descrip, quantity, priceUsd, priceBs, formattedFecha])
+            const { codigo, quantity, descrip, priceUsd, priceBs } = prod
+  
+            // Buscar el producto y verificar su existencia
+            const productQuery = `SELECT existencia FROM sinv WHERE codigo = ?;`
+            const [product] = await connection.execute(productQuery, [codigo])
+            
+            if (product.length > 0) {
+              let currentExistence = product[0].existencia
+  
+              // Ajusta la existencia a 0 si la cantidad solicitada es mayor que la existencia actual
+              if (currentExistence < quantity) {
+                quantity = currentExistence
+                currentExistence = 0
+              } else {
+                currentExistence -= quantity
+              }
+  
+              // Guardamos el producto en el pedido
+              const saveProd = `INSERT INTO prodorder (id_order, codigo, descrip, quantity, priceUsd, priceBs, date_created) VALUES (?, ?, ?, ?, ?, ?, ?);`
+              await connection.execute(saveProd, [id_orderr, codigo, descrip, quantity, priceUsd, priceBs, formattedFecha])
+  
+              // Actualizamos la existencia del producto
+              const updateExistence = `UPDATE sinv SET existencia = ? WHERE codigo = ?;`
+              await connection.execute(updateExistence, [currentExistence, codigo])
+            } else {
+              allProductsAvailable = false
+              ordersNotCompleted.push(info)
+              break
+            }
           }
-          ordersCompleted.push(info)
+  
+          if (allProductsAvailable) {
+            ordersCompleted.push(info)
+          }
         }
-        connection.release()
       }
+  
+      connection.release()
   
       return {
         code: 200,
@@ -60,8 +86,8 @@ export class Orders {
     } catch (error) {
       return error
     }
-  }  
-
+  }
+  
   static async saveVisits(visits) {
     try {
       let visitsCompleted = []

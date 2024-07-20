@@ -3,9 +3,8 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'center',
+    // justifyContent: 'center',
   },
   gradientBackground: {
     width: '100%',
@@ -13,8 +12,7 @@ const styles = StyleSheet.create({
   },
   imgContainer: {
     width: '100%',
-    height: '30%',
-    justifyContent: 'center',
+    height: '5%',
     alignItems: 'center',
     marginBottom: 20,
   },
@@ -23,23 +21,22 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   containerInfo: {
-    flex: 1,
-    // backgroundColor: '#E8E8E8',
     backgroundColor: 'rgba(0, 0, 0, 0.10)',
-    width: '100%',
+    width: '90%',
+    paddingTop: 30,
     justifyContent: 'center',
     alignItems: 'center',
     borderTopRightRadius: 50,
     borderTopLeftRadius: 50,
+    borderBottomRightRadius: 50,
+    borderBottomLeftRadius: 50,
     shadowColor: '#000',
     shadowOffset: {
-      width: 5,
-      height: 5,
+      width: 1,
+      height: 1,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 10,
-    paddingTop: 20,
+    marginTop: '45%',
+    marginBottom: '30%'
   },
   containerWelcome: {
     width: '80%',
@@ -54,15 +51,20 @@ const styles = StyleSheet.create({
     color: '#6D6D6D',
     marginTop: 5,
   },
+  iconTop: {
+    marginRight: 10,
+    marginBottom: 20,
+  },
   ViewTextInput: {
     flexDirection: 'row',
     alignItems: 'center',
     width: '80%',
     backgroundColor: '#fff',
-    paddingVertical: 10,
+    paddingVertical: 2,
     paddingHorizontal: 15,
     borderRadius: 15,
     marginBottom: 20,
+    // marginTop: 30,
   },
   textInput: {
     flex: 1,
@@ -75,10 +77,10 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   button: {
-    width: 200,
-    backgroundColor: '#38B0DB',
+    width: 300,
+    backgroundColor: '#3090b3',
     borderRadius: 15,
-    height: 60,
+    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 20,
@@ -94,9 +96,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontWeight: 'bold',
     fontFamily: 'Roboto',
-    fontSize: 20,
+    fontSize: 18,
   }
 });
 

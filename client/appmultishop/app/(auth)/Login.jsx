@@ -9,11 +9,11 @@ import {
   Text,
   TouchableOpacity,
   Platform,
-  Alert
+  Alert,
+  ImageBackground
 } from 'react-native'
-import { router }               from 'expo-router'
-import { LinearGradient } from 'expo-linear-gradient';
-
+import { router } from 'expo-router'
+import { FontAwesome } from '@expo/vector-icons';
 import { images } from '../../constants'
 import { MaterialIcons } from '@expo/vector-icons'
 import styles from '../../styles/Login.styles'
@@ -28,6 +28,7 @@ const Login = () => {
   const [modalVisible, setModalVisible] = useState(false)
   const [modalMessage, setModalMessage] = useState("Cargando...")
   const [modalStatus, setModalStatus] = useState(null)
+  const [showPassword, setShowPassword] = useState(false) // Estado para mostrar u ocultar contraseña
 
   useEffect(() => {
     checkLogin()
@@ -69,50 +70,50 @@ const Login = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
-
-      
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <LinearGradient
-        colors={['#ffff','#ffff', '#38B0DB']}
-        style={styles.gradientBackground}
-        >
+        <ImageBackground
+          source={images.fondo} // Cambia la ruta según la ubicación de tu imagen
+          style={styles.gradientBackground}        >
           <View style={styles.container}>
-          <View style={styles.imgContainer}>
-            <Image source={images.logo} resizeMode="contain" style={styles.logo} />
-          </View>
+            <View style={styles.containerInfo}>
+            <FontAwesome name="user-circle" size={90} color="#FFF" style={styles.iconTop}/>
+              <View style={styles.ViewTextInput}>
+                <MaterialIcons name="email" size={24} color="#777777" style={styles.icon} />
+                <TextInput
+                  placeholder='Usuario'
+                  style={styles.textInput}
+                  value={username}
+                  onChangeText={(text) => setUsername(text)}
+                />
+              </View>
+              <View style={styles.ViewTextInput}>
+                <MaterialIcons name="lock" size={24} color="#777777" style={styles.icon} />
+                <TextInput
+                  placeholder='Contraseña'
+                  style={styles.textInput}
+                  secureTextEntry={!showPassword} // Controla si la contraseña es visible
+                  value={password}
+                  onChangeText={(text) => setPassword(text)}
+                />
+                <TouchableOpacity
+                  style={styles.eyeIcon}
+                  onPress={() => setShowPassword(!showPassword)} // Alterna la visibilidad de la contraseña
+                >
+                  <MaterialIcons name={showPassword ? "visibility-off" : "visibility"} size={24} color="#777777" />
+                </TouchableOpacity>
+              </View>
+              <StatusBar style="auto" />
 
-          <View style={styles.containerInfo}>
-            <View style={styles.containerWelcome}>
-              <Text style={styles.textWelcome}>Bienvenido</Text>
-              <Text style={styles.textDescription}>Por favor, ingresa tus datos para iniciar sesión</Text>
+              <TouchableOpacity style={styles.button} onPress={handleLogin}>
+                <Text style={styles.buttonText}>Iniciar Sesión</Text>
+              </TouchableOpacity>
             </View>
-            <View style={styles.ViewTextInput}>
-              <MaterialIcons name="email" size={24} color="#777777" style={styles.icon} />
-              <TextInput
-                placeholder='usuario'
-                style={styles.textInput}
-                value={username}
-                onChangeText={(text) => setUsername(text)}
-              />
-            </View>
-            <View style={styles.ViewTextInput}>
-              <MaterialIcons name="lock" size={24} color="#777777" style={styles.icon} />
-              <TextInput
-                placeholder='contraseña'
-                style={styles.textInput}
-                secureTextEntry={true}
-                value={password}
-                onChangeText={(text) => setPassword(text)}
-              />
-            </View>
-            <StatusBar style="auto" />
 
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-              <Text style={styles.buttonText}>Ingresar</Text>
-            </TouchableOpacity>
+            <View style={styles.imgContainer}>
+              <Image source={images.logo} resizeMode="contain" style={styles.logo} />
+            </View>
           </View>
-        </View>
-        </LinearGradient>
+        </ImageBackground>
       </ScrollView>
 
       <ModalLoaderLogin visible={modalVisible} message={modalMessage} status={modalStatus} />
