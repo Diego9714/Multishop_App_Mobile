@@ -7,11 +7,6 @@
     "orientation": "portrait",
     "icon": "./assets/MsICODesktop2021.png",
     "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "assetBundlePatterns": [
       "**/*"
     ],

@@ -35,10 +35,10 @@ const Navbar = () => {
 
       if (success) {
         setSuccess(true);
-        setMessage('Información sincronizada con éxito.');
+        setMessage('Información actualizada con éxito.');
         startAnimation();
       } else {
-        setMessage(error || 'Sincronización no exitosa.');
+        setMessage(error || 'Información no actualizada.');
         setRetry(true); // Establece el estado de reintento si hubo un error
       }
     } catch (error) {
