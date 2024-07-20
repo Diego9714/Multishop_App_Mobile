@@ -5,7 +5,7 @@
     "scheme" : "appmultishop",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/MsICODesktop2021.png",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -20,7 +20,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/MsICODesktop2021.png",
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.diego9714.appmultishop",
