@@ -59,7 +59,6 @@ controller.saveVisit = async (req, res) => {
     }
 
     const result = await Orders.saveVisits(visits)
-    console.log(result)
 
     const processVisits = {
       completed: result.completed,

@@ -117,67 +117,118 @@ const SelectOrders = () => {
   }, [selectedOrders, orders]);
 
   const synchronizeOrders = async () => {
-    const ordersToSync = orders.filter(order => selectedOrders[order.id_order]);
-    console.log('Orders to sync:', ordersToSync[0].products);
-
+    const controller = new AbortController();
+    const { signal } = controller;
+  
     setIsLoading(true);  // Inicia el loader
     setModalSincroVisible(true);  // Abre el modal de sincronización
-    const timer = setTimeout(() => {
+  
+    // Configura el temporizador para cancelar la solicitud después de 10 segundos
+    const timeoutId = setTimeout(() => {
+      controller.abort();
       setIsLoading(false);
-      setUnsynchronizedOrders(ordersToSync);  // Marca todos los pedidos como no sincronizados
-    }, 10000);  // 10 segundos de espera
-
+      setModalSincroVisible(false);
+      console.log('Synchronization request timed out.');
+    }, 10000);  // 10 segundos
+  
+    const ordersToSync = orders.filter(order => selectedOrders[order.id_order]);
+    console.log('Orders to sync:', ordersToSync[0]?.products);
+  
     try {
-      const response = await instanceSincro.post('/api/register/order', { order: ordersToSync });
-      console.log('Synchronization response:', response.data);
-
-      if (response.status === 200) {
-        clearTimeout(timer);
-        const { processOrder } = response.data;
-        const completed = processOrder.completed || [];
-        const existing = processOrder.existing || [];
-        const notCompleted = processOrder.notCompleted || [];
-
-        // console.log('Completed orders:', completed);
-        // console.log('Existing orders:', existing);
-        // console.log('Not completed orders:', notCompleted);
-
-        const processedOrderIds = new Set([
-          ...completed.map(order => order.id_order),
-          ...existing.map(order => order.id_order)
-        ]);
-
-        console.log('Processed order IDs:', processedOrderIds);
-
-        const updatedOrders = orders.filter(order => !processedOrderIds.has(order.id_order));
-        setOrders(updatedOrders);
-        setStoredOrders(updatedOrders);
-
-        setSynchronizedOrders(completed);
-        setUnsynchronizedOrders(notCompleted);
-
-        setSelectedOrders({});
-
-        const storedOrders = await AsyncStorage.getItem('OrdersClient');
-        const parsedStoredOrders = storedOrders ? JSON.parse(storedOrders) : [];
-
-        const remainingStoredOrders = parsedStoredOrders.filter(order => !processedOrderIds.has(order.id_order));
-        await AsyncStorage.setItem('OrdersClient', JSON.stringify(remainingStoredOrders));
+      const token = await AsyncStorage.getItem('tokenUser');
+      if (!token) {
+        setIsLoading(false);
+        setModalSincroVisible(false);
+        console.error('No token found');
+        setUnsynchronizedOrders(ordersToSync.map(order => ({
+          ...order,
+          status: 'Not completed'
+        })));
+        return;
+      }
+  
+      const decodedToken = jwtDecode(token);
+      const cod_ven = decodedToken.cod_ven;
+  
+      if (ordersToSync.length === 0) {
+        setIsLoading(false);
+        setModalSincroVisible(false);
+        console.error('No orders to sync');
+        return;
+      }
+  
+      try {
+        const response = await instanceSincro.post('/api/register/order', { order: ordersToSync }, { signal });
+  
+        if (response.status === 200) {
+          clearTimeout(timeoutId); // Cancela el temporizador si la solicitud se completa a tiempo
+  
+          const { processOrder } = response.data;
+          const completed = processOrder.completed || [];
+          const existing = processOrder.existing || [];
+          const notCompleted = processOrder.notCompleted || [];
+  
+          const processedOrderIds = new Set([
+            ...completed.map(order => order.id_order),
+            ...existing.map(order => order.id_order)
+          ]);
+  
+          const updatedOrders = orders.filter(order => !processedOrderIds.has(order.id_order));
+          setOrders(updatedOrders);
+          setStoredOrders(updatedOrders);
+  
+          setSynchronizedOrders(completed);
+          setUnsynchronizedOrders(notCompleted);
+  
+          setSelectedOrders({});
+  
+          const storedOrders = await AsyncStorage.getItem('OrdersClient');
+          const parsedStoredOrders = storedOrders ? JSON.parse(storedOrders) : [];
+  
+          const remainingStoredOrders = parsedStoredOrders.filter(order => !processedOrderIds.has(order.id_order));
+          await AsyncStorage.setItem('OrdersClient', JSON.stringify(remainingStoredOrders));
+        } else {
+          console.log('Unexpected response status:', response.status);
+          setUnsynchronizedOrders(ordersToSync.map(order => ({
+            ...order,
+            status: 'Not completed'
+          })));
+        }
+      } catch (error) {
+        if (error.name === 'AbortError') {
+          console.log('Request to sync orders was aborted.');
+        } else {
+          console.error('Error synchronizing orders:', error);
+          // Manejo específico para errores 500 u otros
+          const ordersToMarkAsNotCompleted = ordersToSync.map(order => ({
+            ...order,
+            status: 'Not completed'
+          }));
+          setUnsynchronizedOrders(ordersToMarkAsNotCompleted);
+        }
       }
     } catch (error) {
       console.error('Error synchronizing orders:', error);
+  
+      // Manejo específico para el error 500
       if (error.response && error.response.status === 500) {
         const ordersToMarkAsNotCompleted = ordersToSync.map(order => ({
           ...order,
           status: 'Not completed'
         }));
         setUnsynchronizedOrders(ordersToMarkAsNotCompleted);
+      } else {
+        setUnsynchronizedOrders(ordersToSync.map(order => ({
+          ...order,
+          status: 'Not completed'
+        })));
       }
     } finally {
       setIsLoading(false);  // Detiene el loader
+      setModalSincroVisible(true); // Asegúrate de que el modal se mantenga visible si hay actualizaciones
     }
   };
-
+  
   const renderPaginationButtons = () => {
     const numberOfPages = Math.ceil(orders.length / itemsPerPage);
     let buttons = [];
