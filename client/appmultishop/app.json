@@ -20,7 +20,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/MsICODesktop2021.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.diego9714.appmultishop",
