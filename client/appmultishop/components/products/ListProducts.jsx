@@ -34,7 +34,13 @@ const ListProducts = () => {
     };
 
     getProductsAndCategories();
-  }, []);
+
+    const intervalId = setInterval(() => {
+      getProductsAndCategories();
+    }, 10000); // Actualiza cada 10 segundos
+
+    return () => clearInterval(intervalId); // Limpia el intervalo al desmontar el componente
+  }, []); 
 
   useEffect(() => {
     applyFilters();
