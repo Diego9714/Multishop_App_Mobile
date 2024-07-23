@@ -2,12 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, Pressable, Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../../styles/ListProducts.styles';
+// JWT - Token
+import { jwtDecode } from 'jwt-decode';
+import { decode } from 'base-64';
+global.atob = decode;
 
 const ModalProduct = ({ isVisible, onClose, product }) => {
   const [currency, setCurrency] = useState([]);
   const [cambioBolivares, setCambioBolivares] = useState(null);
   const [cambioDolares, setCambioDolares] = useState(null);
   const [cambioPesos, setCambioPesos] = useState(null);
+  const [prodExistence, setProdExistence] = useState(null);
 
   useEffect(() => {
     const fetchCurrency = async () => {
@@ -24,15 +29,12 @@ const ModalProduct = ({ isVisible, onClose, product }) => {
 
           if (bolivares) {
             setCambioBolivares(bolivares.cambio);
-            // console.log('Valor de cambio para Bolivares:', bolivares.cambio);
           }
           if (dolares) {
             setCambioDolares(dolares.cambio);
-            // console.log('Valor de cambio para Dolares:', dolares.cambio);
           }
           if (pesos) {
             setCambioPesos(pesos.cambio);
-            // console.log('Valor de cambio para Pesos:', pesos.cambio);
           }
         }
       } catch (error) {
@@ -41,6 +43,21 @@ const ModalProduct = ({ isVisible, onClose, product }) => {
     };
 
     fetchCurrency();
+  }, []);
+
+  useEffect(() => {
+    const getExistence = async () => {
+      try {
+        const token = await AsyncStorage.getItem('tokenUser');
+        const decodedToken = jwtDecode(token);
+        const prodExists = decodedToken.prodExistence;
+        setProdExistence(prodExists);
+      } catch (error) {
+        console.error('Error al obtener datos de AsyncStorage:', error);
+      }
+    };
+
+    getExistence();
   }, []);
 
   const formatNumber = (number) => {
@@ -54,10 +71,14 @@ const ModalProduct = ({ isVisible, onClose, product }) => {
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.titleModal}>{product.descrip}</Text>
-          <Text style={styles.subtitleModal}>Existencia</Text>
-          <View style={styles.modalInfoClient}>
-            <Text style={styles.textModal}>{product.existencia}</Text>
-          </View>
+          {prodExistence !== 0 && (
+            <>
+              <Text style={styles.subtitleModal}>Existencia</Text>
+              <View style={styles.modalInfoClient}>
+                <Text style={styles.textModal}>{product.existencia}</Text>
+              </View>
+            </>
+          )}
           <Text style={styles.subtitleModal}>Precio(Bs)</Text>
           <View style={styles.modalInfoClient}>
             <Text style={styles.textModal}>{formatNumber(product.precioUsd * cambioBolivares)}</Text>

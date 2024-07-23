@@ -13,7 +13,7 @@ export class Users {
 
       const connection = await pool.getConnection()
 
-      let sql = 'SELECT cod_ven , user_vend , pass_vend , nom_ven , ced_ven FROM svend WHERE user_vend = ?;'
+      let sql = 'SELECT cod_ven , user_vend , pass_vend , existenceStatus , nom_ven , ced_ven FROM svend WHERE user_vend = ?;'
       let [user] = await connection.execute(sql,[username])
       
       connection.release()
@@ -25,7 +25,8 @@ export class Users {
           cod_ven : user[0].cod_ven,
           user_ven : user[0].user_vend,
           nom_ven : user[0].nom_ven,
-          ced_ven : user[0].ced_ven
+          ced_ven : user[0].ced_ven,
+          prodExistence: user[0].existenceStatus
         }
         
         let tokenUser

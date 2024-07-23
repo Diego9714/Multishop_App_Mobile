@@ -1,7 +1,8 @@
 import axios from "axios"
 
 export const instanceAuth = axios.create({
-  baseURL: `https://multishop-app-mobile-auth.onrender.com`,
+  baseURL: `https://multishopappmobile-production.up.railway.app`,
+  // baseURL: `https://multishop-app-mobile-auth.onrender.com`,
   // baseURL: 'http://192.168.1.102:4000',
   headers: {
     Accept: "application/json"
@@ -9,7 +10,8 @@ export const instanceAuth = axios.create({
 })
 
 export const instanceClient = axios.create({
-  baseURL: 'https://multishop-app-mobile-clients.onrender.com',
+  baseURL: 'https://clients-production.up.railway.app',
+  // baseURL: 'https://multishop-app-mobile-clients.onrender.com',
   // baseURL: 'http://192.168.1.102:5000',
   headers: {
     Accept: "application/json"
@@ -17,7 +19,8 @@ export const instanceClient = axios.create({
 })
 
 export const instanceProducts = axios.create({
-  baseURL: `https://multishop-app-mobile-products.onrender.com/`,
+  baseURL: `https://products-production-9262.up.railway.app`,
+  // baseURL: 'https://multishop-app-mobile-clients.onrender.com',
   // baseURL: 'http://192.168.1.102:6000',
   headers: {
     Accept: "application/json"
@@ -25,7 +28,8 @@ export const instanceProducts = axios.create({
 })
 
 export const instanceSincro = axios.create({
-  baseURL: `https://multishop-app-mobile-orders.onrender.com/`,
+  baseURL: `https://orders-production-c033.up.railway.app`,
+  // baseURL: 'https://multishop-app-mobile-clients.onrender.com',
   // baseURL: 'http://192.168.1.102:7000',
   headers: {
     Accept: "application/json"

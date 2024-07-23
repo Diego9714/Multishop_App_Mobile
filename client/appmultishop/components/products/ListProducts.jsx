@@ -27,20 +27,22 @@ const ListProducts = () => {
       try {
         const productsInfo = await AsyncStorage.getItem('products');
         const productsJson = JSON.parse(productsInfo);
-        setProducts(productsJson || []);
+        const filteredProducts = (productsJson || []).filter(product => product.existencia > 0);
+        setProducts(filteredProducts);
       } catch (error) {
         console.error('Error al obtener datos de AsyncStorage:', error);
       }
     };
-
+  
     getProductsAndCategories();
-
+  
     const intervalId = setInterval(() => {
       getProductsAndCategories();
-    }, 10000); // Actualiza cada 10 segundos
-
-    return () => clearInterval(intervalId); // Limpia el intervalo al desmontar el componente
-  }, []); 
+    }, 10000)
+  
+    return () => clearInterval(intervalId);
+  }, []);
+  
 
   useEffect(() => {
     applyFilters();

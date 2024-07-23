@@ -135,6 +135,7 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
   
         await AsyncStorage.setItem('OrdersClient', JSON.stringify(updatedOrders));
   
+        if (order.prodExistence !== 0) {
         // Actualizar existencias en la lista de productos
         const productsInfo = await AsyncStorage.getItem('products');
         const productList = productsInfo ? JSON.parse(productsInfo) : [];
@@ -195,6 +196,7 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
         });
   
         await AsyncStorage.setItem('OrdersClient', JSON.stringify(finalUpdatedOrders));
+        }
   
         onClose();
       }
@@ -497,14 +499,14 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
                 </View>
 
                 <View style={styles.containerButton}>
-                  <Pressable onPress={saveOrder} style={styles.otherButton}>
-                    <Text style={styles.buttonText}>Guardar</Text>
+                  <Pressable onPress={handleCancelEdit} style={styles.closeButton}>
+                    <Text style={styles.buttonText}>Salir</Text>
                   </Pressable>
                   <Pressable onPress={handleGenerateAndSharePdf} style={styles.otherButton}>
                     <Text style={styles.buttonText}>PDF</Text>
                   </Pressable>
-                  <Pressable onPress={handleCancelEdit} style={styles.closeButton}>
-                    <Text style={styles.buttonText}>Salir</Text>
+                  <Pressable onPress={saveOrder} style={styles.otherButton}>
+                    <Text style={styles.buttonText}>Guardar</Text>
                   </Pressable>
                 </View>
               </View>

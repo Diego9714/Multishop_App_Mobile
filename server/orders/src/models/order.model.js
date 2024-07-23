@@ -9,7 +9,7 @@ export class Orders {
       const connection = await pool.getConnection()
   
       for (const info of order) {
-        const { id_order, id_scli, cod_cli, nom_cli, cod_ven, totalUsd, totalBs, tipfac, fecha, products } = info
+        const { id_order, id_scli, cod_cli, nom_cli, cod_ven, totalUsd, totalBs, tipfac, fecha, products, prodExistence } = info
   
         const dateObj = new Date(fecha);
         const day = dateObj.getDate().toString().padStart(2, '0')
@@ -35,36 +35,47 @@ export class Orders {
   
           let allProductsAvailable = true
   
-          // Verificamos la existencia de los productos
-          for (const prod of products) {
-            const { codigo, quantity, descrip, priceUsd, priceBs } = prod
-  
-            // Buscar el producto y verificar su existencia
-            const productQuery = `SELECT existencia FROM sinv WHERE codigo = ?;`
-            const [product] = await connection.execute(productQuery, [codigo])
-            
-            if (product.length > 0) {
-              let currentExistence = product[0].existencia
-  
-              // Ajusta la existencia a 0 si la cantidad solicitada es mayor que la existencia actual
-              if (currentExistence < quantity) {
-                quantity = currentExistence
-                currentExistence = 0
-              } else {
-                currentExistence -= quantity
-              }
-  
+          if(prodExistence == 0){
+            // Verificamos la existencia de los productos
+            for (const prod of products) {
+              const { codigo, quantity, descrip, priceUsd, priceBs } = prod
+    
               // Guardamos el producto en el pedido
               const saveProd = `INSERT INTO prodorder (id_order, codigo, descrip, quantity, priceUsd, priceBs, date_created) VALUES (?, ?, ?, ?, ?, ?, ?);`
               await connection.execute(saveProd, [id_orderr, codigo, descrip, quantity, priceUsd, priceBs, formattedFecha])
-  
-              // Actualizamos la existencia del producto
-              const updateExistence = `UPDATE sinv SET existencia = ? WHERE codigo = ?;`
-              await connection.execute(updateExistence, [currentExistence, codigo])
-            } else {
-              allProductsAvailable = false
-              ordersNotCompleted.push(info)
-              break
+            }
+          }else{
+            // Verificamos la existencia de los productos
+            for (const prod of products) {
+              const { codigo, quantity, descrip, priceUsd, priceBs } = prod
+    
+              // Buscar el producto y verificar su existencia
+              const productQuery = `SELECT existencia FROM sinv WHERE codigo = ?;`
+              const [product] = await connection.execute(productQuery, [codigo])
+
+              if (product.length > 0) {
+                let currentExistence = product[0].existencia
+    
+                // Ajusta la existencia a 0 si la cantidad solicitada es mayor que la existencia actual
+                if (currentExistence < quantity) {
+                  quantity = currentExistence
+                  currentExistence = 0
+                } else {
+                  currentExistence -= quantity
+                }
+    
+                // Guardamos el producto en el pedido
+                const saveProd = `INSERT INTO prodorder (id_order, codigo, descrip, quantity, priceUsd, priceBs, date_created) VALUES (?, ?, ?, ?, ?, ?, ?);`
+                await connection.execute(saveProd, [id_orderr, codigo, descrip, quantity, priceUsd, priceBs, formattedFecha])
+    
+                // Actualizamos la existencia del producto
+                const updateExistence = `UPDATE sinv SET existencia = ? WHERE codigo = ?;`
+                await connection.execute(updateExistence, [currentExistence, codigo])
+              } else {
+                allProductsAvailable = false
+                ordersNotCompleted.push(info)
+                break
+              }
             }
           }
   

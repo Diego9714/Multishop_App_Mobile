@@ -11,6 +11,10 @@ import SaveOrder                                        from './SaveOrder';
 import FilterCategories                                 from '../filter/FilterCategories';
 // Styles
 import styles                                           from '../../styles/SelectProducts.styles';
+// JWT - Token
+import { jwtDecode } from 'jwt-decode';
+import { decode } from 'base-64';
+global.atob = decode;
 
 const SelectProducts = ({ isVisible, onClose, client }) => {
   const [selectedProductsCount, setSelectedProductsCount] = useState(0);
@@ -30,39 +34,41 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
   const [searchBrand, setSearchBrand] = useState([]);
   const [priceOrder, setPriceOrder] = useState('');
   const [isFiltering, setIsFiltering] = useState(false);
-
+  const [prodExistence, setProdExistence] = useState(null);
+  
   useEffect(() => {
     const getProducts = async () => {
       const productsInfo = await AsyncStorage.getItem('products');
       const productsJson = JSON.parse(productsInfo);
-      setProducts(productsJson || []);
+      const filteredProducts = (productsJson || []).filter(product => product.existencia > 0);
+      setProducts(filteredProducts);
     };
     getProducts();
-  }, []);
+  }, []);  
 
   useEffect(() => {
-    let filteredProducts = products;
-
+    let filteredProducts = products.filter(product => product.existencia > 0);
+  
     if (displaySearchProduct.length >= 3) {
       const searchWords = displaySearchProduct.toLowerCase().split(' ');
       filteredProducts = filteredProducts.filter(product =>
         searchWords.every(word => product.descrip.toLowerCase().includes(word))
       );
     }
-
+  
     const start = (page - 1) * itemsPerPage;
     const end = page * itemsPerPage;
     const paginatedProducts = filteredProducts.slice(start, end);
-
+  
     const updatedVisibleProducts = paginatedProducts.map(product => ({
       ...product,
       quantity: productQuantities[product.codigo] || 0,
       selected: product.codigo in productQuantities
     }));
-
+  
     setVisibleProducts(updatedVisibleProducts);
   }, [page, products, displaySearchProduct, productQuantities]);
-
+  
   useEffect(() => {
     applyFilters();
   }, [page, products, displaySearchProduct, searchCategory, searchBrand, priceOrder]);
@@ -70,6 +76,21 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
   useEffect(() => {
     setIsFiltering(searchCategory.length > 0 || searchBrand.length > 0 || priceOrder !== '');
   }, [searchCategory, searchBrand, priceOrder]);
+
+  useEffect(() => {
+    const getExistence = async () => {
+      try {
+        const token = await AsyncStorage.getItem('tokenUser');
+        const decodedToken = jwtDecode(token);
+        const prodExists = decodedToken.prodExistence;
+        setProdExistence(prodExists);
+      } catch (error) {
+        console.error('Error al obtener datos de AsyncStorage:', error);
+      }
+    };
+
+    getExistence();
+  }, []);
 
   const handleSearch = () => {
     if (searchProduct.length === 0) {
@@ -111,19 +132,44 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
       Alert.alert('Cantidad no válida', 'Por favor ingrese solo números enteros positivos.');
       return;
     }
-
+  
     const quantity = text === '' ? 0 : parseInt(text, 10);
     const product = products.find(p => p.codigo === productId);
-
+  
+    // Allow any quantity greater than 0 if prodExistence is 0
+    if (prodExistence === 0 && quantity > 0) {
+      const updatedProductQuantities = { ...productQuantities };
+      updatedProductQuantities[productId] = quantity;
+  
+      if (quantity > 0) {
+        if (!product.selected) {
+          product.selected = true;
+          setSelectedProductsCount(prevCount => prevCount + 1);
+        }
+      } else {
+        if (product.selected) {
+          product.selected = false;
+          setSelectedProductsCount(prevCount => Math.max(prevCount - 1, 0));
+        }
+      }
+  
+      setProductQuantities(updatedProductQuantities);
+      setProducts(products.map(p =>
+        p.codigo === productId ? { ...p, selected: quantity > 0 } : p
+      ));
+      return;
+    }
+  
+    // Standard quantity check
     if (quantity > product.existencia) {
-      Alert.alert('Cantidad no disponible', `La cantidad ingresada: ${quantity} , supera la cantidad existente en el inventario : ${product.existencia}`);
+      Alert.alert('Cantidad no disponible', `La cantidad ingresada: ${quantity} supera la cantidad existente en el inventario: ${product.existencia}`);
       handleProductDelete(productId); // Deselect the product and clear the quantity if it exceeds the stock
       return;
     }
-
+  
     const updatedProductQuantities = { ...productQuantities };
     updatedProductQuantities[productId] = quantity;
-
+  
     if (quantity > 0) {
       if (!product.selected) {
         product.selected = true;
@@ -135,12 +181,13 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
         setSelectedProductsCount(prevCount => Math.max(prevCount - 1, 0));
       }
     }
-
+  
     setProductQuantities(updatedProductQuantities);
     setProducts(products.map(p =>
       p.codigo === productId ? { ...p, selected: quantity > 0 } : p
     ));
-  }, [productQuantities, products]);
+  }, [productQuantities, products, prodExistence]);
+  
 
   const handleProductDelete = useCallback((productId) => {
     const updatedProductQuantities = { ...productQuantities };

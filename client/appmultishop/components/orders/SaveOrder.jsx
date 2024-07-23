@@ -137,15 +137,17 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
       Alert.alert('Error', 'Debe seleccionar el tipo de factura');
       return;
     }
-
+  
     if (products.length === 0) {
       Alert.alert('Error', 'Debe seleccionar al menos un producto');
       return;
     }
-
+  
     let token = await AsyncStorage.getItem('tokenUser');
     const decodedToken = jwtDecode(token);
 
+    let prodExistence = decodedToken.prodExistence
+  
     const orderData = {
       id_order: generateRandomProductId(),
       id_scli: client.id_scli,
@@ -166,39 +168,37 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
       totalUsd: parseFloat(totalPriceUsd),
       totalBs: parseFloat((totalPriceUsd * cambioBolivares).toFixed(2)),
       fecha: new Date().toISOString(),
+      prodExistence : prodExistence
     };
-
+  
     try {
       const existingOrders = await AsyncStorage.getItem('OrdersClient');
       const orders = existingOrders ? JSON.parse(existingOrders) : [];
       orders.push(orderData);
       await AsyncStorage.setItem('OrdersClient', JSON.stringify(orders));
-
-      // Actualizar existencias en la lista de productos
-      const productsInfo = await AsyncStorage.getItem('products');
-      const productList = productsInfo ? JSON.parse(productsInfo) : [];
-
-      const updatedProductList = productList.map(prod => {
-        const orderedProduct = products.find(p => p.codigo === prod.codigo);
-        // console.log(orderedProduct)
-        if (orderedProduct) {
-
-          // console.log(prod.existencia - orderedProduct.quantity)
-
-          // console.log(`Producto encontrado y actualizado: ${prod.descrip}, Existencia actual: ${prod.exists}, Cantidad ordenada: ${orderedProduct.quantity}`);
-          return { ...prod, existencia: prod.existencia - orderedProduct.quantity };
-
-        }
-        return prod;
-      });
-
-      await AsyncStorage.setItem('products', JSON.stringify(updatedProductList));
-
+  
+      // Actualizar existencias en la lista de productos solo si prodExistence != 0
+      if (prodExistence !== 0) {
+        const productsInfo = await AsyncStorage.getItem('products');
+        const productList = productsInfo ? JSON.parse(productsInfo) : [];
+  
+        const updatedProductList = productList.map(prod => {
+          const orderedProduct = products.find(p => p.codigo === prod.codigo);
+          if (orderedProduct) {
+            return { ...prod, existencia: prod.existencia - orderedProduct.quantity };
+          }
+          return prod;
+        });
+  
+        await AsyncStorage.setItem('products', JSON.stringify(updatedProductList));
+      }
+  
       setIsOrderSavedModalVisible(true); // Mostrar el modal de confirmación
     } catch (error) {
       console.error('Error saving order:', error);
     }
   };
+  
 
   const generatePdfFileName = () => {
     return `Pedido_${generateRandomProductId()}.pdf`;
@@ -389,8 +389,6 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
       console.error('Error generando o compartiendo el PDF:', error);
     }
   };
-  
-  
 
   return (
     <Modal visible={isVisible} animationType="slide">
@@ -479,17 +477,18 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
           </View>
 
           <View style={styles.containerButton}>
-            <Pressable onPress={handleSaveOrder} style={styles.otherButton}>
-              <Text style={styles.buttonText}>Guardar</Text>
+            <Pressable onPress={onClose} style={styles.closeButton}>
+              <Text style={styles.buttonText}>Regresar</Text>
             </Pressable>
 
             <Pressable onPress={handleGenerateAndSharePdf} style={styles.otherButton}>
               <Text style={styles.buttonText}>PDF</Text>
             </Pressable>
 
-            <Pressable onPress={onClose} style={styles.closeButton}>
-              <Text style={styles.buttonText}>Regresar</Text>
+            <Pressable onPress={handleSaveOrder} style={styles.otherButton}>
+              <Text style={styles.buttonText}>Guardar</Text>
             </Pressable>
+
           </View>
         </ScrollView>
 

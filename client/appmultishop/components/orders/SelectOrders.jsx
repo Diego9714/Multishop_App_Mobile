@@ -58,7 +58,6 @@ const SelectOrders = () => {
     }
   };
 
-
   useEffect(() => {
     if (!isLoaded) {
       fetchOrders();
@@ -101,7 +100,7 @@ const SelectOrders = () => {
 
   const handleOrderSelection = useCallback((order) => {
     const updatedSelectedOrders = { ...selectedOrders };
-
+  
     if (order.selected) {
       order.selected = false;
       delete updatedSelectedOrders[order.id_order];
@@ -109,30 +108,29 @@ const SelectOrders = () => {
       order.selected = true;
       updatedSelectedOrders[order.id_order] = true;
     }
-
+  
     setSelectedOrders(updatedSelectedOrders);
     setOrders(orders.map(o => 
       o.id_order === order.id_order ? { ...o, selected: !o.selected } : o
     ));
   }, [selectedOrders, orders]);
-
+  
   const synchronizeOrders = async () => {
     const controller = new AbortController();
     const { signal } = controller;
   
-    setIsLoading(true);  // Inicia el loader
-    setModalSincroVisible(true);  // Abre el modal de sincronización
+    setIsLoading(true);
+    setModalSincroVisible(true);
   
-    // Configura el temporizador para cancelar la solicitud después de 10 segundos
     const timeoutId = setTimeout(() => {
       controller.abort();
       setIsLoading(false);
       setModalSincroVisible(false);
       console.log('Synchronization request timed out.');
-    }, 10000);  // 10 segundos
+    }, 10000);
   
     const ordersToSync = orders.filter(order => selectedOrders[order.id_order]);
-    console.log('Orders to sync:', ordersToSync[0]?.products);
+    // console.log('Orders to sync:', ordersToSync[0]?.products);
   
     try {
       const token = await AsyncStorage.getItem('tokenUser');
@@ -160,8 +158,8 @@ const SelectOrders = () => {
       try {
         const response = await instanceSincro.post('/api/register/order', { order: ordersToSync }, { signal });
   
-        if (response.status === 200) {
-          clearTimeout(timeoutId); // Cancela el temporizador si la solicitud se completa a tiempo
+        if (response.data.code === 200) {
+          clearTimeout(timeoutId);
   
           const { processOrder } = response.data;
           const completed = processOrder.completed || [];
@@ -199,7 +197,6 @@ const SelectOrders = () => {
           console.log('Request to sync orders was aborted.');
         } else {
           console.error('Error synchronizing orders:', error);
-          // Manejo específico para errores 500 u otros
           const ordersToMarkAsNotCompleted = ordersToSync.map(order => ({
             ...order,
             status: 'Not completed'
@@ -210,7 +207,6 @@ const SelectOrders = () => {
     } catch (error) {
       console.error('Error synchronizing orders:', error);
   
-      // Manejo específico para el error 500
       if (error.response && error.response.status === 500) {
         const ordersToMarkAsNotCompleted = ordersToSync.map(order => ({
           ...order,
@@ -224,10 +220,11 @@ const SelectOrders = () => {
         })));
       }
     } finally {
-      setIsLoading(false);  // Detiene el loader
-      setModalSincroVisible(true); // Asegúrate de que el modal se mantenga visible si hay actualizaciones
+      setIsLoading(false);
+      setModalSincroVisible(true);
     }
   };
+  
   
   const renderPaginationButtons = () => {
     const numberOfPages = Math.ceil(orders.length / itemsPerPage);
