@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, Modal, Pressable, TextInput, Alert } from 'react-native'
-import styles from '../../styles/ModalEditProd.styles'
+import styles from '../../styles/modalEditProd.styles'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 // JWT - Token
 import { jwtDecode } from 'jwt-decode'
@@ -10,9 +10,29 @@ global.atob = decode
 const ModalEditProd = ({ isVisible, selectedProduct, onClose, onQuantityChange, onDeleteProduct }) => {
   const [quantity, setQuantity] = useState(selectedProduct?.quantity || 0)
   const [originalQuantity, setOriginalQuantity] = useState(selectedProduct?.quantity || 0)
+  const [exist, setExist] = useState('')
   const [prodExistence, setProdExistence] = useState(null)
 
-  console.log(selectedProduct)
+  useEffect(() => {
+    const fetchProductExistence = async () => {
+      try {
+        const productsInfo = await AsyncStorage.getItem('products')
+        const productList = productsInfo ? JSON.parse(productsInfo) : []
+        const product = productList.find(prod => prod.codigo === selectedProduct.codigo)
+        
+        if (product) {
+          setExist(product.existencia.toString())
+        }
+      } catch (error) {
+        console.error('Error fetching product existence from AsyncStorage:', error)
+      }
+    }
+
+    if (selectedProduct) {
+      setQuantity(selectedProduct.quantity.toString())
+      fetchProductExistence()
+    }
+  }, [selectedProduct])
 
   useEffect(() => {
     if (selectedProduct) {

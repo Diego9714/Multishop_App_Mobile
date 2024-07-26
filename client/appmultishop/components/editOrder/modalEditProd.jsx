@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, Modal, Pressable, TextInput, Alert } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import styles from '../../styles/ModalEditProd.styles'
+import styles from '../../styles/modalEditProd.styles'
 // JWT - Token
 import { jwtDecode } from 'jwt-decode'
 import { decode } from 'base-64'

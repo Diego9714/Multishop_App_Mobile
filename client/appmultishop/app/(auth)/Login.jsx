@@ -16,7 +16,7 @@ import { router } from 'expo-router'
 import { FontAwesome } from '@expo/vector-icons';
 import { images } from '../../constants'
 import { MaterialIcons } from '@expo/vector-icons'
-import styles from '../../styles/Login.styles'
+import styles from '../../styles/login.styles'
 import { UserContext } from '../../context/UserContext'
 import ModalLoaderLogin from '../../components/users/ModalLoaderLogin'
 
