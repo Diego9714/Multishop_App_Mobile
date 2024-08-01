@@ -61,7 +61,7 @@ const ModalEditProd = ({ isVisible, selectedProduct, onClose, onQuantityChange, 
     }else{
       if (isNaN(newQuantity) || newQuantity <= 0) {
         setQuantity('')
-      } else if (newQuantity > parseInt(exist, 10) + selectedProduct.exists) {
+      } else if (newQuantity > parseInt(exist, 10) + selectedProduct.quantity) {
         Alert.alert('Cantidad no disponible', 'La cantidad ingresada supera la cantidad existente en el inventario.')
         setQuantity('')
       } else {
@@ -87,8 +87,10 @@ const ModalEditProd = ({ isVisible, selectedProduct, onClose, onQuantityChange, 
         Alert.alert('Cantidad no válida', 'La cantidad seleccionada debe ser mayor que 0.')
         return
       }
+
+      console.log(parseInt(exist, 10) + selectedProduct.quantity)
   
-      if (newQuantity > parseInt(exist, 10) + selectedProduct.exists) {
+      if (newQuantity > parseInt(exist, 10) + selectedProduct.quantity) {
         Alert.alert('Cantidad no disponible', 'La cantidad ingresada supera la cantidad existente en el inventario.')
         return
       }

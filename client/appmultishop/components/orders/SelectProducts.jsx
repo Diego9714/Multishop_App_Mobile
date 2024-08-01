@@ -242,10 +242,11 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
     let filteredProducts = products.slice()  
     
     if (displaySearchProduct.length >= 3) {
-      const searchTerm = displaySearchProduct.toLowerCase();
-      filteredProducts = filteredProducts.filter(product =>
-        product.descrip.toLowerCase().includes(searchTerm)
-      );
+      const searchTerms = displaySearchProduct.toLowerCase().split(' ').filter(term => term.length > 0);
+      filteredProducts = filteredProducts.filter(product => {
+        const productDescrip = product.descrip.toLowerCase();
+        return searchTerms.every(term => productDescrip.includes(term));
+      });
     }
     if (searchCategory.length > 0 || searchBrand.length > 0) {
       filteredProducts = filteredProducts.filter(product =>
@@ -303,10 +304,11 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
     let filteredProducts = products.slice();
   
     if (displaySearchProduct.length >= 3) {
-      const searchTerm = displaySearchProduct.toLowerCase();
-      filteredProducts = filteredProducts.filter(product =>
-        product.descrip.toLowerCase().includes(searchTerm)
-      );
+      const searchTerms = displaySearchProduct.toLowerCase().split(' ').filter(term => term.length > 0);
+      filteredProducts = filteredProducts.filter(product => {
+        const productDescrip = product.descrip.toLowerCase();
+        return searchTerms.every(term => productDescrip.includes(term));
+      });
 
       // Mostrar alerta si no se encontraron productos
       if (filteredProducts.length === 0) {

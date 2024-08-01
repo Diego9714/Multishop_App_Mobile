@@ -1,239 +1,232 @@
 // SelectProducts.js
-import React, { useState, useEffect, useCallback } from 'react';
-import { Text, View, Pressable, Modal, TextInput, ScrollView, Alert, TouchableOpacity } from 'react-native';
-import { AntDesign, FontAwesome, MaterialIcons } from '@expo/vector-icons';
-import { LinearGradient }                               from 'expo-linear-gradient';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import styles from '../../styles/SelectProducts.styles';
-import ModalProduct from '../products/ModalProducts'; // Adjust path as necessary
-import FilterCategories from '../filter/FilterCategories';
+import React, { useState, useEffect, useCallback } from 'react'
+import { Text, View, Pressable, Modal, TextInput, ScrollView, Alert, TouchableOpacity } from 'react-native'
+import { AntDesign, FontAwesome, MaterialIcons } from '@expo/vector-icons'
+import { LinearGradient }                               from 'expo-linear-gradient'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import styles from '../../styles/SelectProducts.styles'
+import ModalProduct from '../products/ModalProducts' // Adjust path as necessary
+import FilterCategories from '../filter/FilterCategories'
 // JWT - Token
-import { jwtDecode } from 'jwt-decode';
-import { decode } from 'base-64';
-global.atob = decode;
+import { jwtDecode } from 'jwt-decode'
+import { decode } from 'base-64'
+global.atob = decode
 
 const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
-  const [selectedProductsCount, setSelectedProductsCount] = useState(0);
-  const [products, setProducts] = useState([]);
-  const [visibleProducts, setVisibleProducts] = useState([]);
-  const [searchProduct, setSearchProduct] = useState('');
-  const [displaySearchProduct, setDisplaySearchProduct] = useState('');
-  const [productQuantities, setProductQuantities] = useState({});
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [isProductModalVisible, setIsProductModalVisible] = useState(false);
-  const itemsPerPage = 10;
-  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
-  const [searchCategory, setSearchCategory] = useState([]);
-  const [searchBrand, setSearchBrand] = useState([]);
-  const [priceOrder, setPriceOrder] = useState('');
-  const [isFiltering, setIsFiltering] = useState(false);
-  const [prodExistence, setProdExistence] = useState(null);
+  const [selectedProductsCount, setSelectedProductsCount] = useState(0)
+  const [producCant, setproducCant] = useState(0)
+  const [products, setProducts] = useState([])
+  const [visibleProducts, setVisibleProducts] = useState([])
+  const [searchProduct, setSearchProduct] = useState('')
+  const [displaySearchProduct, setDisplaySearchProduct] = useState('')
+  const [productQuantities, setProductQuantities] = useState({})
+  const [currentPage, setCurrentPage] = useState(1)
+  const [selectedProduct, setSelectedProduct] = useState(null)
+  const [isProductModalVisible, setIsProductModalVisible] = useState(false)
+  const itemsPerPage = 10
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false)
+  const [searchCategory, setSearchCategory] = useState([])
+  const [searchBrand, setSearchBrand] = useState([])
+  const [priceOrder, setPriceOrder] = useState('')
+  const [isFiltering, setIsFiltering] = useState(false)
+  const [prodExistence, setProdExistence] = useState(null)
+  const [initialProductQuantities, setInitialProductQuantities] = useState({})
 
   useEffect(() => {
     const getProducts = async () => {
-      const productsInfo = await AsyncStorage.getItem('products');
-      const productsJson = JSON.parse(productsInfo);
-      const filteredProducts = (productsJson || []).filter(product => product.existencia > 0);
-      setProducts(filteredProducts);
-    };
-    getProducts();
-  }, []); 
+      const productsInfo = await AsyncStorage.getItem('products')
+      const productsJson = JSON.parse(productsInfo)
+      const filteredProducts = (productsJson || []).filter(product => product.existencia > 0)
+      setProducts(filteredProducts)
+    }
+    getProducts()
+  }, []) 
   
   useEffect(() => {
     const getExistence = async () => {
       try {
-        const token = await AsyncStorage.getItem('tokenUser');
-        const decodedToken = jwtDecode(token);
-        const prodExists = decodedToken.prodExistence;
-        setProdExistence(prodExists);
+        const token = await AsyncStorage.getItem('tokenUser')
+        const decodedToken = jwtDecode(token)
+        const prodExists = decodedToken.prodExistence
+        setProdExistence(prodExists)
       } catch (error) {
-        console.error('Error al obtener datos de AsyncStorage:', error);
+        console.error('Error al obtener datos de AsyncStorage:', error)
       }
-    };
+    }
 
-    getExistence();
-  }, []);
+    getExistence()
+  }, [])
 
 
   useEffect(() => {
     const initializeProductQuantities = () => {
-      const initialQuantities = {};
+      const initialQuantities = {}
       selectedOrder.products.forEach(item => {
-        initialQuantities[item.codigo] = item.quantity;
-      });
-      setProductQuantities(initialQuantities);
-      setSelectedProductsCount(Object.keys(initialQuantities).length);
-    };
-    initializeProductQuantities();
-  }, [selectedOrder]);
+        initialQuantities[item.codigo] = item.quantity
+      })
+      setInitialProductQuantities(initialQuantities)
+      setProductQuantities(initialQuantities)
+      setSelectedProductsCount(Object.keys(initialQuantities).length)
+    }
+    initializeProductQuantities()
+  }, [selectedOrder])
 
   useEffect(() => {
-    let filteredProducts = products.filter(product => product.existencia > 0);
+    let filteredProducts = products.filter(product => product.existencia > 0)
 
     if (displaySearchProduct.length >= 3) {
-      const searchWords = displaySearchProduct.toLowerCase().split(' ');
+      const searchWords = displaySearchProduct.toLowerCase().split(' ')
       filteredProducts = filteredProducts.filter(product =>
         searchWords.every(word => product.descrip.toLowerCase().includes(word))
-      );
+      )
     }
 
-    const start = (currentPage - 1) * itemsPerPage;
-    const end = currentPage * itemsPerPage;
-    const paginatedProducts = filteredProducts.slice(start, end);
+    const start = (currentPage - 1) * itemsPerPage
+    const end = currentPage * itemsPerPage
+    const paginatedProducts = filteredProducts.slice(start, end)
 
     const updatedVisibleProducts = paginatedProducts.map(product => ({
       ...product,
       quantity: productQuantities[product.codigo] || 0,
       selected: product.codigo in productQuantities
-    }));
+    }))
 
-    setVisibleProducts(updatedVisibleProducts);
-  }, [currentPage, products, displaySearchProduct, productQuantities]);
-
-  useEffect(() => {
-    applyFilters();
-  }, [currentPage, products, displaySearchProduct, searchCategory, searchBrand, priceOrder]);
+    setVisibleProducts(updatedVisibleProducts)
+  }, [currentPage, products, displaySearchProduct, productQuantities])
 
   useEffect(() => {
-    setIsFiltering(searchCategory.length > 0 || searchBrand.length > 0 || priceOrder !== '');
-  }, [searchCategory, searchBrand, priceOrder]);
+    applyFilters()
+  }, [currentPage, products, displaySearchProduct, searchCategory, searchBrand, priceOrder])
+
+  useEffect(() => {
+    setIsFiltering(searchCategory.length > 0 || searchBrand.length > 0 || priceOrder !== '')
+  }, [searchCategory, searchBrand, priceOrder])
 
 
   const openFilterModal = () => {
-    setIsFilterModalVisible(true);
-  };
+    setIsFilterModalVisible(true)
+  }
 
   const closeFilterModal = () => {
-    setIsFilterModalVisible(false);
-  };
+    setIsFilterModalVisible(false)
+  }
 
   const handleSearch = () => {
     if (searchProduct.length === 0) {
-      setDisplaySearchProduct('');
-      setCurrentPage(1);
-      return;
+      setDisplaySearchProduct('')
+      setCurrentPage(1)
+      return
     }
   
     if (searchProduct.length < 3) {
-      Alert.alert('Por favor ingrese al menos tres letras para buscar');
-      return;
+      Alert.alert('Por favor ingrese al menos tres letras para buscar')
+      return
     }
   
-    setDisplaySearchProduct(searchProduct);
-    setCurrentPage(1);
-  };
+    setDisplaySearchProduct(searchProduct)
+    setCurrentPage(1)
+  }
 
   const handleProductSelection = useCallback((product) => {
-    const updatedProductQuantities = { ...productQuantities };
+    const updatedProductQuantities = { ...productQuantities }
 
     if (!updatedProductQuantities[product.codigo]) {
-      updatedProductQuantities[product.codigo] = 1; // Establecer cantidad por defecto a 1
-      setSelectedProductsCount(prevCount => prevCount + 1);
+      updatedProductQuantities[product.codigo] = 1 // Establecer cantidad por defecto a 1
+      setSelectedProductsCount(prevCount => prevCount + 1)
     }
 
-    setProductQuantities(updatedProductQuantities);
+    setProductQuantities(updatedProductQuantities)
     setProducts(products.map(p =>
       p.codigo === product.codigo ? { ...p, selected: !p.selected } : p
-    ));
-  }, [productQuantities, products]);
+    ))
+  }, [productQuantities, products])
 
   const handleQuantityChange = useCallback((productId, text) => {
-    if (!/^\d*$/.test(text)) { // Allow empty string for quantity input
-      Alert.alert('Cantidad no válida', 'Por favor ingrese solo números enteros positivos.');
-      return;
+    if (!/^\d*$/.test(text)) { // Permitir cadena vacía para la entrada de cantidad
+      Alert.alert('Cantidad no válida', 'Por favor ingrese solo números enteros positivos.')
+      return
     }
   
-    const quantity = text === '' ? 0 : parseInt(text, 10);
-    const product = products.find(p => p.codigo === productId);
-  
-    // Allow any quantity greater than 0 if prodExistence is 0
+    const quantity = text === '' ? 0 : parseInt(text, 10)
+    const product = products.find(p => p.codigo === productId)
+    
+    // No modificar la existencia del producto en el inventario
     if (prodExistence === 0 && quantity > 0) {
-      const updatedProductQuantities = { ...productQuantities };
-      updatedProductQuantities[productId] = quantity;
+      const updatedProductQuantities = { ...productQuantities }
+      const wasSelected = updatedProductQuantities[productId] > 0
   
-      if (quantity > 0) {
-        if (!product.selected) {
-          product.selected = true;
-          setSelectedProductsCount(prevCount => prevCount + 1);
-        }
-      } else {
-        if (product.selected) {
-          product.selected = false;
-          setSelectedProductsCount(prevCount => Math.max(prevCount - 1, 0));
-        }
+      updatedProductQuantities[productId] = quantity
+  
+      if (quantity > 0 && !wasSelected) {
+        setSelectedProductsCount(prevCount => prevCount + 1)
+      } else if (quantity === 0 && wasSelected) {
+        setSelectedProductsCount(prevCount => prevCount - 1)
       }
   
-      setProductQuantities(updatedProductQuantities);
-      setProducts(products.map(p =>
-        p.codigo === productId ? { ...p, selected: quantity > 0 } : p
-      ));
-      return;
+      setProductQuantities(updatedProductQuantities)
+      return
+    }
+
+    const productOrder = selectedOrder.products.find(p => p.codigo === productId) || { exists: 0 }
+  
+    setproducCant(productOrder.exists)
+
+    if (quantity > product.existencia + productOrder.exists) { // Se debe verificar contra la existencia del inventario
+      Alert.alert('Cantidad no disponible', `La cantidad ingresada: ${quantity} supera la cantidad existente en el inventario: ${product.existencia}`)
+      handleProductDelete(productId)
+      return
     }
   
-    // Standard quantity check
-    if (quantity > product.existencia) {
-      Alert.alert('Cantidad no disponible', `La cantidad ingresada: ${quantity} supera la cantidad existente en el inventario: ${product.existencia}`);
-      handleProductDelete(productId); // Deselect the product and clear the quantity if it exceeds the stock
-      return;
+    const updatedProductQuantities = { ...productQuantities }
+    const wasSelected = updatedProductQuantities[productId] > 0
+  
+    updatedProductQuantities[productId] = quantity
+  
+    if (quantity > 0 && !wasSelected) {
+      setSelectedProductsCount(prevCount => prevCount + 1)
+    } else if (quantity === 0 && wasSelected) {
+      setSelectedProductsCount(prevCount => prevCount - 1)
     }
   
-    const updatedProductQuantities = { ...productQuantities };
-    updatedProductQuantities[productId] = quantity;
-  
-    if (quantity > 0) {
-      if (!product.selected) {
-        product.selected = true;
-        setSelectedProductsCount(prevCount => prevCount + 1);
-      }
-    } else {
-      if (product.selected) {
-        product.selected = false;
-        setSelectedProductsCount(prevCount => Math.max(prevCount - 1, 0));
-      }
-    }
-  
-    setProductQuantities(updatedProductQuantities);
-    setProducts(products.map(p =>
-      p.codigo === productId ? { ...p, selected: quantity > 0 } : p
-    ));
-  }, [productQuantities, products, prodExistence]);
+    setProductQuantities(updatedProductQuantities)
+  }, [productQuantities, products, prodExistence])
   
 
   const handleProductDelete = useCallback((productId) => {
-    const updatedProductQuantities = { ...productQuantities };
-    delete updatedProductQuantities[productId];
-    setProductQuantities(updatedProductQuantities);
-    setSelectedProductsCount(prevCount => prevCount - 1);
-  }, [productQuantities]);
+    const updatedProductQuantities = { ...productQuantities }
+    delete updatedProductQuantities[productId]
+    setProductQuantities(updatedProductQuantities)
+    setSelectedProductsCount(prevCount => prevCount - 1)
+  }, [productQuantities])
 
   const renderPaginationButtons = () => {
     let filteredProducts = products.slice()
 
     if (displaySearchProduct.length >= 3) {
-      const searchTerm = displaySearchProduct.toLowerCase();
-      filteredProducts = filteredProducts.filter(product =>
-        product.descrip.toLowerCase().includes(searchTerm)
-      );
+      const searchTerms = displaySearchProduct.toLowerCase().split(' ').filter(term => term.length > 0)
+      filteredProducts = filteredProducts.filter(product => {
+        const productDescrip = product.descrip.toLowerCase()
+        return searchTerms.every(term => productDescrip.includes(term))
+      })
     }
     if (searchCategory.length > 0 || searchBrand.length > 0) {
       filteredProducts = filteredProducts.filter(product =>
         searchCategory.some(category => product.ncate.includes(category)) ||
         searchBrand.some(brand => product.nmarca.includes(brand))
-      );
+      )
     }
 
-    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
 
     // Si no hay búsqueda ni filtros, establecer las páginas por defecto en 5
-    const maxPages = (displaySearchProduct.length === 0 && searchCategory.length === 0 && searchBrand.length === 0) ? 5 : totalPages;
+    const maxPages = (displaySearchProduct.length === 0 && searchCategory.length === 0 && searchBrand.length === 0) ? 5 : totalPages
 
-    let buttons = [];
-    let startPage = Math.max(1, currentPage - 2);
-    let endPage = Math.min(maxPages, startPage + 4);
+    let buttons = []
+    let startPage = Math.max(1, currentPage - 2)
+    let endPage = Math.min(maxPages, startPage + 4)
 
     if (endPage - startPage < 4) {
-      startPage = Math.max(1, endPage - 4);
+      startPage = Math.max(1, endPage - 4)
     }
 
     for (let i = startPage; i <= endPage; i++) {
@@ -247,35 +240,36 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
             {i}
           </Text>
         </Pressable>
-      );
+      )
     }
-    return buttons;
-  };
+    return buttons
+  }
 
   const handleSaveFilters = (selectedFilters) => {
-    console.log('Filtros seleccionados:', selectedFilters);
-    setSearchCategory(selectedFilters.selectedCategory || '');
-    setSearchBrand(selectedFilters.selectedBrand || '');
-    setPriceOrder(selectedFilters.selectedPriceOrder || '');
-    setCurrentPage(1); // Reiniciar a la primera página al aplicar filtros
-  };
+    console.log('Filtros seleccionados:', selectedFilters)
+    setSearchCategory(selectedFilters.selectedCategory || '')
+    setSearchBrand(selectedFilters.selectedBrand || '')
+    setPriceOrder(selectedFilters.selectedPriceOrder || '')
+    setCurrentPage(1) // Reiniciar a la primera página al aplicar filtros
+  }
 
   const applyFilters = () => {
     let filteredProducts = products.slice()
 
     if (displaySearchProduct.length >= 3) {
-      const searchTerm = displaySearchProduct.toLowerCase();
-      filteredProducts = filteredProducts.filter(product =>
-        product.descrip.toLowerCase().includes(searchTerm)
-      );
-
+      const searchTerms = displaySearchProduct.toLowerCase().split(' ').filter(term => term.length > 0)
+      filteredProducts = filteredProducts.filter(product => {
+        const productDescrip = product.descrip.toLowerCase()
+        return searchTerms.every(term => productDescrip.includes(term))
+      })
+      
       // Mostrar alerta si no se encontraron productos
       if (filteredProducts.length === 0) {
-        Alert.alert('Producto no encontrado', 'No se encontró ningún producto con ese nombre.');
-        setSearchProduct('');
-        setDisplaySearchProduct('');
-        setCurrentPage(1);
-        return;
+        Alert.alert('Producto no encontrado', 'No se encontró ningún producto con ese nombre.')
+        setSearchProduct('')
+        setDisplaySearchProduct('')
+        setCurrentPage(1)
+        return
       }
     }
 
@@ -283,42 +277,49 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
       filteredProducts = filteredProducts.filter(product =>
         searchCategory.some(category => product.ncate.includes(category)) ||
         searchBrand.some(brand => product.nmarca.includes(brand))
-      );
+      )
     }
 
     // Ordenar según el precio si se selecciona
     if (priceOrder === 'menor-mayor') {
-      filteredProducts = filteredProducts.sort((a, b) => a.precioUsd - b.precioUsd);
+      filteredProducts = filteredProducts.sort((a, b) => a.precioUsd - b.precioUsd)
     } else if (priceOrder === 'mayor-menor') {
-      filteredProducts = filteredProducts.sort((a, b) => b.precioUsd - a.precioUsd);
+      filteredProducts = filteredProducts.sort((a, b) => b.precioUsd - a.precioUsd)
     }
 
     // Calcular productos visibles según la paginación
-    const start = (currentPage - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-    setVisibleProducts(filteredProducts.slice(start, end));
+    const start = (currentPage - 1) * itemsPerPage
+    const end = start + itemsPerPage
+    setVisibleProducts(filteredProducts.slice(start, end))
 
     // Ajustar página si se filtra y no hay suficientes productos para la página actual
     if (filteredProducts.length > 0 && currentPage > Math.ceil(filteredProducts.length / itemsPerPage)) {
-      setCurrentPage(1);
+      setCurrentPage(1)
     }
-  };
+  }
 
   const generateSelectedProductJSON = () => {
     const selectedProductsWithQuantities = Object.entries(productQuantities).map(([codigo, quantity]) => {
-      const product = products.find(p => p.codigo === codigo);
+      const product = products.find(p => p.codigo === codigo)
       return {
         codigo: product.codigo,
         descrip: product.descrip,
-        exists: product.existencia,
+        exists: producCant,
         quantity,
         priceUsd: product.precioUsd,
         priceBs: product.precioBs,
-      };
-    });
+      }
+    })
 
-    return selectedProductsWithQuantities;
-  };
+    return selectedProductsWithQuantities
+  }
+
+  const handleCancel = () => {
+    setProductQuantities(initialProductQuantities)
+    setSelectedProductsCount(Object.keys(initialProductQuantities).length)
+    onClose()
+  }
+  
 
   return (
     <Modal visible={isVisible} animationType="slide">
@@ -394,8 +395,8 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
                     <Pressable
                       style={styles.buttonMore}
                       onPress={() => {
-                        setSelectedProduct(product);
-                        setIsProductModalVisible(true);
+                        setSelectedProduct(product)
+                        setIsProductModalVisible(true)
                       }}
                     >
                       <MaterialIcons name="more-vert" size={30} color="#7A7A7B" />
@@ -414,19 +415,19 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
           </View>
 
           <View style={styles.buttonsAction}>
-            <Pressable style={styles.buttonExit} onPress={onClose}>
+            <Pressable style={styles.buttonExit} onPress={handleCancel}>
               <Text style={styles.buttonText}>Salir</Text>
             </Pressable>
             <Pressable
               style={styles.buttonModal}
               onPress={() => {
                 if (Object.keys(productQuantities).length === 0) {
-                  Alert.alert('Pedido Vacío', 'Por favor seleccione al menos un producto antes de guardar el pedido.');
-                  return;
+                  Alert.alert('Pedido Vacío', 'Por favor seleccione al menos un producto antes de guardar el pedido.')
+                  return
                 }
-                const selectedProducts = generateSelectedProductJSON();
-                onSave(selectedProducts);
-                onClose();
+                const selectedProducts = generateSelectedProductJSON()
+                onSave(selectedProducts)
+                onClose()
               }}
             >
               <Text style={styles.buttonTextSave}>Guardar</Text>
@@ -447,7 +448,7 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
         </View>
       </LinearGradient>
     </Modal>
-  );
-};
+  )
+}
 
-export default SelectProducts;
+export default SelectProducts
