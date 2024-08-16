@@ -1,7 +1,7 @@
 // Dependencies
 import React, { useState, useEffect } from 'react';
-import { Text, View, Modal, 
-Pressable, ScrollView, Alert }        from 'react-native';
+import { Text, View, Modal, Pressable, ScrollView, 
+  Alert, ImageBackground }            from 'react-native';
 import AsyncStorage                   from '@react-native-async-storage/async-storage';
 import { useNavigation }              from '@react-navigation/native';
 import { LinearGradient }             from 'expo-linear-gradient';
@@ -11,6 +11,7 @@ import ModalEditProd                  from './modalEditProd';
 import ModalOrderSaved                from './ModalOrderSaved';
 // Styles
 import styles                         from '../../styles/SaveOrder.styles';
+import { images }                     from '../../constants'
 // PDF
 import * as Print                     from 'expo-print';
 import * as Sharing                   from 'expo-sharing';
@@ -392,9 +393,9 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
 
   return (
     <Modal visible={isVisible} animationType="slide">
-      <LinearGradient
-      colors={['#ffff', '#9bdef6', '#ffffff', '#9bdef6']}
-      style={styles.gradientBackground}
+      <ImageBackground
+        source={images.fondo}
+        style={styles.gradientBackground}
       >
         <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -517,7 +518,7 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
           }}
         />
         </View>
-      </LinearGradient>
+      </ImageBackground>
     </Modal>
   );
 };

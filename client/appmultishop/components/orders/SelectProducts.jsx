@@ -1,6 +1,6 @@
 // Dependencies
-import { Text, View, Pressable, Modal, 
-  TextInput, ScrollView, Alert , TouchableOpacity }     from 'react-native';
+import { Text, View, Pressable, Modal, TextInput, ScrollView, 
+  Alert , TouchableOpacity, ImageBackground }           from 'react-native';
 import React, { useState, useEffect, useCallback }      from 'react';
 import { AntDesign, MaterialIcons, FontAwesome }        from '@expo/vector-icons';
 import AsyncStorage                                     from '@react-native-async-storage/async-storage';
@@ -10,10 +10,11 @@ import ModalProduct                                     from '../products/ModalP
 import SaveOrder                                        from './SaveOrder';
 import FilterCategories                                 from '../filter/FilterCategories';
 // Styles
+import { images }                                       from '../../constants'
 import styles                                           from '../../styles/SelectProducts.styles';
 // JWT - Token
-import { jwtDecode } from 'jwt-decode';
-import { decode } from 'base-64';
+import { jwtDecode }                                    from 'jwt-decode';
+import { decode }                                       from 'base-64';
 global.atob = decode;
 
 const SelectProducts = ({ isVisible, onClose, client }) => {
@@ -348,9 +349,9 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
 
   return (
     <Modal visible={isVisible} animationType="slide">
-      <LinearGradient
-      colors={['#ffff', '#9bdef6', '#ffffff', '#9bdef6']}
-      style={styles.gradientBackground}
+      <ImageBackground
+        source={images.fondo}
+        style={styles.gradientBackground}
       >
         <View style={styles.container}>
           <View style={styles.mainTitleContainer}>
@@ -392,12 +393,13 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
             <View style={styles.headerProductContainer}>
               <View style={styles.titleListContainer}>
                 <Text style={styles.titleListProduct}>Producto</Text>
-                <Text style={styles.titleListCant}>Cantidad</Text>
+                {/* <Text style={styles.titleListCant}>Cantidad</Text> */}
                 <Text style={styles.titleListActions}>Acciones</Text>
               </View>
             </View>
 
-            <ScrollView>
+            <View style={styles.listContainer}>
+              <ScrollView>
               {visibleProducts.map((product, index) => (
                 <View key={index} style={styles.productItem}>
                   <View style={styles.nameProd}>
@@ -411,29 +413,32 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
                       value={String(productQuantities[product.codigo] || '')}
                       onChangeText={text => handleQuantityChange(product.codigo, text)}
                     />
-                  </View>
-                  <View style={styles.buttonAction}>
+
                     {productQuantities[product.codigo] > 0 && (
                       <Pressable
                         style={styles.button}
                         onPress={() => handleProductDelete(product.codigo)}
                       >
-                        <MaterialIcons name="delete" size={30} color="#7A7A7B" />
+                        <MaterialIcons name="delete" size={33} color="#7A7A7B" />
                       </Pressable>
                     )}
+
+                    <View style={styles.buttonMore}>
                     <Pressable
-                      style={styles.buttonMore}
                       onPress={() => {
-                        setSelectedProduct(product);
-                        setIsProductModalVisible(true);
+                        setSelectedProduct(product)
+                        setIsProductModalVisible(true)
                       }}
                     >
-                      <MaterialIcons name="more-vert" size={30} color="#7A7A7B" />
+                      <MaterialIcons name="more-vert" size={33} color="#7A7A7B" />
                     </Pressable>
+                    </View>
+
                   </View>
                 </View>
               ))}
-            </ScrollView>
+              </ScrollView>
+            </View>
           </View>
 
           <View style={styles.pagination}>
@@ -480,7 +485,7 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
             onDeleteProduct={handleProductDelete}
           />
         </View>
-      </LinearGradient>
+      </ImageBackground>
     </Modal>
   );
 };

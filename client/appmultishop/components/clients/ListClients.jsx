@@ -1,68 +1,78 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Text, View, FlatList, Pressable, TextInput, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
-import { LinearGradient } from 'expo-linear-gradient';
-import styles from '../../styles/ListClients.styles';
-import ClientModal from './ClientModal';
+import React, { useState, useEffect, 
+  useCallback }                         from 'react'
+import { Text, 
+  View, 
+  FlatList, 
+  Pressable, 
+  TextInput, 
+  ScrollView, 
+  TouchableOpacity, 
+  Alert, 
+  ImageBackground }                     from 'react-native'
+import { FontAwesome5, MaterialIcons }  from '@expo/vector-icons'
+import { useFocusEffect }               from '@react-navigation/native'
+import { LinearGradient }               from 'expo-linear-gradient'
+import ClientModal                      from './ClientModal'
 import {
   getClientsFromStorage,
   filterClientsByName,
   calculateTotalPages,
-  paginateClients
-} from '../../utils/ListClientsUtils';
+  paginateClients }                     from '../../utils/ListClientsUtils'
+// Styles
+import { images }                       from '../../constants'
+import styles                           from '../../styles/ListClients.styles'
 
 const ListClients = () => {
-  const [clients, setClients] = useState([]);
-  const [visibleClients, setVisibleClients] = useState([]);
-  const [isClientModalVisible, setIsClientModalVisible] = useState(false);
-  const [searchText, setSearchText] = useState('');
-  const [displaySearchText, setDisplaySearchText] = useState('');
-  const [page, setPage] = useState(1);
-  const [selectedClient, setSelectedClient] = useState(null);
-  const itemsPerPage = 10;
-  const defaultMaxPages = 5;
+  const [clients, setClients] = useState([])
+  const [visibleClients, setVisibleClients] = useState([])
+  const [isClientModalVisible, setIsClientModalVisible] = useState(false)
+  const [searchText, setSearchText] = useState('')
+  const [displaySearchText, setDisplaySearchText] = useState('')
+  const [page, setPage] = useState(1)
+  const [selectedClient, setSelectedClient] = useState(null)
+  const itemsPerPage = 10
+  const defaultMaxPages = 5
 
   const resetStates = () => {
-    setSearchText('');
-    setDisplaySearchText('');
-    setPage(1);
-    setSelectedClient(null);
-    setIsClientModalVisible(false);
-  };
+    setSearchText('')
+    setDisplaySearchText('')
+    setPage(1)
+    setSelectedClient(null)
+    setIsClientModalVisible(false)
+  }
 
   useFocusEffect(
     useCallback(() => {
-      resetStates();
+      resetStates()
       const fetchData = async () => {
-        const data = await getClientsFromStorage();
-        setClients(data);
-      };
-      fetchData();
+        const data = await getClientsFromStorage()
+        setClients(data)
+      }
+      fetchData()
     }, [])
-  );
+  )
 
   useEffect(() => {
-    const filteredClients = filterClientsByName(clients, displaySearchText);
-    setVisibleClients(paginateClients(filteredClients, page, itemsPerPage));
+    const filteredClients = filterClientsByName(clients, displaySearchText)
+    setVisibleClients(paginateClients(filteredClients, page, itemsPerPage))
 
     // Verificar si no se encontraron clientes solo si se realizó una búsqueda activa desde el buscador
     if (searchText !== '' && filteredClients.length === 0) {
-      Alert.alert('No se pudo encontrar ningún cliente con ese nombre.');
-      setSearchText('');
-      setDisplaySearchText('');
-      setPage(1);
+      Alert.alert('No se pudo encontrar ningún cliente con ese nombre.')
+      setSearchText('')
+      setDisplaySearchText('')
+      setPage(1)
     }
-  }, [clients, displaySearchText, page]);
+  }, [clients, displaySearchText, page])
 
   const handleSearch = () => {
     if (searchText.length > 0 && searchText.length < 3) {
-      Alert.alert('Por favor ingrese al menos tres letras para buscar');
-      return;
+      Alert.alert('Por favor ingrese al menos tres letras para buscar')
+      return
     }
-    setDisplaySearchText(searchText);
-    setPage(1);
-  };
+    setDisplaySearchText(searchText)
+    setPage(1)
+  }
 
   const renderElements = ({ item }) => {
     return (
@@ -74,28 +84,28 @@ const ListClients = () => {
           <Pressable
             style={styles.button}
             onPress={() => {
-              setSelectedClient(item);
-              setIsClientModalVisible(true);
+              setSelectedClient(item)
+              setIsClientModalVisible(true)
             }}
           >
             <FontAwesome5 name="user-edit" size={24} color="#515151" />
           </Pressable>
         </View>
       </View>
-    );
-  };
+    )
+  }
 
   const renderPaginationButtons = () => {
-    const filteredClients = filterClientsByName(clients, displaySearchText);
-    const totalPages = calculateTotalPages(filteredClients, itemsPerPage);
+    const filteredClients = filterClientsByName(clients, displaySearchText)
+    const totalPages = calculateTotalPages(filteredClients, itemsPerPage)
 
-    let buttons = [];
-    let maxPagesToShow = displaySearchText ? totalPages : Math.min(totalPages, defaultMaxPages);
-    let startPage = Math.max(1, page - 2);
-    let endPage = Math.min(maxPagesToShow, startPage + 4);
+    let buttons = []
+    let maxPagesToShow = displaySearchText ? totalPages : Math.min(totalPages, defaultMaxPages)
+    let startPage = Math.max(1, page - 2)
+    let endPage = Math.min(maxPagesToShow, startPage + 4)
 
     if (endPage - startPage < 4) {
-      startPage = Math.max(1, endPage - 4);
+      startPage = Math.max(1, endPage - 4)
     }
 
     for (let i = startPage; i <= endPage; i++) {
@@ -109,15 +119,15 @@ const ListClients = () => {
             {i}
           </Text>
         </Pressable>
-      );
+      )
     }
-    return buttons;
-  };
+    return buttons
+  }
 
   return (
-    <LinearGradient
-    colors={['#ffff', '#9bdef6', '#ffffff', '#9bdef6']}
-    style={styles.gradientBackground}
+    <ImageBackground
+      source={images.fondo}
+      style={styles.gradientBackground}
     >
     <View style={styles.list}>
       <View style={styles.titlePage}>
@@ -167,14 +177,14 @@ const ListClients = () => {
           isVisibleClientModal={isClientModalVisible}
           selectedClient={selectedClient}
           onClose={() => {
-            setIsClientModalVisible(false);
-            setSelectedClient(null);
+            setIsClientModalVisible(false)
+            setSelectedClient(null)
           }}
         />
       )}
     </View>
-    </LinearGradient>
-  );
-};
+    </ImageBackground>
+  )
+}
 
-export default ListClients;
+export default ListClients

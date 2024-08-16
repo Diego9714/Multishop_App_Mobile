@@ -134,5 +134,36 @@ export class Products {
       return error
     }
   }
+
+  static async company() {
+    try {
+      let msg = {
+        status: false,
+        msg: "Company not founded",
+        code: 404
+      }
+
+      const connection = await pool.getConnection()
+
+      let sql = `SELECT rif_emp , nom_emp , dir1_emp , noteOrder FROM empresa;`
+      let [company] = await connection.execute(sql)
+      
+      connection.release()
+
+      if(company.length > 0){
+
+        msg = {
+          status: true,
+          msg: "company found",
+          code: 200,
+          company
+        } 
+      }
+  
+      return msg
+    } catch (error) {
+      return error
+    }
+  }
 }
 

@@ -181,7 +181,7 @@ const FilterCategories = ({ visible, onClose, onSave }) => {
 
           <View style={styles.sectionButtonsModal}>
             <Pressable style={styles.buttonModal} onPress={handleSave}>
-              <Text style={styles.buttonTextModal}>Guardar</Text>
+              <Text style={styles.buttonTextModal}>Aplicar</Text>
             </Pressable>
             <Pressable style={styles.buttonModalExit} onPress={handleClearFilters}>
               <Text style={styles.buttonTextModal}>Borrar Filtros</Text>

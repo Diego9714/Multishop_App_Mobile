@@ -17,9 +17,8 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 20,
     fontWeight: "400",
-    color: '#4D4D4D'
+    color: '#FFF'
   },
-
   finderContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -72,7 +71,7 @@ const styles = StyleSheet.create({
     textAlign: 'justify'
   },
   container: {
-    backgroundColor: 'rgba(255, 255, 255, 0.70)',
+    backgroundColor: 'rgba(255, 255, 255, 0.90)',
     marginHorizontal: 10,
     height: "54%",
     borderRadius: 20,

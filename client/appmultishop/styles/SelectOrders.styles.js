@@ -20,20 +20,20 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 20,
     fontWeight: "400",
-    color: '#4D4D4D'
+    color: '#FFF'
   },
   listOrderContainer: {
     height: "55%",
     width: "90%",
-    backgroundColor: 'rgba(255, 255, 255, 0.70)',
+    backgroundColor: 'rgba(255, 255, 255, 0.90)',
     borderRadius: 15,
     shadowColor: "#000",
   },
   headerProductContainer: {
     width: "100%",
     backgroundColor: '#38B0DB',
-    borderTopRightRadius: 20,
-    borderTopLeftRadius: 20,
+    borderTopRightRadius: 15,
+    borderTopLeftRadius: 15,
     color: '#fff',
     marginBottom: 20
   },

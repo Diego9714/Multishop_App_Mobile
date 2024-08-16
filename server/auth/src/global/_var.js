@@ -14,7 +14,4 @@ export const DB_NAME                   = process.env.NAME
 
 // Users
 export const LOGIN                     = process.env.LOGIN
-export const VERIFY                    = process.env.VERIFY
 export const LOGOUT                    = process.env.LOGOUT
-export const REGISTER                  = process.env.REGISTER
-export const PROFILE                   = process.env.PROFILE

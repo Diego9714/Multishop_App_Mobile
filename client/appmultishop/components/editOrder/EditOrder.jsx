@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, Modal, Pressable, ScrollView, Alert } from 'react-native';
+import { Text, View, Modal, Pressable, ScrollView, Alert, ImageBackground } from 'react-native';
 import { LinearGradient }             from 'expo-linear-gradient';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import * as FileSystem                from 'expo-file-system';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../../styles/EditOrder.js';
+import { images }                     from '../../constants'
 import ModalEditProd from './modalEditProd';
 import EditSelectFact from './EditSelectFact';
 import SelectProducts from './SelectProducts';
@@ -401,9 +402,9 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
 
   return (
     <Modal visible={isVisible} animationType="slide">
-      <LinearGradient
-      colors={['#ffff', '#9bdef6', '#ffffff', '#9bdef6']}
-      style={styles.gradientBackground}
+      <ImageBackground
+        source={images.fondo}
+        style={styles.gradientBackground}
       >
         <View style={styles.container}>
           <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -543,7 +544,7 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
           />
 
         </View>
-      </LinearGradient>
+      </ImageBackground>
     </Modal>
   );
 };

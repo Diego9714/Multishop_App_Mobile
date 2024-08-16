@@ -1,11 +1,12 @@
 import React                              from 'react'
-import { Text, View , TouchableOpacity  } from 'react-native'
+import { Text, View , TouchableOpacity , ImageBackground } from 'react-native'
 import { MaterialIcons }                  from '@expo/vector-icons'
 import { useNavigation }                  from '@react-navigation/native'
 import MaterialCommunityIcons             from 'react-native-vector-icons/MaterialCommunityIcons'
 import { LinearGradient }                 from 'expo-linear-gradient';
+// Styles
+import { images }                         from '../../constants'
 import styles                             from '../../styles/CardsHome.styles'
-
 // // Screens
 import Clients                            from '../../app/(tabs)/Clients'
 import Orders                             from '../../app/(tabs)/Orders'
@@ -20,8 +21,8 @@ const CardsHome = () => {
   }
 
   return (
-    <LinearGradient
-      colors={['#ffff', '#9bdef6', '#ffffff', '#9bdef6']}
+    <ImageBackground
+      source={images.fondo}
       style={styles.gradientBackground}
     >
     <View style={styles.mainContainer}>
@@ -49,7 +50,7 @@ const CardsHome = () => {
           </TouchableOpacity>
         </View>
     </View>
-    </LinearGradient>
+    </ImageBackground>
   )
 }
 

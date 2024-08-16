@@ -133,7 +133,7 @@ const BrandFilteredModal = ({ visible, onClose, onSave, selectedBrands }) => {
           </View>
 
           <Pressable style={styles.buttonModal} onPress={handleSave}>
-            <Text style={styles.buttonTextModal}>Guardar</Text>
+            <Text style={styles.buttonTextModal}>Seleccionar</Text>
           </Pressable>
           <Pressable style={styles.buttonModalExit} onPress={handleClose}>
             <Text style={styles.buttonTextModal}>Cerrar</Text>
