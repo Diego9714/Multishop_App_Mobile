@@ -75,6 +75,17 @@ const ModalPass = ({ isVisible, onClose, client }) => {
       let token = await AsyncStorage.getItem('tokenUser');
       const decodedToken = jwtDecode(token);
 
+      const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      };
+    
+      const fecha = new Date().toISOString();
+      const formattedDate = formatDate(fecha);
+
       const passUser = {
         id_pass: generateRandomProductId(),
         id_scli: client.id_scli,
@@ -84,8 +95,7 @@ const ModalPass = ({ isVisible, onClose, client }) => {
         monto: amount,
         tipoPago: paymentType,
         tasaPago: paymentType === 'dollars' ? cambioDolares : (paymentType === 'bs' ? cambioBolivares : cambioPesos),
-        fecha: new Date().toISOString(),
-        status: "No sincronizada"
+        fecha: formattedDate
       };
 
       // console.log(passUser);

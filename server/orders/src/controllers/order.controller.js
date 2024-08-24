@@ -88,8 +88,6 @@ controller.savePass = async (req, res) => {
 
     const { payments } = req.body
 
-    // console.log(payments)
-
     if (!payments || payments.length === 0) {
       return res.status(400).json({
         status: false,

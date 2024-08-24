@@ -102,7 +102,7 @@ const getUnsyncedVisits = async () => {
       if (visits) {
         let visitsArray = JSON.parse(visits);
 
-        return visitsArray.filter(visit => visit.cod_ven === cod_ven && visit.status === "No sincronizada");
+        return visitsArray.filter(visit => visit.cod_ven === cod_ven)
       } else {
         return [];
       }
@@ -123,10 +123,14 @@ const getUnsyncedPayments = async () => {
       const cod_ven = decodedToken.cod_ven;
 
       const payments = await AsyncStorage.getItem('ClientPass');
+      const paymentsSync = await AsyncStorage.getItem('SyncedClientPass');
+
+      console.log(paymentsSync)
+
       if (payments) {
         let paymentsArray = JSON.parse(payments);
 
-        return paymentsArray.filter(payment => payment.cod_ven === cod_ven && payment.status === "No sincronizada");
+        return paymentsArray.filter(payment => payment.cod_ven === cod_ven);
       } else {
         return [];
       }
@@ -142,46 +146,48 @@ const getUnsyncedPayments = async () => {
 const getVisits = async (signal) => {
   try {
     const unsyncedVisits = await getUnsyncedVisits();
-    
-    if (unsyncedVisits.length > 0) {
-      try {
-        const response = await instanceSincro.post('/api/register/visit', { visits: unsyncedVisits }, { signal });
 
-        if (response.status === 200) {
-          const syncedVisits = response.data.processVisits.completed;
-
-          let visitsArray = [...unsyncedVisits]; // This should be the original array from AsyncStorage
-
-          visitsArray = visitsArray.map(visit => {
-            const syncedVisit = syncedVisits.find(syncedVisit => syncedVisit.id_visit === visit.id_visit);
-            if (syncedVisit && visit.status !== 'sincronizada') {
-              visit.status = 'sincronizada';
-            }
-            return visit;
-          });
-
-          await AsyncStorage.setItem('ClientVisits', JSON.stringify(visitsArray));
-
-          const { completed, notCompleted } = response.data.processVisits;
-          return { success: true, completed, notCompleted };
-        } else {
-          console.log('Unexpected response status:', response.status);
-          return { success: false, error: 'Unexpected response status' };
-        }
-      } catch (error) {
-        if (error.name === 'AbortError') {
-          console.log('Request to sync visits was aborted.');
-        } else {
-          console.error('Error sending visits:', error);
-        }
-        return { success: false, error };
-      }
-    } else {
-      return { success: true, error: 'No unsynchronized visits found' };
+    if (unsyncedVisits.length === 0) {
+      setIsLoading(false);
+      setModalSincroVisible(false);
+      console.log('No unsynchronized visits found.');
+      return;
     }
-  } catch (err) {
-    console.error('Error retrieving visits:', err);
-    return { success: false, error: err };
+
+    const response = await instanceSincro.post('/api/register/visit', { visits: unsyncedVisits }, { signal });
+
+    if (response.status === 200) {
+      const syncedVisits = response.data.processVisits.completed;
+
+      // Filtra las visitas sincronizadas del objeto original
+      const remainingVisits = unsyncedVisits.filter(visit => !syncedVisits.some(syncedVisit => syncedVisit.id_visit === visit.id_visit));
+
+      console.log(remainingVisits)
+
+      // Guardar las visitas restantes (no sincronizadas) en AsyncStorage
+      await AsyncStorage.setItem('ClientVisits', JSON.stringify(remainingVisits));
+
+      // Obtener la lista existente de visitas sincronizadas
+      const syncedVisitsString = await AsyncStorage.getItem('SyncedClientVisits');
+      const existingSyncedVisits = syncedVisitsString ? JSON.parse(syncedVisitsString) : [];
+
+      // Agregar las nuevas visitas sincronizadas a la lista existente
+      const updatedSyncedVisits = [...existingSyncedVisits, ...syncedVisits];
+
+      // Guardar la lista actualizada de visitas sincronizadas en AsyncStorage
+      await AsyncStorage.setItem('SyncedClientVisits', JSON.stringify(updatedSyncedVisits));
+
+      return { success: true, completed: syncedVisits, notCompleted: remainingVisits };
+    } else {
+      return { success: false, error: 'Unexpected response status' };
+    }
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      console.log('Request to sync visits was aborted.');
+    } else {
+      console.error('Error sending visits:', error);
+    }
+    return { success: false, error };
   }
 };
 
@@ -189,44 +195,70 @@ const getPayments = async (signal) => {
   try {
     const unsyncedPayments = await getUnsyncedPayments();
 
-    if (unsyncedPayments.length > 0) {
-      try {
-        const response = await instanceSincro.post('/api/register/pass', { payments: unsyncedPayments }, { signal });
-
-        if (response.data.code === 200) {
-          const syncedPass = Array.isArray(response.data.completed) ? response.data.completed : [];
-
-          let paymentsArray = [...unsyncedPayments]; // This should be the original array from AsyncStorage
-
-          paymentsArray = paymentsArray.map(payment => {
-            const syncedPayment = syncedPass.find(syncedPayment => syncedPayment.id_pass === payment.id_pass);
-            if (syncedPayment && payment.status !== 'sincronizada') {
-              payment.status = 'sincronizada';
-            }
-            return payment;
-          });
-
-          await AsyncStorage.setItem('ClientPass', JSON.stringify(paymentsArray));
-
-          const { completed = [], notCompleted = [] } = response.data;
-          return { success: true, completed, notCompleted };
-        } else {
-          console.log('Unexpected response status:', response.status);
-          return { success: false, error: 'Unexpected response status' };
-        }
-      } catch (error) {
-        if (error.name === 'AbortError') {
-          console.log('Request to sync payments was aborted.');
-        } else {
-          console.error('Error sending payments:', error);
-        }
-        return { success: false, error };
-      }
-    } else {
-      return { success: false, error: 'No unsynchronized payments found' };
+    if (unsyncedPayments.length === 0) {
+      setIsLoading(false);
+      setModalSincroVisible(false);
+      console.log('No unsynchronized payments found.');
+      return;
     }
-  } catch (err) {
-    return { success: false, error: err };
+
+    const response = await instanceSincro.post('/api/register/pass', { payments: unsyncedPayments }, { signal });
+
+    // console.log(response.data.processPass.completed)
+
+    if (response.data.code === 200) {
+
+      const syncedPass = Array.isArray(response.data.processPass.completed) ? response.data.processPass.completed : [];
+
+      console.log(syncedPass)
+
+      // Filtra los abonos sincronizados del objeto original
+      const remainingPayments = unsyncedPayments.filter(payment => !syncedPass.some(syncedPayment => syncedPayment.id_pass === payment.id_pass));
+
+      console.log("remainingPayments")
+      console.log(remainingPayments)
+
+      // Guardar los abonos restantes (no sincronizados) en AsyncStorage
+      await AsyncStorage.setItem('ClientPass', JSON.stringify(remainingPayments));
+
+      // Obtener la lista existente de abonos sincronizados
+      const syncedPaymentsString = await AsyncStorage.getItem('SyncedClientPass');
+      console.log(syncedPaymentsString)
+      const existingSyncedPayments = syncedPaymentsString ? JSON.parse(syncedPaymentsString) : [];
+
+      // Agregar los nuevos abonos sincronizados a la lista existente
+      const updatedSyncedPayments = [...existingSyncedPayments, ...syncedPass];
+
+      // Guardar la lista actualizada de abonos sincronizados en AsyncStorage
+      await AsyncStorage.setItem('SyncedClientPass', JSON.stringify(updatedSyncedPayments));
+
+      return { success: true, completed: syncedPass, notCompleted: remainingPayments };
+    } else {
+      return { success: false, error: 'Unexpected response status' };
+    }
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      console.log('Request to sync payments was aborted.');
+    } else {
+      console.error('Error sending payments:', error);
+    }
+    return { success: false, error };
+  }
+};
+
+const getCompany = async (signal) => {
+  try {
+    const res = await instanceProducts.get(`/api/company`, { signal });
+    const listCompany = res.data.company;
+    await storeData('company', listCompany);
+    return { success: true };
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      console.log('Request to get company was aborted.');
+    } else {
+      console.error('Error fetching company:', error);
+    }
+    return { success: false, error };
   }
 };
 
@@ -258,6 +290,7 @@ const getAllInfo = async (setLoading, setMessage) => {
         getCategories(signal),
         getBrands(signal),
         getCurrency(signal),
+        getCompany(signal),
         unsyncedVisits.length > 0 ? getVisits(signal) : { success: true },
         unsyncedPayments.length > 0 ? getPayments(signal) : { success: true }
       ]);

@@ -1,112 +1,266 @@
-// Dependencies
-import React, { useEffect }   from 'react'
-import { View }               from 'react-native'
-import AsyncStorage           from '@react-native-async-storage/async-storage'
-// Components
-import CardsHome              from '../../components/home/CardsHome'
-import Navbar                 from '../../components/Navbar'
-// JwtDecode
-import  {  jwtDecode  }       from  "jwt-decode"  
-import { decode }             from "base-64"
-global.atob = decode
-// Api
-import {instanceClient, instanceProducts}       from '../../global/api'
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import ModalErrorSincro from '../../components/home/ModalErrorSincro'; // Importa el modal de error
+import CardsHome from '../../components/home/CardsHome';
+import Navbar from '../../components/Navbar';
+import { instanceClient, instanceProducts } from '../../global/api';
+// JWT - Token
+import { jwtDecode } from 'jwt-decode';
+import { decode } from 'base-64';
+global.atob = decode;
+
+// Helper functions
+const storeData = async (key, value) => {
+  try {
+    await AsyncStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {
+    console.error(`Error storing ${key}:`, error);
+    throw error;
+  }
+};
+
+const getProducts = async (signal) => {
+  try {
+
+    const storedData = await AsyncStorage.getItem('products');
+    if (storedData){
+      console.log('Products data already stored, skipping fetch.');
+      return { success: true };
+    }
+
+    const res = await instanceProducts.get(`/api/products`, { signal });
+    const listProducts = res.data.products || []; // Asegúrate de que sea una lista, incluso si está vacía
+    await storeData('products', listProducts);
+    return { success: true };
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      console.log('Request to get products was aborted.');
+    } else {
+      console.error('Error fetching products:', error);
+    }
+    return { success: false, error };
+  }
+};
+
+const getCategories = async (signal) => {
+  try {
+    const storedData = await AsyncStorage.getItem('categories');
+    if (storedData){
+      console.log('Categories data already stored, skipping fetch.');
+      return { success: true };
+    }
+
+    const res = await instanceProducts.get(`/api/categories`, { signal });
+    const listCategories = res.data.categories || []; // Asegúrate de que sea una lista, incluso si está vacía
+    await storeData('categories', listCategories);
+    return { success: true };
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      console.log('Request to get categories was aborted.');
+    } else {
+      console.error('Error fetching categories:', error);
+    }
+    return { success: false, error };
+  }
+};
+
+const getCurrency = async (signal) => {
+  try {
+    const storedData = await AsyncStorage.getItem('currency');
+    if (storedData){
+      console.log('Currency data already stored, skipping fetch.');
+      return { success: true };
+    }
+
+    const res = await instanceProducts.get(`/api/currency`, { signal });
+    const listCurrency = res.data.currency || []; // Asegúrate de que sea una lista, incluso si está vacía
+    await storeData('currency', listCurrency);
+    return { success: true };
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      console.log('Request to get currency was aborted.');
+    } else {
+      console.error('Error fetching currency:', error);
+    }
+    return { success: false, error };
+  }
+};
+
+const getCompany = async (signal) => {
+  try {
+    const storedData = await AsyncStorage.getItem('company');
+    if (storedData){
+      console.log('Company data already stored, skipping fetch.');
+      return { success: true };
+    }
+
+    const res = await instanceProducts.get(`/api/company`, { signal });
+    const listCompany = res.data.company || []; // Asegúrate de que sea una lista, incluso si está vacía
+    await storeData('company', listCompany);
+    return { success: true };
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      console.log('Request to get company was aborted.');
+    } else {
+      console.error('Error fetching company:', error);
+    }
+    return { success: false, error };
+  }
+};
+
+const getClients = async (signal) => {
+  try {
+    const storedData = await AsyncStorage.getItem('clients');
+    if (storedData){
+      console.log('Clients data already stored, skipping fetch.');
+      return { success: true };
+    }
 
 
-const Home = () => {
-  useEffect(() => {
-    const getAllInfo = async () => {
-      try {
-        const token = await AsyncStorage.getItem('tokenUser')
-        if (token) {
-          const decodedToken = jwtDecode(token)
-          let cod_ven = decodedToken.cod_ven
+    let token = await AsyncStorage.getItem('tokenUser');
+    const decodedToken = jwtDecode(token)
+    let cod_ven = decodedToken.cod_ven
 
-          const clientsStored = await AsyncStorage.getItem('clients')
-          const productsStored = await AsyncStorage.getItem('products')
-          const categoriesStored = await AsyncStorage.getItem('categories')
-          const brandsStored = await AsyncStorage.getItem('brands')
-          const currencyStored = await AsyncStorage.getItem('currency')
+    const res = await instanceClient.get(`/api/clients/${cod_ven}`, { signal });
+    const listClients = res.data.clients || []; // Asegúrate de que sea una lista, incluso si está vacía
+    await storeData('clients', listClients);
+    return { success: true };
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      console.log('Request to get clients was aborted.');
+    } else {
+      console.error('Error fetching clients:', error);
+    }
+    return { success: false, error };
+  }
+};
 
-          if (!clientsStored) {
-            getClients(cod_ven)
-          }
-          if (!productsStored) {
-            getProducts()
-          }
-          if (!categoriesStored) {
-            getCategories()
-          }
-          if (!brandsStored) {
-            getBrands()
-          }
-          if (!currencyStored) {
-            getCurrency()
-          }
-        }
-      } catch (error) {
-        console.error('Error al obtener el token:', error)
+// const getOrdersSync = async (signal) => {
+//   try {
+//     let token = await AsyncStorage.getItem('tokenUser');
+//     const decodedToken = JWT.decode(token, "appMultishop2024*");
+
+//     let cod_cli = decodedToken.cod_cli;
+
+//     const res = await instanceProducts.get(`/api/orders/client/${cod_cli}`, { signal });
+//     const listorders = res.data.orders || []; // Asegúrate de que sea una lista, incluso si está vacía
+//     await storeData('SynchronizedOrders', listorders);
+//     return { success: true };
+//   } catch (error) {
+//     if (error.name === 'AbortError') {
+//       console.log('Request to get orders was aborted.');
+//     } else {
+//       console.error('Error fetching orders:', error);
+//     }
+//     return { success: false, error };
+//   }
+// };
+
+const getAllInfo = async (setLoading, setMessage, setShowErrorModal) => {
+  setLoading(true);
+  setMessage('');
+  setShowErrorModal(false); // Reinicia el estado del modal al iniciar la sincronización
+
+  const controller = new AbortController();
+  const { signal } = controller;
+
+  const timeoutId = setTimeout(() => {
+    controller.abort();
+    setLoading(false);
+    setMessage('Tiempo de espera agotado. Intenta nuevamente.');
+    setShowErrorModal(true);
+  }, 2000); // Timeout de 2 segundos
+
+  try {
+    const token = await AsyncStorage.getItem('tokenUser');
+    if (token) {
+
+      const results = await Promise.all([
+        getProducts(signal),
+        getCategories(signal),
+        getCurrency(signal),
+        getCompany(signal),
+        getClients(signal),
+        // getOrdersSync(signal)
+      ]);
+
+      clearTimeout(timeoutId);
+      setLoading(false);
+
+      const allSuccessful = results.every(result => result.success);
+
+      if (allSuccessful) {
+        return { success: true };
+      } else {
+        setShowErrorModal(true); // Muestra el modal si alguna solicitud falla
+        return { success: false, error: 'Información no recibida.' };
       }
+    } else {
+      clearTimeout(timeoutId);
+      setLoading(false);
+      return { success: false, error: 'No se encontró el token del usuario.' };
     }
-    getAllInfo()
-  }, [])
-
-  const getClients = async (cod_ven) => {
-    try {
-      const res = await instanceClient.get(`/api/clients/${cod_ven}`)
-      let listClients = res.data.clients
-      await AsyncStorage.setItem('clients', JSON.stringify(listClients))
-    } catch (error) {
-      console.error('Error al obtener los clientes:', error)
-    }
+  } catch (error) {
+    clearTimeout(timeoutId);
+    setLoading(false);
+    setShowErrorModal(true); // Muestra el modal si ocurre un error
+    return { success: false, error: 'Error al actualizar la información.' };
   }
+};
 
-  const getProducts = async () => {
-    try {
-      const res = await instanceProducts.get(`/api/products`)
-      let listProducts = res.data.products
-      await AsyncStorage.setItem('products', JSON.stringify(listProducts))
-    } catch (error) {
-      console.error('Error al obtener los productos:', error)
-    }
-  }
+// Home Component
+const Home = () => {
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [showErrorModal, setShowErrorModal] = useState(false); // Estado para manejar la visibilidad del modal
+  const [abortController, setAbortController] = useState(null);
 
-  const getCategories = async () => {
-    try {
-      const res = await instanceProducts.get(`/api/categories`)
-      let listCategories = res.data.categories
-      await AsyncStorage.setItem('categories', JSON.stringify(listCategories))
-    } catch (error) {
-      console.error('Error al obtener las categorías:', error)
+  const handleRetry = async () => {
+    setShowErrorModal(false);
+    const result = await getAllInfo(setLoading, setMessage, setShowErrorModal);
+    if (!result.success) {
+      setMessage(result.error);
+      setShowErrorModal(true);
     }
-  }
+  };
 
-  const getBrands = async () => {
-    try {
-      const res = await instanceProducts.get(`/api/brands`)
-      let listBrands = res.data.brands
-      await AsyncStorage.setItem('brands', JSON.stringify(listBrands))
-    } catch (error) {
-      console.error('Error al obtener las marcas:', error)
-    }
-  }
+  const handleCloseModal = () => {
+    setShowErrorModal(false);
+  };
 
-  const getCurrency = async () => {
-    try {
-      const res = await instanceProducts.get(`/api/currency`)
-      let listCurrency = res.data.currency
-      await AsyncStorage.setItem('currency', JSON.stringify(listCurrency))
-    } catch (error) {
-      console.error('Error al obtener el cambio de las monedas:', error)
-    }
-  }
+  useEffect(() => {
+    const fetchData = async () => {
+      const controller = new AbortController();
+      setAbortController(controller);
+      const result = await getAllInfo(setLoading, setMessage, setShowErrorModal);
+      if (!result.success) {
+        setMessage(result.error);
+        setShowErrorModal(true);
+      }
+    };
+    fetchData();
+
+    // Cleanup function to abort request if component unmounts or new request is made
+    return () => {
+      if (abortController) {
+        abortController.abort();
+      }
+    };
+  }, []);
 
   return (
     <View>
       <Navbar />
       <CardsHome />
+      <ModalErrorSincro
+        visible={showErrorModal}
+        onClose={handleCloseModal}
+        onRetry={handleRetry}
+        message={message}
+      />
     </View>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

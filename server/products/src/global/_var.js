@@ -2,7 +2,7 @@
 export const PORT                      = process.env.PORT
 
 /* ----------- JWT ----------- */
-export const KEY                      = process.env.KEY
+export const KEY                       = process.env.KEY
 
 /* ----------- DATABASE ----------- */
 export const DB_HOST                   = process.env.HOST
@@ -18,3 +18,6 @@ export const CATEGORY                  = process.env.CATEGORY
 export const BRANDS                    = process.env.BRANDS
 export const CURRENCY                  = process.env.CURRENCY
 export const COMPANY                   = process.env.COMPANY
+export const ORDERS                    = process.env.ORDERS
+export const PAYMENTS                  = process.env.PAYMENTS
+export const VISITS                    = process.env.VISITS

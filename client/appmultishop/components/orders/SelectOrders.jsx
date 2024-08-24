@@ -131,7 +131,6 @@ const SelectOrders = () => {
     }, 10000)
   
     const ordersToSync = orders.filter(order => selectedOrders[order.id_order])
-    // console.log('Orders to sync:', ordersToSync[0]?.products)
   
     try {
       const token = await AsyncStorage.getItem('tokenUser')
@@ -145,9 +144,6 @@ const SelectOrders = () => {
         })))
         return
       }
-  
-      const decodedToken = jwtDecode(token)
-      const cod_ven = decodedToken.cod_ven
   
       if (ordersToSync.length === 0) {
         setIsLoading(false)
@@ -181,11 +177,28 @@ const SelectOrders = () => {
   
           setSelectedOrders({})
   
+          // Obtener la lista existente de pedidos sincronizados
+          const synchronizedOrdersString = await AsyncStorage.getItem('SynchronizedOrders')
+          console.log("synchronizedOrdersString")
+          console.log(synchronizedOrdersString)
+          const existingSynchronizedOrders = synchronizedOrdersString ? JSON.parse(synchronizedOrdersString) : []
+  
+          // Agregar los nuevos pedidos sincronizados a la lista existente
+          const updatedSynchronizedOrders = [
+            ...existingSynchronizedOrders,
+            ...completed
+          ]
+  
+          // Guardar la lista actualizada de pedidos sincronizados en AsyncStorage
+          await AsyncStorage.setItem('SynchronizedOrders', JSON.stringify(updatedSynchronizedOrders))
+  
+          // Actualizar la lista de pedidos almacenados
           const storedOrders = await AsyncStorage.getItem('OrdersClient')
           const parsedStoredOrders = storedOrders ? JSON.parse(storedOrders) : []
   
           const remainingStoredOrders = parsedStoredOrders.filter(order => !processedOrderIds.has(order.id_order))
           await AsyncStorage.setItem('OrdersClient', JSON.stringify(remainingStoredOrders))
+  
         } else {
           console.log('Unexpected response status:', response.status)
           setUnsynchronizedOrders(ordersToSync.map(order => ({

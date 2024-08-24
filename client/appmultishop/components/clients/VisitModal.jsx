@@ -1,29 +1,45 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { View, Text, Modal, Pressable, Animated, Easing } from 'react-native'
-import { AntDesign } from '@expo/vector-icons'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { jwtDecode } from 'jwt-decode'
-import { decode } from 'base-64'
-global.atob = decode
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, Modal, Pressable, Animated, Easing } from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { jwtDecode } from 'jwt-decode';
+import { decode } from 'base-64';
+global.atob = decode;
 // Styles
-import styles from '../../styles/ModalVisit.styles'
+import styles from '../../styles/ModalVisit.styles';
 
 const VisitModal = ({ isVisible, onClose, client }) => {
-  const [visitStatus, setVisitStatus] = useState('') // Estado para el mensaje de estado de la visita
-  const scaleValue = useRef(new Animated.Value(0)).current
-  const opacityValue = useRef(new Animated.Value(0)).current
+  const [visitStatus, setVisitStatus] = useState(''); // Estado para el mensaje de estado de la visita
+  const scaleValue = useRef(new Animated.Value(0)).current;
+  const opacityValue = useRef(new Animated.Value(0)).current;
 
   const generateRandomProductId = () => {
-    const randomNumber = Math.floor(Math.random() * 100000)
-    const timestamp = Date.now()
-    return `${timestamp}-${randomNumber}`
-  }
+    const randomNumber = Math.floor(Math.random() * 100000);
+    const timestamp = Date.now();
+    return `${timestamp}-${randomNumber}`;
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const convertToComparableDate = (dateString) => {
+    const [day, month, year] = dateString.split('/');
+    return `${year}-${month}-${day}`; // Formato yyyy-mm-dd para comparación
+  };
 
   useEffect(() => {
     const regVisit = async (client) => {
       try {
-        let token = await AsyncStorage.getItem('tokenUser')
-        const decodedToken = jwtDecode(token)
+        let token = await AsyncStorage.getItem('tokenUser');
+        const decodedToken = jwtDecode(token);
+
+        const fecha = new Date().toISOString();
+        const formattedDate = formatDate(fecha);
 
         const visit = {
           id_visit: generateRandomProductId(),
@@ -31,38 +47,58 @@ const VisitModal = ({ isVisible, onClose, client }) => {
           cod_cli: client.cod_cli,
           nom_cli: client.nom_cli,
           cod_ven: decodedToken.cod_ven,
-          fecha: new Date().toISOString(),
-          status: "No sincronizada"
-        }
+          fecha: formattedDate,
+        };
 
-        const existingVisits = await AsyncStorage.getItem('ClientVisits')
-        const visits = existingVisits ? JSON.parse(existingVisits) : []
+        const existingVisits = await AsyncStorage.getItem('ClientVisits');
+        const visitsSync = await AsyncStorage.getItem('SyncedClientVisits');
+
+        const visits = existingVisits ? JSON.parse(existingVisits) : [];
+        const syncedVisits = visitsSync ? JSON.parse(visitsSync) : [];
+
+        // console.log("visits")
+        // console.log(visits)
+        // console.log("syncedVisits")
+        // console.log(syncedVisits)
+
 
         // Verificar si ya existe una visita para este cliente por el mismo vendedor en la misma fecha
-        const today = new Date().toISOString().split('T')[0]
-        const existingVisit = visits.find(
+        const today = convertToComparableDate(formattedDate);
+
+        const existingVisitInClientVisits = visits.find(
           (v) =>
             v.id_scli === client.id_scli &&
             v.cod_ven === decodedToken.cod_ven &&
-            v.fecha.split('T')[0] === today
-        )
+            convertToComparableDate(v.fecha) === today
+        );
 
-        if (existingVisit) {
-          setVisitStatus('Ya se ha registrado una visita para este cliente hoy.')
+        const existingVisitInSyncedVisits = syncedVisits.find(
+          (v) =>
+            v.id_scli === client.id_scli &&
+            v.cod_ven === decodedToken.cod_ven &&
+            convertToComparableDate(v.fecha) === today
+        );
+
+        console.log(existingVisitInClientVisits)
+        console.log(existingVisitInSyncedVisits)
+
+
+        if (existingVisitInClientVisits || existingVisitInSyncedVisits) {
+          setVisitStatus('Ya se ha registrado una visita para este cliente hoy.');
         } else {
-          visits.push(visit)
-          await AsyncStorage.setItem('ClientVisits', JSON.stringify(visits))
-          setVisitStatus('Visita registrada con éxito!')
+          visits.push(visit);
+          await AsyncStorage.setItem('ClientVisits', JSON.stringify(visits));
+          setVisitStatus('Visita registrada con éxito!');
         }
       } catch (error) {
-        setVisitStatus(`Visita no registrada - ${error}`)
+        setVisitStatus(`Visita no registrada - ${error}`);
       }
-    }
+    };
 
     if (isVisible) {
-      regVisit(client)
+      regVisit(client);
     }
-  }, [isVisible, client])
+  }, [isVisible, client]);
 
   useEffect(() => {
     if (isVisible) {
@@ -79,14 +115,14 @@ const VisitModal = ({ isVisible, onClose, client }) => {
           easing: Easing.linear,
           useNativeDriver: true,
         }),
-      ]).start()
+      ]).start();
     } else {
       // Reset values if modal is not visible
-      scaleValue.setValue(0)
-      opacityValue.setValue(0)
-      setVisitStatus('') // Resetear el mensaje cuando se cierra el modal
+      scaleValue.setValue(0);
+      opacityValue.setValue(0);
+      setVisitStatus(''); // Resetear el mensaje cuando se cierra el modal
     }
-  }, [isVisible])
+  }, [isVisible]);
 
   return (
     <Modal visible={isVisible} animationType="fade" transparent={true}>
@@ -114,7 +150,7 @@ const VisitModal = ({ isVisible, onClose, client }) => {
         </View>
       </View>
     </Modal>
-  )
-}
+  );
+};
 
-export default VisitModal
+export default VisitModal;

@@ -51,3 +51,66 @@ controller.getCompany = async (req, res) => {
     return res.status(500).json({ error: error.message })
   }
 }
+
+controller.getOrders = async (req, res) => {
+  try {
+    const { cod_ven } = req.params
+
+    if (!cod_ven || cod_ven.length === 0) {
+      return res.status(400).json({
+        status: false,
+        msg: "No seller provided",
+        code: 400
+      })
+    }
+
+    const orders = await Products.orders(cod_ven)
+
+    res.status(orders.code).json(orders)
+
+  } catch (error) {
+    return res.status(500).json({ error: error.message })
+  }
+}
+
+controller.getPayments = async (req, res) => {
+  try {
+    const { cod_ven } = req.params
+
+    if (!cod_ven || cod_ven.length === 0) {
+      return res.status(400).json({
+        status: false,
+        msg: "No seller provided",
+        code: 400
+      })
+    }
+
+    const payments = await Products.payments(cod_ven)
+
+    res.status(payments.code).json(payments)
+
+  } catch (error) {
+    return res.status(500).json({ error: error.message })
+  }
+}
+
+controller.getVisits = async (req, res) => {
+  try {
+    const { cod_ven } = req.params
+
+    if (!cod_ven || cod_ven.length === 0) {
+      return res.status(400).json({
+        status: false,
+        msg: "No seller provided",
+        code: 400
+      })
+    }
+
+    const visits = await Products.visits(cod_ven)
+
+    res.status(visits.code).json(visits)
+
+  } catch (error) {
+    return res.status(500).json({ error: error.message })
+  }
+}
