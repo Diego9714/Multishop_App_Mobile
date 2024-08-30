@@ -66,6 +66,7 @@ const styles = StyleSheet.create({
   },
   sectionButtonsModal: {
     marginTop: "2%",
+    gap: 5,
     flexDirection: "column",
     justifyContent: "space-around",
     flexWrap: "wrap",

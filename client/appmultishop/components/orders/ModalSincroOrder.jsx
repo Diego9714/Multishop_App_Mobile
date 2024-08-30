@@ -1,26 +1,40 @@
-import React, { useEffect } from 'react';
-import { View, Text, Modal, ActivityIndicator, Pressable, FlatList } from 'react-native';
-import styles from '../../styles/ModalSincroOrder.styles';
+import React, { useEffect, useRef } from 'react'
+import { View, Text, Modal, ActivityIndicator, Pressable, FlatList, Animated, Easing } from 'react-native'
+import AntDesign from 'react-native-vector-icons/AntDesign'
+import styles from '../../styles/ModalSincroOrder.styles'
 
 const ModalSincroOrder = ({ isVisible, onClose, synchronizedOrders, unsynchronizedOrders, isLoading }) => {
+  const scaleValue = useRef(new Animated.Value(0)).current
+  const opacityValue = useRef(new Animated.Value(0)).current
+
   useEffect(() => {
     if (isVisible && !isLoading) {
-      const timer = setTimeout(() => {
-        onClose();
-      }, 10000);
-
-      return () => clearTimeout(timer);
+      Animated.parallel([
+        Animated.spring(scaleValue, {
+          toValue: 1,
+          friction: 2,
+          tension: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityValue, {
+          toValue: 1,
+          duration: 500,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        }),
+      ]).start()
+    } else {
+      scaleValue.setValue(0)
+      opacityValue.setValue(0)
     }
-  }, [isVisible, isLoading, onClose]);
+  }, [isVisible, isLoading])
 
-  const renderItem = ({ item }) => {
-    return (
-      <View style={styles.orderItem}>
-        <Text style={styles.orderText}>{item.nom_cli}</Text>
-        <Text style={styles.orderText}>Total a pagar: {item.totalUsd.toFixed(2)} $</Text>
-      </View>
-    );
-  };
+  const renderItem = ({ item }) => (
+    <View style={styles.orderItem}>
+      <Text style={styles.orderText}>{item.nom_cli}</Text>
+      <Text style={styles.orderText}>Total a pagar: {item.totalUsd.toFixed(2)} $</Text>
+    </View>
+  )
 
   return (
     <Modal visible={isVisible} transparent={true} animationType="slide">
@@ -33,20 +47,28 @@ const ModalSincroOrder = ({ isVisible, onClose, synchronizedOrders, unsynchroniz
             </View>
           ) : (
             <>
-              <Text style={styles.titleModal}>Pedidos Sincronizados:</Text>
-              <FlatList
-                data={synchronizedOrders}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id_order.toString()}
-                ListEmptyComponent={<Text style={styles.subtitleModal}>No hay pedidos sincronizados</Text>}
-              />
-              <Text style={styles.titleModal}>Pedidos No Sincronizados:</Text>
-              <FlatList
-                data={unsynchronizedOrders}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id_order.toString()}
-                ListEmptyComponent={<Text style={styles.subtitleModal}>No hay pedidos no sincronizados</Text>}
-              />
+              {synchronizedOrders.length > 0 && synchronizedOrders.length === 0 ? (
+                <>
+                  <Text style={styles.titleModal}>Pedidos No Sincronizados</Text>
+                  <Animated.View style={{ transform: [{ scale: scaleValue }], opacity: opacityValue }}>
+                    <AntDesign name="closecircle" size={48} color="#FF4D4F" />
+                  </Animated.View>
+                </>
+              ) : unsynchronizedOrders.length > 0 ? (
+                <>
+                  <Text style={styles.titleModal}>Pedidos No Sincronizados</Text>
+                  <Animated.View style={{ transform: [{ scale: scaleValue }], opacity: opacityValue }}>
+                    <AntDesign name="closecircle" size={48} color="#FF4D4F" />
+                  </Animated.View>
+                </>
+              ) : (
+                <>
+                  <Text style={styles.titleModal}>Pedidos Sincronizados con Éxito</Text>
+                  <Animated.View style={{ transform: [{ scale: scaleValue }], opacity: opacityValue }}>
+                    <AntDesign name="checkcircle" size={48} color="#38B0DB" />
+                  </Animated.View>
+                </>
+              )}
               <Pressable style={styles.buttonModalExit} onPress={onClose}>
                 <Text style={styles.buttonTextModal}>Salir</Text>
               </Pressable>
@@ -55,7 +77,7 @@ const ModalSincroOrder = ({ isVisible, onClose, synchronizedOrders, unsynchroniz
         </View>
       </View>
     </Modal>
-  );
-};
+  )
+}
 
-export default ModalSincroOrder;
+export default ModalSincroOrder

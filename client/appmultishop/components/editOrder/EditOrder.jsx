@@ -298,7 +298,7 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
         <table class="table">
           <thead>
             <tr class="date">
-              <td colspan="2">Fecha: ${fechaFormateada}</td>
+              <td colspan="2">Fecha: ${order.fecha}</td>
             </tr>
             <td colspan="2"/>
             <tr>
@@ -398,7 +398,7 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
     }
   };
 
-  const fechaFormateada = order && order.fecha ? new Date(order.fecha).toISOString().split('T')[0] : '';
+  // const fechaFormateada = order && order.fecha ? new Date(order.fecha).toISOString().split('T')[0] : '';
 
   return (
     <Modal visible={isVisible} animationType="slide">
@@ -433,7 +433,7 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
                   </View>
                   <Text style={styles.nameInputDetailedClient}>Fecha del Pedido:</Text>
                   <View style={styles.infoClientContainer}>
-                    <Text style={styles.textDetailedClient}>{fechaFormateada}</Text>
+                    <Text style={styles.textDetailedClient}>{order.fecha}</Text>
                   </View>
                 </View>
 

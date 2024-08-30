@@ -27,9 +27,15 @@ export class Orders {
         if (checkOrder.length > 0) {
           ordersCompleted.push(info)
         } else {
-          // Registramos la visita
-          let sqlVisit = 'INSERT INTO visits (cod_ven, id_scli, cod_cli, nom_cli, date_created) VALUES (?, ?, ?, ?, ?);'
-          await connection.execute(sqlVisit, [cod_ven, id_scli, cod_cli, nom_cli, formattedFecha])
+
+          const existingVisit = `SELECT id_visit FROM visits WHERE id_scli = ? AND cod_cli = ? AND cod_ven = ? AND date_created = ?;`
+          const [checkVisit] = await connection.execute(existingVisit, [id_scli, cod_cli, cod_ven, formattedFecha])
+
+          if (checkVisit.length <= 0) {
+            // Registramos la visita
+            let sqlVisit = 'INSERT INTO visits (cod_ven, id_scli, cod_cli, nom_cli, type_visit, date_created) VALUES (?, ?, ?, ?, ?, ?);'
+            await connection.execute(sqlVisit, [cod_ven, id_scli, cod_cli, nom_cli, 2, formattedFecha])
+          }
   
           // Registramos el pedido
           let sqlOrder = 'INSERT INTO preorder (cod_order, id_scli, cod_cli, cod_ven, amountUsd, amountBs, tip_doc, date_created) VALUES (?, ?, ?, ?, ?, ?, ?, ?);'
@@ -125,8 +131,8 @@ export class Orders {
         if (checkVisit.length > 0) {
           visitsCompleted.push(info)
         } else {
-          let sql = 'INSERT INTO visits (cod_ven, id_scli, cod_cli, nom_cli, date_created) VALUES (?, ?, ?, ?, ?);'
-          await connection.execute(sql, [cod_ven, id_scli, cod_cli, nom_cli, formattedFecha])
+          let sql = 'INSERT INTO visits (cod_ven, id_scli, cod_cli, nom_cli, type_visit, date_created) VALUES (?, ?, ?, ?, ?, ?);'
+          await connection.execute(sql, [cod_ven, id_scli, cod_cli, nom_cli, 1, formattedFecha])
   
           visitsCompleted.push(info)
         }
