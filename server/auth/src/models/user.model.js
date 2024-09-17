@@ -1,43 +1,40 @@
-import { createAccessToken }   from '../libs/jwt.js'
-import { pool }   from '../connection/mysql.connect.js'
-// import bcrypt     from "bcrypt"
+import { createAccessToken } from '../libs/jwt.js'
+import mysql                 from "mysql2/promise"
 
 export class Users {
-  static async search(username , password) {
+  static async search(username , password, dbConfig) {
     try {
       let msg = {
         status: false,
         msg: "User not found",
-        code: 500
+        code: 404
       }
 
+      const pool = mysql.createPool(dbConfig)
       const connection = await pool.getConnection()
 
-      let sql = 'SELECT cod_ven , user_vend , pass_vend , existenceStatus , nom_ven , ced_ven FROM svend WHERE user_vend = ?;'
+      let sql = `SELECT cod_ven , user_vend , AES_DECRYPT(pass_vend, '321ytiruces_drowssap987') AS pass_vend , existenceStatus , nom_ven , ced_ven FROM svend WHERE user_vend = ?;`
       let [user] = await connection.execute(sql,[username.toUpperCase()])
-      
+
       connection.release()
 
-      if(user) {
-        let pass = password.toUpperCase()
+      if(user.length > 0) {
+        let decryptedPassword = user[0].pass_vend.toString()
+        let isMatch = decryptedPassword === password.toUpperCase()
 
-        let decryptedPassword = pass.toString('utf8');
-        let isMatch = decryptedPassword === password.toUpperCase();        
-        // let isMatch = await bcrypt.compare(password, user[0].pass_vend)
-
-        let userToken = {
-          cod_ven : user[0].cod_ven,
-          user_ven : user[0].user_vend,
-          nom_ven : user[0].nom_ven,
-          ced_ven : user[0].ced_ven,
-          prodExistence: user[0].existenceStatus
-        }
+        console.log(isMatch)
         
-        let tokenUser
-
         if(isMatch){
+
+          let userToken = {
+            cod_ven : user[0].cod_ven,
+            user_ven : user[0].user_vend,
+            nom_ven : user[0].nom_ven,
+            ced_ven : user[0].ced_ven,
+            prodExistence: user[0].existenceStatus
+          }
           
-          tokenUser = await createAccessToken(userToken)
+          let tokenUser = await createAccessToken(userToken)
 
           msg = {
             status: true,
@@ -45,6 +42,12 @@ export class Users {
             code: 200,
             tokenUser
           } 
+        }else{
+          msg = {
+            status: false,
+            msg: "Incorrect password",
+            code: 401
+          };
         }
       }
   

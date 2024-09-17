@@ -1,5 +1,5 @@
 import { pool }           from '../connection/mysql.connect.js'
-import {parse, format }   from 'date-fns'
+import {parseISO, parse, format }   from 'date-fns'
 
 export class Orders {
   static async saveOrder(order) {
@@ -18,9 +18,6 @@ export class Orders {
         // Formatear la fecha a 'YYYY-MM-DD'
         const formattedFecha = format(dateObj, 'yyyy-MM-dd');
 
-        // console.log("formattedFecha");
-        // console.log(formattedFecha);
-
         const existingOrder = `SELECT id_order FROM preorder WHERE cod_order = ? AND id_scli = ? AND cod_ven = ? AND cod_cli = ? AND amountUsd = ? AND date_created = ?;`
         const [checkOrder] = await connection.execute(existingOrder, [id_order ,id_scli, cod_ven, cod_cli, totalUsd, formattedFecha])
   
@@ -33,8 +30,8 @@ export class Orders {
 
           if (checkVisit.length <= 0) {
             // Registramos la visita
-            let sqlVisit = 'INSERT INTO visits (cod_ven, id_scli, cod_cli, nom_cli, type_visit, date_created) VALUES (?, ?, ?, ?, ?, ?);'
-            await connection.execute(sqlVisit, [cod_ven, id_scli, cod_cli, nom_cli, 2, formattedFecha])
+            let sqlVisit = 'INSERT INTO visits (cod_visit, cod_ven, id_scli, cod_cli, nom_cli, type_visit, date_created) VALUES (?, ?, ?, ?, ?, ?, ?);'
+            await connection.execute(sqlVisit, [id_order, cod_ven, id_scli, cod_cli, nom_cli, 2, formattedFecha])
           }
   
           // Registramos el pedido
@@ -115,7 +112,7 @@ export class Orders {
       let visitsNotCompleted = []
   
       for (const info of visits) {
-        const { id_scli, cod_cli, nom_cli, cod_ven, fecha } = info
+        const { id_visit ,id_scli, cod_cli, nom_cli, cod_ven, fecha } = info
   
         // Convertir la fecha desde 'DD/MM/YYYY' a un objeto Date
         const dateObj = parse(fecha, 'dd/MM/yyyy', new Date());
@@ -131,8 +128,8 @@ export class Orders {
         if (checkVisit.length > 0) {
           visitsCompleted.push(info)
         } else {
-          let sql = 'INSERT INTO visits (cod_ven, id_scli, cod_cli, nom_cli, type_visit, date_created) VALUES (?, ?, ?, ?, ?, ?);'
-          await connection.execute(sql, [cod_ven, id_scli, cod_cli, nom_cli, 1, formattedFecha])
+          let sql = 'INSERT INTO visits (cod_visit, cod_ven, id_scli, cod_cli, nom_cli, type_visit, date_created) VALUES (?, ?, ?, ?, ?, ?, ?);'
+          await connection.execute(sql, [id_visit, cod_ven, id_scli, cod_cli, nom_cli, 1, formattedFecha])
   
           visitsCompleted.push(info)
         }
@@ -158,8 +155,8 @@ export class Orders {
       let passNotCompleted = []
   
       for (const info of payments) {
-        const { id_pass, id_scli, cod_cli, nom_cli, cod_ven, monto, tipoPago, tasaPago, fecha } = info
-  
+        const { id_pass, id_scli, cod_cli, nom_cli, cod_ven, amount, tipoPago, tasaPago, fecha } = info
+
         // Convertir la fecha desde 'DD/MM/YYYY' a un objeto Date
         const dateObj = parse(fecha, 'dd/MM/yyyy', new Date());
 
@@ -175,7 +172,7 @@ export class Orders {
           passCompleted.push(info)
         } else {
           let sql = 'INSERT INTO pass (identifier, id_scli, cod_cli, nom_cli, cod_ven, amount, currency_type, currency_rate, date_created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
-          await connection.execute(sql, [id_pass, id_scli, cod_cli, nom_cli, cod_ven, monto, tipoPago, tasaPago, formattedFecha])
+          await connection.execute(sql, [id_pass, id_scli, cod_cli, nom_cli, cod_ven, amount, tipoPago, tasaPago, formattedFecha])
   
           passCompleted.push(info)
         }

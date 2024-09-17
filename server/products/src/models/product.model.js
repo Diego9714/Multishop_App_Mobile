@@ -1,9 +1,8 @@
-import { createAccessToken }   from '../libs/jwt.js'
-import { pool }   from '../connection/mysql.connect.js'
+import mysql      from "mysql2/promise"
 import { format } from 'date-fns'
 
 export class Products {
-  static async all() {
+  static async all(dbConfig) {
     try {
       let msg = {
         status: false,
@@ -11,6 +10,7 @@ export class Products {
         code: 404
       }
 
+      const pool = mysql.createPool(dbConfig)
       const connection = await pool.getConnection()
 
       let sql = `SELECT 
@@ -43,7 +43,7 @@ export class Products {
     }
   }
 
-  static async categories() {
+  static async categories(dbConfig) {
     try {
       let msg = {
         status: false,
@@ -51,6 +51,7 @@ export class Products {
         code: 404
       }
 
+      const pool = mysql.createPool(dbConfig)
       const connection = await pool.getConnection()
 
       let sql = `SELECT ccate , ncate FROM catego;`
@@ -74,7 +75,7 @@ export class Products {
     }
   }
 
-  static async brands() {
+  static async brands(dbConfig) {
     try {
       let msg = {
         status: false,
@@ -82,6 +83,7 @@ export class Products {
         code: 404
       }
 
+      const pool = mysql.createPool(dbConfig)
       const connection = await pool.getConnection()
 
       let sql = `SELECT cmarca , nmarca FROM marca;`
@@ -105,7 +107,7 @@ export class Products {
     }
   }
 
-  static async currency() {
+  static async currency(dbConfig) {
     try {
       let msg = {
         status: false,
@@ -113,6 +115,7 @@ export class Products {
         code: 404
       }
 
+      const pool = mysql.createPool(dbConfig)
       const connection = await pool.getConnection()
 
       let sql = `SELECT moneda , cambio FROM tasamoneda;`
@@ -136,7 +139,7 @@ export class Products {
     }
   }
 
-  static async company() {
+  static async company(dbConfig) {
     try {
       let msg = {
         status: false,
@@ -144,6 +147,7 @@ export class Products {
         code: 404
       }
 
+      const pool = mysql.createPool(dbConfig)
       const connection = await pool.getConnection()
 
       let sql = `SELECT rif_emp , nom_emp , dir1_emp , noteOrder FROM empresa;`
@@ -167,7 +171,7 @@ export class Products {
     }
   }
 
-  static async orders(cod_ven) {
+  static async orders(cod_ven, dbConfig) {
     try {
       const msg = {
         status: false,
@@ -175,6 +179,7 @@ export class Products {
         code: 500
       };
   
+      const pool = mysql.createPool(dbConfig)
       const connection = await pool.getConnection();
   
       // Query to get orders details
@@ -268,38 +273,57 @@ export class Products {
     }
   }
 
-  static async visits(cod_ven) {
+  static async visits(cod_ven, dbConfig) {
     try {
       const msg = {
         status: false,
         msg: "Error retrieving visits",
         code: 500
-      };
+      }
   
-      const connection = await pool.getConnection();
+      const pool = mysql.createPool(dbConfig)
+      const connection = await pool.getConnection()
   
-      // Query to get orders details
-      const sql = `
+      // Query to get visit details
+      const sqlVisits = `
         SELECT 
-          visits.id_visit, 
+          visits.id_visit,
+          visits.cod_visit,
           visits.id_scli, 
           visits.cod_cli, 
-          visits.nom_cli,  
+          visits.nom_cli,
+          visits.type_visit,
           visits.date_created AS fecha
-        FROM visits WHERE visits.cod_ven = ?;
-      `;
-      const [visitsClient] = await connection.execute(sql, [cod_ven]);
+        FROM visits 
+        WHERE visits.cod_ven = ?;
+      `
+      const [visitsClient] = await connection.execute(sqlVisits, [cod_ven])
   
-      connection.release();
-
+      connection.release()
+  
+      const formatDate = (dateString) => {
+        return format(new Date(dateString), 'dd/MM/yyyy')
+      }
+  
+      // Organize visits data
       if (visitsClient.length > 0) {
+        const visits = visitsClient.map(visit => ({
+          id_visit: visit.cod_visit,
+          id_scli: visit.id_scli,
+          cod_cli: visit.cod_cli,
+          nom_cli: visit.nom_cli,
+          type_visit: visit.type_visit,
+          fecha: formatDate(visit.fecha)
+        }))
+  
         return {
           status: true,
-          msg: "visits found",
+          msg: "Visits found",
           code: 200,
-          visits: visitsClient
+          visits
         }
       } else {
+        // Return a 200 status with a message indicating no visits
         return {
           status: true,
           msg: "No visits found",
@@ -313,11 +337,11 @@ export class Products {
         msg: "Error retrieving visits",
         code: 500,
         error: error.message
-      };
+      }
     }
   }
 
-  static async payments(cod_ven) {
+  static async payments(cod_ven, dbConfig) {
     try {
       const msg = {
         status: false,
@@ -325,22 +349,55 @@ export class Products {
         code: 500
       };
   
+      const pool = mysql.createPool(dbConfig)
       const connection = await pool.getConnection();
   
-      const sql = ` SELECT id_pass, identifier, id_scli, cod_cli, nom_cli, cod_ven, amount, currency_type, currency_rate, date_created AS fecha FROM pass WHERE cod_ven = ?;`
-      const [paymentsClient] = await connection.execute(sql, [cod_ven]);
-
+      const sqlPayments = ` 
+        SELECT 
+          id_pass, 
+          identifier, 
+          id_scli, 
+          cod_cli, 
+          nom_cli, 
+          cod_ven, 
+          amount, 
+          currency_type, 
+          currency_rate, 
+          date_created AS fecha 
+        FROM pass 
+        WHERE cod_ven = ?;
+      `;
+      const [paymentsClient] = await connection.execute(sqlPayments, [cod_ven]);
+  
       connection.release();
   
-      // Organize orders and products
+      const formatDate = (dateString) => {
+        return format(new Date(dateString), 'dd/MM/yyyy');
+      };
+  
+      // Organize payments data
       if (paymentsClient.length > 0) {
+        const payments = paymentsClient.map(payment => ({
+          id_pass: payment.id_pass,
+          identifier: payment.identifier,
+          id_scli: payment.id_scli,
+          cod_cli: payment.cod_cli,
+          nom_cli: payment.nom_cli,
+          cod_ven: payment.cod_ven,
+          amount: payment.amount,
+          currency_type: payment.currency_type,
+          currency_rate: payment.currency_rate,
+          fecha: formatDate(payment.fecha)
+        }));
+  
         return {
           status: true,
           msg: "Payments found",
           code: 200,
-          payments: paymentsClient
+          payments
         };
       } else {
+        // Return a 200 status with a message indicating no payments
         return {
           status: true,
           msg: "No payments found",
@@ -357,5 +414,6 @@ export class Products {
       };
     }
   }
+
 }
 

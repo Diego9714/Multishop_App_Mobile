@@ -4,7 +4,19 @@ export const controller = {}
 
 controller.getProducts = async (req, res) => {
   try {
-    const products = await Products.all()
+    const { parsedDbCredentials } = req.body
+
+    const dbConfig = {
+      host: parsedDbCredentials.host,
+      user: parsedDbCredentials.username,
+      password: parsedDbCredentials.password,
+      database: parsedDbCredentials.database,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+    };
+
+    const products = await Products.all(dbConfig)
     res.status(products.code).json(products)
 
   } catch (error) {
@@ -14,7 +26,19 @@ controller.getProducts = async (req, res) => {
 
 controller.getCategory = async (req, res) => {
   try {
-    const categories = await Products.categories()
+    const { parsedDbCredentials } = req.body
+
+    const dbConfig = {
+      host: parsedDbCredentials.host,
+      user: parsedDbCredentials.username,
+      password: parsedDbCredentials.password,
+      database: parsedDbCredentials.database,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+    }
+
+    const categories = await Products.categories(dbConfig)
     res.status(categories.code).json(categories)
 
   } catch (error) {
@@ -24,7 +48,19 @@ controller.getCategory = async (req, res) => {
 
 controller.getBrands = async (req, res) => {
   try {
-    const brands = await Products.brands()
+    const { parsedDbCredentials } = req.body
+
+    const dbConfig = {
+      host: parsedDbCredentials.host,
+      user: parsedDbCredentials.username,
+      password: parsedDbCredentials.password,
+      database: parsedDbCredentials.database,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+    }
+
+    const brands = await Products.brands(dbConfig)
     res.status(brands.code).json(brands)
 
   } catch (error) {
@@ -34,7 +70,19 @@ controller.getBrands = async (req, res) => {
 
 controller.getCurrency = async (req, res) => {
   try {
-    const currency = await Products.currency()
+    const { parsedDbCredentials } = req.body
+
+    const dbConfig = {
+      host: parsedDbCredentials.host,
+      user: parsedDbCredentials.username,
+      password: parsedDbCredentials.password,
+      database: parsedDbCredentials.database,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+    }
+
+    const currency = await Products.currency(dbConfig)
     res.status(currency.code).json(currency)
 
   } catch (error) {
@@ -44,7 +92,19 @@ controller.getCurrency = async (req, res) => {
 
 controller.getCompany = async (req, res) => {
   try {
-    const company = await Products.company()
+    const { parsedDbCredentials } = req.body
+
+    const dbConfig = {
+      host: parsedDbCredentials.host,
+      user: parsedDbCredentials.username,
+      password: parsedDbCredentials.password,
+      database: parsedDbCredentials.database,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+    }
+
+    const company = await Products.company(dbConfig)
     res.status(company.code).json(company)
 
   } catch (error) {
@@ -55,6 +115,17 @@ controller.getCompany = async (req, res) => {
 controller.getOrders = async (req, res) => {
   try {
     const { cod_ven } = req.params
+    const { parsedDbCredentials } = req.body
+
+    const dbConfig = {
+      host: parsedDbCredentials.host,
+      user: parsedDbCredentials.username,
+      password: parsedDbCredentials.password,
+      database: parsedDbCredentials.database,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+    }
 
     if (!cod_ven || cod_ven.length === 0) {
       return res.status(400).json({
@@ -64,7 +135,7 @@ controller.getOrders = async (req, res) => {
       })
     }
 
-    const orders = await Products.orders(cod_ven)
+    const orders = await Products.orders(cod_ven, dbConfig)
 
     res.status(orders.code).json(orders)
 
@@ -76,6 +147,17 @@ controller.getOrders = async (req, res) => {
 controller.getPayments = async (req, res) => {
   try {
     const { cod_ven } = req.params
+    const { parsedDbCredentials } = req.body
+
+    const dbConfig = {
+      host: parsedDbCredentials.host,
+      user: parsedDbCredentials.username,
+      password: parsedDbCredentials.password,
+      database: parsedDbCredentials.database,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+    }
 
     if (!cod_ven || cod_ven.length === 0) {
       return res.status(400).json({
@@ -85,7 +167,7 @@ controller.getPayments = async (req, res) => {
       })
     }
 
-    const payments = await Products.payments(cod_ven)
+    const payments = await Products.payments(cod_ven, dbConfig)
 
     res.status(payments.code).json(payments)
 
@@ -93,10 +175,20 @@ controller.getPayments = async (req, res) => {
     return res.status(500).json({ error: error.message })
   }
 }
-
 controller.getVisits = async (req, res) => {
   try {
     const { cod_ven } = req.params
+    const { parsedDbCredentials } = req.body
+
+    const dbConfig = {
+      host: parsedDbCredentials.host,
+      user: parsedDbCredentials.username,
+      password: parsedDbCredentials.password,
+      database: parsedDbCredentials.database,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+    }
 
     if (!cod_ven || cod_ven.length === 0) {
       return res.status(400).json({
@@ -106,8 +198,7 @@ controller.getVisits = async (req, res) => {
       })
     }
 
-    const visits = await Products.visits(cod_ven)
-
+    const visits = await Products.visits(cod_ven, dbConfig)
     res.status(visits.code).json(visits)
 
   } catch (error) {
