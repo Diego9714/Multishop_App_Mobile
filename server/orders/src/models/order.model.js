@@ -1,16 +1,17 @@
-import { pool }           from '../connection/mysql.connect.js'
-import {parseISO, parse, format }   from 'date-fns'
+import mysql                      from "mysql2/promise"
+import {parseISO, parse, format } from 'date-fns'
 
 export class Orders {
-  static async saveOrder(order) {
+  static async saveOrder(order, dbConfig) {
     try {
       let ordersCompleted = []
       let ordersNotCompleted = []
   
+      const pool = mysql.createPool(dbConfig)
       const connection = await pool.getConnection()
   
       for (const info of order) {
-        const { id_order, id_scli, cod_cli, nom_cli, cod_ven, totalUsd, totalBs, tipfac, fecha, products, prodExistence } = info
+        const { id_order, id_scli, cod_cli, nom_cli, cod_ven, totalUsd, totalBs, tipfac, fecha, products, prodExistence, ubicacion } = info
   
         // Convertir la fecha desde 'DD/MM/YYYY' a un objeto Date
         const dateObj = parse(fecha, 'dd/MM/yyyy', new Date());
@@ -30,8 +31,8 @@ export class Orders {
 
           if (checkVisit.length <= 0) {
             // Registramos la visita
-            let sqlVisit = 'INSERT INTO visits (cod_visit, cod_ven, id_scli, cod_cli, nom_cli, type_visit, date_created) VALUES (?, ?, ?, ?, ?, ?, ?);'
-            await connection.execute(sqlVisit, [id_order, cod_ven, id_scli, cod_cli, nom_cli, 2, formattedFecha])
+            let sqlVisit = 'INSERT INTO visits (cod_visit, cod_ven, id_scli, cod_cli, nom_cli, type_visit, ubication_visit, date_created) VALUES (?, ?, ?, ?, ?, ?, ?, ?);'
+            await connection.execute(sqlVisit, [id_order, cod_ven, id_scli, cod_cli, nom_cli, 2, ubicacion, formattedFecha])
           }
   
           // Registramos el pedido
@@ -106,13 +107,13 @@ export class Orders {
     }
   }
   
-  static async saveVisits(visits) {
+  static async saveVisits(visits, dbConfig) {
     try {
       let visitsCompleted = []
       let visitsNotCompleted = []
   
       for (const info of visits) {
-        const { id_visit ,id_scli, cod_cli, nom_cli, cod_ven, fecha } = info
+        const { id_visit ,id_scli, cod_cli, nom_cli, cod_ven, fecha, ubicacion } = info
   
         // Convertir la fecha desde 'DD/MM/YYYY' a un objeto Date
         const dateObj = parse(fecha, 'dd/MM/yyyy', new Date());
@@ -120,6 +121,9 @@ export class Orders {
         // Formatear la fecha a 'YYYY-MM-DD'
         const formattedFecha = format(dateObj, 'yyyy-MM-dd');
 
+        let ubication_visit = `Latitud: ${ubicacion.lat} - Longitud: ${ubicacion.lon}`
+
+        const pool = mysql.createPool(dbConfig)
         const connection = await pool.getConnection()
   
         const existingVisit = `SELECT id_visit FROM visits WHERE id_scli = ? AND cod_cli = ? AND cod_ven = ? AND date_created = ?;`
@@ -128,8 +132,8 @@ export class Orders {
         if (checkVisit.length > 0) {
           visitsCompleted.push(info)
         } else {
-          let sql = 'INSERT INTO visits (cod_visit, cod_ven, id_scli, cod_cli, nom_cli, type_visit, date_created) VALUES (?, ?, ?, ?, ?, ?, ?);'
-          await connection.execute(sql, [id_visit, cod_ven, id_scli, cod_cli, nom_cli, 1, formattedFecha])
+          let sql = 'INSERT INTO visits (cod_visit, cod_ven, id_scli, cod_cli, nom_cli, type_visit, ubication_visit, date_created) VALUES (?, ?, ?, ?, ?, ?, ?, ?);'
+          await connection.execute(sql, [id_visit, cod_ven, id_scli, cod_cli, nom_cli, 1, ubication_visit , formattedFecha])
   
           visitsCompleted.push(info)
         }
@@ -149,7 +153,7 @@ export class Orders {
     }
   }
 
-  static async savePass(payments) {
+  static async savePass(payments, dbConfig) {
     try {
       let passCompleted = []
       let passNotCompleted = []
@@ -163,6 +167,7 @@ export class Orders {
         // Formatear la fecha a 'YYYY-MM-DD'
         const formattedFecha = format(dateObj, 'yyyy-MM-dd');
 
+        const pool = mysql.createPool(dbConfig)
         const connection = await pool.getConnection()
   
         const existingPass = `SELECT id_pass FROM pass WHERE id_scli = ? AND identifier = ? AND cod_ven = ? AND date_created = ?;`

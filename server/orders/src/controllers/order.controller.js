@@ -10,7 +10,7 @@ controller.saveOrder = async (req, res) => {
       code: 500
     }
 
-    const { order } = req.body
+    const { order , parsedDbCredentials } = req.body
 
     if (!order || order.length === 0) {
       return res.status(400).json({
@@ -20,7 +20,17 @@ controller.saveOrder = async (req, res) => {
       })
     }
 
-    const result = await Orders.saveOrder(order)
+    const dbConfig = {
+      host: parsedDbCredentials.host,
+      user: parsedDbCredentials.username,
+      password: parsedDbCredentials.password,
+      database: parsedDbCredentials.database,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+    };
+
+    const result = await Orders.saveOrder(order , dbConfig)
 
     const processOrder = {
       completed: result.completed,
@@ -48,7 +58,7 @@ controller.saveVisit = async (req, res) => {
       code: 500
     }
 
-    const { visits } = req.body
+    const { visits , parsedDbCredentials } = req.body
 
     if (!visits || visits.length === 0) {
       return res.status(400).json({
@@ -58,8 +68,17 @@ controller.saveVisit = async (req, res) => {
       })
     }
 
-    const result = await Orders.saveVisits(visits)
-    console.log(result)
+    const dbConfig = {
+      host: parsedDbCredentials.host,
+      user: parsedDbCredentials.username,
+      password: parsedDbCredentials.password,
+      database: parsedDbCredentials.database,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+    };
+
+    const result = await Orders.saveVisits(visits, dbConfig)
 
     const processVisits = {
       completed: result.completed,
@@ -87,7 +106,7 @@ controller.savePass = async (req, res) => {
       code: 500
     }
 
-    const { payments } = req.body
+    const { payments , parsedDbCredentials } = req.body
 
     if (!payments || payments.length === 0) {
       return res.status(400).json({
@@ -97,7 +116,17 @@ controller.savePass = async (req, res) => {
       })
     }
 
-    const result = await Orders.savePass(payments)
+    const dbConfig = {
+      host: parsedDbCredentials.host,
+      user: parsedDbCredentials.username,
+      password: parsedDbCredentials.password,
+      database: parsedDbCredentials.database,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+    };
+
+    const result = await Orders.savePass(payments, dbConfig)
 
     const processPass = {
       completed: result.completed,

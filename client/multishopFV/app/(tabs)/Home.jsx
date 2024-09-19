@@ -154,7 +154,10 @@ const getOrdersSync = async (signal) => {
     const decodedToken = jwtDecode(token)
     let cod_ven = decodedToken.cod_ven
 
-    const res = await instanceProducts.get(`/api/orders/${cod_ven}`, { signal })
+    const dbCredentials = await AsyncStorage.getItem("multishopDB")
+    const parsedDbCredentials = JSON.parse(dbCredentials)
+
+    const res = await instanceProducts.post(`/api/orders/${cod_ven}`, {parsedDbCredentials} , { signal })
     const listorders = res.data.orders || []
     await storeData('SynchronizedOrders', listorders)
     return { success: true }
@@ -249,7 +252,7 @@ const getAllInfo = async (setLoading, setMessage, setShowErrorModal) => {
         getCurrency(signal),
         getCompany(signal),
         getClients(signal),
-        // getOrdersSync(signal),
+        getOrdersSync(signal),
         getVisits(signal),
         getPayments(signal),
       ])

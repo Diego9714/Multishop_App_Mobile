@@ -175,7 +175,10 @@ const sendVisits = async (signal) => {
       return
     }
 
-    const response = await instanceSincro.post('/api/register/visit', { visits: unsyncedVisits }, { signal })
+    const dbCredentials = await AsyncStorage.getItem("multishopDB")
+    const parsedDbCredentials = JSON.parse(dbCredentials)
+
+    const response = await instanceSincro.post('/api/register/visit', { visits: unsyncedVisits , parsedDbCredentials }, { signal })
 
     if (response.status === 200) {
       const syncedVisits = response.data.processVisits.completed
@@ -236,9 +239,6 @@ const sendPayments = async (signal) => {
   try {
     const unsyncedPayments = await getUnsyncedPayments()
 
-    // console.log("unsyncedPayments - Pagos para sincronizar")
-    // console.log(unsyncedPayments)
-
     if (unsyncedPayments.length === 0) {
       setIsLoading(false)
       setModalSincroVisible(false)
@@ -246,22 +246,16 @@ const sendPayments = async (signal) => {
       return
     }
 
-    const response = await instanceSincro.post('/api/register/pass', { payments: unsyncedPayments }, { signal })
+    const dbCredentials = await AsyncStorage.getItem("multishopDB")
+    const parsedDbCredentials = JSON.parse(dbCredentials)
 
-    // console.log(response.data.processPass.completed)
+    const response = await instanceSincro.post('/api/register/pass', { payments: unsyncedPayments , parsedDbCredentials }, { signal })
 
     if (response.data.code === 200) {
       const syncedPass = Array.isArray(response.data.processPass.completed) ? response.data.processPass.completed : []
       
-      console.log("syncedPass")
-      console.log(syncedPass)
-
-
       // Filtra los abonos sincronizados del objeto original
       const remainingPayments = unsyncedPayments.filter(payment => !syncedPass.some(syncedPayment => syncedPayment.id_pass === payment.id_pass))
-
-      // console.log("remainingPayments")
-      // console.log(remainingPayments)
 
       // Guardar los abonos restantes (no sincronizados) en AsyncStorage
       await AsyncStorage.setItem('ClientPass', JSON.stringify(remainingPayments))
@@ -269,21 +263,11 @@ const sendPayments = async (signal) => {
       // Obtener la lista existente de abonos sincronizados
       const syncedPaymentsString = await AsyncStorage.getItem('SyncedClientPass')
 
-      // console.log("syncedPaymentsString")
-      // console.log(syncedPaymentsString)
-
       const existingSyncedPayments = syncedPaymentsString ? JSON.parse(syncedPaymentsString) : []
-
-      // Agregar los nuevos abonos sincronizados a la lista existente
       const updatedSyncedPayments = [...existingSyncedPayments, ...syncedPass]
-
-      console.log("updatedSyncedPayments")
-      console.log(updatedSyncedPayments)
-
-      // Guardar la lista actualizada de abonos sincronizados en AsyncStorage
       await AsyncStorage.setItem('SyncedClientPass', JSON.stringify(updatedSyncedPayments))
-
       return { success: true, completed: syncedPass, notCompleted: remainingPayments }
+
     } else {
       return { success: false, error: 'Unexpected response status' }
     }
@@ -384,9 +368,9 @@ const getAllInfo = async (setLoading, setMessage) => {
         getBrands(signal),
         getCurrency(signal),
         getCompany(signal),
-        // unsyncedVisits.length > 0 ? sendVisits(signal) : { success: true },
+        unsyncedVisits.length > 0 ? sendVisits(signal) : { success: true },
         getVisits(cod_ven , signal),
-        // unsyncedPayments.length > 0 ? sendPayments(signal) : { success: true },
+        unsyncedPayments.length > 0 ? sendPayments(signal) : { success: true },
         getPayments(cod_ven , signal),
         getOrders(cod_ven , signal)
       ])

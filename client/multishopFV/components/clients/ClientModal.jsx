@@ -13,6 +13,7 @@ const ClientModal = ({ isVisibleClientModal, selectedClient, onClose }) => {
   const [isOpenVisitModal, setIsOpenVisitModal] = useState(false);
   const [isConfirmVisitModalVisible, setIsConfirmVisitModalVisible] = useState(false);
   const [isModalPassVisible, setIsModalPassVisible] = useState(false); // Nuevo estado para controlar la visibilidad del modal de abono
+  const [visitLocation, setVisitLocation] = useState(null); // Estado para la ubicación de la visita
 
   // Visit Modal
   const openVisitModal = () => {
@@ -32,7 +33,8 @@ const ClientModal = ({ isVisibleClientModal, selectedClient, onClose }) => {
     setIsConfirmVisitModalVisible(false);
   }
 
-  const handleConfirmVisit = () => {
+  const handleConfirmVisit = (location) => {
+    setVisitLocation(location); // Guardar la ubicación cuando se confirme
     setIsConfirmVisitModalVisible(false);
     setIsOpenVisitModal(true);
   }
@@ -118,6 +120,7 @@ const ClientModal = ({ isVisibleClientModal, selectedClient, onClose }) => {
           isVisible={isOpenVisitModal}
           onClose={closeVisitModal}
           client={selectedClient}
+          location={visitLocation} // Pasar la ubicación a VisitModal
         />
       )}
 

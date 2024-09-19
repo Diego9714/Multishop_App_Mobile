@@ -9,6 +9,8 @@ import { decode } from 'base-64';
 global.atob = decode;
 // Styles
 import styles from '../../styles/ModalPass.styles';
+// Components
+import SignatureModal from './SignatureModal'
 
 const ModalPass = ({ isVisible, onClose, client }) => {
   const [amount, setAmount] = useState('');
@@ -18,7 +20,7 @@ const ModalPass = ({ isVisible, onClose, client }) => {
   const [cambioBolivares, setCambioBolivares] = useState(null);
   const [cambioDolares, setCambioDolares] = useState(null);
   const [cambioPesos, setCambioPesos] = useState(null);
-
+  const [isSignatureVisible, setIsSignatureVisible] = useState(false)
   const scaleValue = useRef(new Animated.Value(0)).current;
   const opacityValue = useRef(new Animated.Value(0)).current;
 
@@ -95,10 +97,8 @@ const ModalPass = ({ isVisible, onClose, client }) => {
         amount: amount,
         tipoPago: paymentType,
         tasaPago: paymentType === 'dollars' ? cambioDolares : (paymentType === 'bs' ? cambioBolivares : cambioPesos),
-        fecha: formattedDate
+        fecha: formattedDate,
       };
-
-      console.log(passUser);
 
       const existingPass = await AsyncStorage.getItem('ClientPass');
       const pass = existingPass ? JSON.parse(existingPass) : [];
@@ -197,6 +197,13 @@ const ModalPass = ({ isVisible, onClose, client }) => {
               </Text>
             </Pressable>
 
+            <Pressable
+              style={styles.buttonModal}
+              onPress={() => setIsSignatureVisible(true)}
+            >
+              <Text style={styles.buttonTextModal}>Firma</Text>
+            </Pressable>
+
             <Pressable style={styles.buttonModalExit} onPress={onClose}>
               <Text style={styles.buttonTextModal}>Salir</Text>
             </Pressable>
@@ -204,6 +211,9 @@ const ModalPass = ({ isVisible, onClose, client }) => {
 
         </View>
       </View>
+
+      <SignatureModal isVisible={isSignatureVisible} onClose={() => setIsSignatureVisible(false)} />
+
     </Modal>
   );
 };

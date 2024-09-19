@@ -120,7 +120,7 @@ const SelectOrders = () => {
     const randomNumber = Math.floor(Math.random() * 100000);
     const timestamp = Date.now();
     return `${timestamp}-${randomNumber}`;
-  };
+  }
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -128,12 +128,12 @@ const SelectOrders = () => {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
-  };
+  }
 
   const convertToComparableDate = (dateString) => {
     const [day, month, year] = dateString.split('/');
     return `${year}-${month}-${day}`; // Formato yyyy-mm-dd para comparación
-  };
+  }
 
   const regVisit = async (client) => {
     try {
@@ -195,9 +195,8 @@ const SelectOrders = () => {
     } catch (error) {
       console.log(`Visita no registrada - ${error}`);
     }
-  };
+  }
   
-
   const synchronizeOrders = async () => {
     const controller = new AbortController()
     const { signal } = controller
@@ -235,7 +234,10 @@ const SelectOrders = () => {
       }
   
       try {
-        const response = await instanceSincro.post('/api/register/order', { order: ordersToSync }, { signal })
+        const dbCredentials = await AsyncStorage.getItem("multishopDB")
+        const parsedDbCredentials = JSON.parse(dbCredentials)
+
+        const response = await instanceSincro.post('/api/register/order', { order: ordersToSync , parsedDbCredentials }, { signal })
   
         if (response.data.code === 200) {
           clearTimeout(timeoutId)
@@ -259,9 +261,9 @@ const SelectOrders = () => {
   
           setSelectedOrders({})
   
-          const clients = completed.map(order => order.id_order)
+          // const clients = completed.map(order => order.id_order)
 
-          console.log(clients)
+          // console.log(clients)
 
           for (const order of completed) {
             const client = {
