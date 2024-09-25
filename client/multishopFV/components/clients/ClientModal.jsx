@@ -4,7 +4,7 @@ import { View, Text, Modal, ScrollView, Pressable } from 'react-native';
 import SelectProducts from '../orders/SelectProducts';
 import VisitModal from './VisitModal';
 import ConfirmModal from './ConfirmModal';
-import ModalPass from './ModalPass'; // Importa el nuevo componente para el modal de abono
+import ModalPass from './ModalPass';
 // Styles
 import styles from '../../styles/ListClients.styles';
 
@@ -12,9 +12,9 @@ const ClientModal = ({ isVisibleClientModal, selectedClient, onClose }) => {
   const [isSelectProductsModalVisible, setIsSelectProductsModalVisible] = useState(false);
   const [isOpenVisitModal, setIsOpenVisitModal] = useState(false);
   const [isConfirmVisitModalVisible, setIsConfirmVisitModalVisible] = useState(false);
-  const [isModalPassVisible, setIsModalPassVisible] = useState(false); // Nuevo estado para controlar la visibilidad del modal de abono
-  const [visitLocation, setVisitLocation] = useState(null); // Estado para la ubicación de la visita
-
+  const [isModalPassVisible, setIsModalPassVisible] = useState(false)
+  const [visitLocation, setVisitLocation] = useState(null)
+  
   // Visit Modal
   const openVisitModal = () => {
     setIsConfirmVisitModalVisible(true);

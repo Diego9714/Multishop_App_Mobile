@@ -1,6 +1,6 @@
 import React , {useEffect, useState} from 'react'
 import { View, Text, Modal, Pressable } from 'react-native'
-import * as Location from 'expo-location';
+import * as Location from 'expo-location'
 // Styles
 import styles from '../../styles/ConfirmModal.styles'
 

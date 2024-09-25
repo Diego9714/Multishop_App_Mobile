@@ -8,6 +8,10 @@ import FilterCategories from '../filter/FilterCategories'
 // Styles
 import { images } from '../../constants'
 import styles from '../../styles/ListProducts.styles'
+// JWT - Token
+import { jwtDecode }                        from 'jwt-decode'
+import { decode }                           from 'base-64'
+global.atob = decode
 
 const ListProducts = () => {
   const [products, setProducts] = useState([])
@@ -23,6 +27,7 @@ const ListProducts = () => {
   const [selectedProduct, setSelectedProduct] = useState(null)
   const itemsPerPage = 10
   const [isFiltering, setIsFiltering] = useState(false)
+  const [isTypeSearch, setIsTypeSearch] = useState('')
 
   useEffect(() => {
     const getProductsAndCategories = async () => {
@@ -44,7 +49,18 @@ const ListProducts = () => {
   
     return () => clearInterval(intervalId)
   }, [])
-  
+
+  useEffect(()=>{
+    const getTypeSearch = async() =>{
+      let token = await AsyncStorage.getItem('tokenUser')
+      const decodedToken = jwtDecode(token)
+      const typeSearch = decodedToken.typeSearch
+
+      setIsTypeSearch(typeSearch)
+    }
+
+    getTypeSearch()
+  }, [])
 
   useEffect(() => {
     applyFilters()
@@ -58,8 +74,10 @@ const ListProducts = () => {
   const applyFilters = () => {
     let filteredProducts = products.slice()
 
+    const minLength = isTypeSearch === 2 ? 1 : 3
+
     // Filtrar por nombre del producto
-    if (displaySearchProduct.length >= 3) {
+    if (displaySearchProduct.length >= minLength) {
       const searchTerms = displaySearchProduct.toLowerCase().split(' ').filter(term => term.length > 0)
       filteredProducts = filteredProducts.filter(product => {
         const productDescrip = product.descrip.toLowerCase()
@@ -109,6 +127,15 @@ const ListProducts = () => {
     setPage(1)
   }
 
+  const handleInputChange = (text) => {
+    setSearchProduct(text)
+
+    if (isTypeSearch === 2) { // Búsqueda en tiempo real
+      setDisplaySearchProduct(text)
+      setPage(1)
+    }
+  }
+
   const handleSearch = () => {
     if (searchProduct.length === 0) {
       setDisplaySearchProduct('')
@@ -147,16 +174,22 @@ const ListProducts = () => {
   }
 
   const renderPaginationButtons = () => {
-    let filteredProducts = products.slice() // Copia de los productos para no modificar el estado original
+    let filteredProducts = products.slice()
+
+    const minLength = isTypeSearch === 2 ? 1 : 3
 
     // Aplicar filtros según la búsqueda, categoría y marca seleccionada
-    if (displaySearchProduct.length >= 3) {
-      const searchTerms = displaySearchProduct.toLowerCase().split(' ').filter(term => term.length > 0)
+    if (displaySearchProduct.length >= minLength) {
+      const searchTerms = displaySearchProduct.toLowerCase().split(' ').filter(term => term.length >= minLength)
+      
       filteredProducts = filteredProducts.filter(product => {
-        const productDescrip = product.descrip.toLowerCase()
-        return searchTerms.every(term => productDescrip.includes(term))
+        const productDescrip = product.descrip.toLowerCase();
+        
+        // Buscar coincidencias completas de términos
+        return searchTerms.some(term => productDescrip.includes(term));
       })
     }
+
     if (searchCategory.length > 0 || searchBrand.length > 0) {
       filteredProducts = filteredProducts.filter(product =>
         searchCategory.some(category => product.ncate.includes(category)) ||
@@ -217,7 +250,7 @@ const ListProducts = () => {
               placeholder='Buscar Producto'
               style={styles.seeker}
               value={searchProduct}
-              onChangeText={(text) => setSearchProduct(text)}
+              onChangeText={handleInputChange}
             />
             <Pressable onPress={handleSearch}>
               <FontAwesome name="search" size={28} color="#8B8B8B" />

@@ -19,6 +19,8 @@ export class Orders {
         // Formatear la fecha a 'YYYY-MM-DD'
         const formattedFecha = format(dateObj, 'yyyy-MM-dd');
 
+        let ubication_visit = `Latitud: ${ubicacion.lat} - Longitud: ${ubicacion.lon}`
+
         const existingOrder = `SELECT id_order FROM preorder WHERE cod_order = ? AND id_scli = ? AND cod_ven = ? AND cod_cli = ? AND amountUsd = ? AND date_created = ?;`
         const [checkOrder] = await connection.execute(existingOrder, [id_order ,id_scli, cod_ven, cod_cli, totalUsd, formattedFecha])
   
@@ -32,7 +34,7 @@ export class Orders {
           if (checkVisit.length <= 0) {
             // Registramos la visita
             let sqlVisit = 'INSERT INTO visits (cod_visit, cod_ven, id_scli, cod_cli, nom_cli, type_visit, ubication_visit, date_created) VALUES (?, ?, ?, ?, ?, ?, ?, ?);'
-            await connection.execute(sqlVisit, [id_order, cod_ven, id_scli, cod_cli, nom_cli, 2, ubicacion, formattedFecha])
+            await connection.execute(sqlVisit, [id_order, cod_ven, id_scli, cod_cli, nom_cli, 2, ubication_visit, formattedFecha])
           }
   
           // Registramos el pedido

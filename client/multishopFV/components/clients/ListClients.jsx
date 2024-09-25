@@ -11,7 +11,6 @@ import { Text,
   ImageBackground }                     from 'react-native'
 import { FontAwesome5, MaterialIcons }  from '@expo/vector-icons'
 import { useFocusEffect }               from '@react-navigation/native'
-import { LinearGradient }               from 'expo-linear-gradient'
 import ClientModal                      from './ClientModal'
 import {
   getClientsFromStorage,

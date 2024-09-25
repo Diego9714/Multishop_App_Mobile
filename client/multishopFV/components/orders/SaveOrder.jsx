@@ -4,7 +4,7 @@ import { Text, View, Modal, Pressable, ScrollView,
   Alert, ImageBackground }            from 'react-native'
 import AsyncStorage                   from '@react-native-async-storage/async-storage'
 import { useNavigation }              from '@react-navigation/native'
-import { LinearGradient }             from 'expo-linear-gradient'
+import * as Location                  from 'expo-location'
 // Modals And Components
 import ModalSelectFact                from './modalSelectFact'
 import ModalEditProd                  from './modalEditProd'
@@ -36,6 +36,22 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
   const [pdfUri, setPdfUri] = useState(null)
   const navigation = useNavigation()
   const [company, setCompany] = useState([])
+  const [location, setLocation] = useState(null)
+  const [errorMsg, setErrorMsg] = useState(null)
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync()
+      if (status !== 'granted') {
+        setErrorMsg('Permiso de ubicación denegado')
+        return
+      }
+
+      let location = await Location.getCurrentPositionAsync({})
+      setLocation(location)
+      console.log(location)
+    })()
+  }, [])
 
   useEffect(() => {
     if (order && order.products) {
@@ -190,8 +206,11 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
       totalUsd: parseFloat(totalPriceUsd),
       totalBs: parseFloat((totalPriceUsd * cambioBolivares).toFixed(2)),
       fecha: formattedDate,
-      prodExistence : prodExistence
+      prodExistence : prodExistence,
+      ubicacion: location ? { lat: location.coords.latitude, lon: location.coords.longitude } : null
     }
+
+    console.log(orderData)
   
     try {
       const existingOrders = await AsyncStorage.getItem('OrdersClient')

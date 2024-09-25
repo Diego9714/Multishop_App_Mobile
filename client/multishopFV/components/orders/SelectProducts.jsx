@@ -35,7 +35,8 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
   const [searchBrand, setSearchBrand] = useState([]);
   const [priceOrder, setPriceOrder] = useState('');
   const [isFiltering, setIsFiltering] = useState(false);
-  const [prodExistence, setProdExistence] = useState(null);
+  const [prodExistence, setProdExistence] = useState(null)
+  const [isTypeSearch, setIsTypeSearch] = useState('')
   
   useEffect(() => {
     const getProducts = async () => {
@@ -45,7 +46,21 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
       setProducts(filteredProducts);
     };
     getProducts();
-  }, []);  
+  }, [])
+
+  useEffect(()=>{
+    const getTypeSearch = async() =>{
+      let token = await AsyncStorage.getItem('tokenUser')
+      const decodedToken = jwtDecode(token)
+      const typeSearch = decodedToken.typeSearch
+
+      console.log(typeSearch)
+
+      setIsTypeSearch(typeSearch)
+    }
+
+    getTypeSearch()
+  }, [])
 
   useEffect(() => {
     let filteredProducts = products.filter(product => product.existencia > 0);
@@ -92,6 +107,15 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
 
     getExistence();
   }, []);
+
+  const handleInputChange = (text) => {
+    setSearchProduct(text)
+
+    if (isTypeSearch === 2) { // Búsqueda en tiempo real
+      setDisplaySearchProduct(text)
+      setPage(1)
+    }
+  }
 
   const handleSearch = () => {
     if (searchProduct.length === 0) {
@@ -242,7 +266,9 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
   const renderPaginationButtonsProducts = () => {
     let filteredProducts = products.slice()  
     
-    if (displaySearchProduct.length >= 3) {
+    const minLength = isTypeSearch === 2 ? 1 : 3
+    
+    if (displaySearchProduct.length >= minLength) {
       const searchTerms = displaySearchProduct.toLowerCase().split(' ').filter(term => term.length > 0);
       filteredProducts = filteredProducts.filter(product => {
         const productDescrip = product.descrip.toLowerCase();
@@ -302,9 +328,11 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
   };
 
   const applyFilters = () => {
-    let filteredProducts = products.slice();
+    let filteredProducts = products.slice()
+
+    const minLength = isTypeSearch === 2 ? 1 : 3
   
-    if (displaySearchProduct.length >= 3) {
+    if (displaySearchProduct.length >= minLength){
       const searchTerms = displaySearchProduct.toLowerCase().split(' ').filter(term => term.length > 0);
       filteredProducts = filteredProducts.filter(product => {
         const productDescrip = product.descrip.toLowerCase();
@@ -368,7 +396,7 @@ const SelectProducts = ({ isVisible, onClose, client }) => {
                 placeholder='Buscar Producto'
                 style={styles.seeker}
                 value={searchProduct}
-                onChangeText={text => setSearchProduct(text)}
+                onChangeText={handleInputChange}
               />
               <Pressable onPress={handleSearch}>
                 <FontAwesome name="search" size={28} color="#8B8B8B" />

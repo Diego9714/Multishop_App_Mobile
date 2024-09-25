@@ -32,6 +32,7 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
   const [isFiltering, setIsFiltering] = useState(false)
   const [prodExistence, setProdExistence] = useState(null)
   const [initialProductQuantities, setInitialProductQuantities] = useState({})
+  const [isTypeSearch, setIsTypeSearch] = useState('')
 
   useEffect(() => {
     const getProducts = async () => {
@@ -42,6 +43,20 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
     }
     getProducts()
   }, []) 
+
+  useEffect(()=>{
+    const getTypeSearch = async() =>{
+      let token = await AsyncStorage.getItem('tokenUser')
+      const decodedToken = jwtDecode(token)
+      const typeSearch = decodedToken.typeSearch
+
+      console.log(typeSearch)
+
+      setIsTypeSearch(typeSearch)
+    }
+
+    getTypeSearch()
+  }, [])
   
   useEffect(() => {
     const getExistence = async () => {
@@ -108,6 +123,15 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
 
   const closeFilterModal = () => {
     setIsFilterModalVisible(false)
+  }
+
+  const handleInputChange = (text) => {
+    setSearchProduct(text)
+
+    if (isTypeSearch === 2) {
+      setDisplaySearchProduct(text)
+      setCurrentPage(1)
+    }
   }
 
   const handleSearch = () => {
@@ -200,8 +224,10 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
   const renderPaginationButtons = () => {
     let filteredProducts = products.slice()
 
-    if (displaySearchProduct.length >= 3) {
-      const searchTerms = displaySearchProduct.toLowerCase().split(' ').filter(term => term.length > 0)
+    const minLength = isTypeSearch === 2 ? 1 : 3
+
+    if (displaySearchProduct.length >= minLength) {
+      const searchTerms = displaySearchProduct.toLowerCase().split(' ').filter(term => term.length > minLength)
       filteredProducts = filteredProducts.filter(product => {
         const productDescrip = product.descrip.toLowerCase()
         return searchTerms.every(term => productDescrip.includes(term))
@@ -254,7 +280,9 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
   const applyFilters = () => {
     let filteredProducts = products.slice()
 
-    if (displaySearchProduct.length >= 3) {
+    const minLength = isTypeSearch === 2 ? 1 : 3
+
+    if (displaySearchProduct.length >= minLength) {
       const searchTerms = displaySearchProduct.toLowerCase().split(' ').filter(term => term.length > 0)
       filteredProducts = filteredProducts.filter(product => {
         const productDescrip = product.descrip.toLowerCase()
@@ -336,7 +364,7 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
                 placeholder='Buscar Producto'
                 style={styles.seeker}
                 value={searchProduct}
-                onChangeText={setSearchProduct}
+                onChangeText={handleInputChange}
               />
               <Pressable onPress={handleSearch}>
                 <FontAwesome name="search" size={28} color="#8B8B8B" />

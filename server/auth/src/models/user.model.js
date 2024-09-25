@@ -13,7 +13,7 @@ export class Users {
       const pool = mysql.createPool(dbConfig)
       const connection = await pool.getConnection()
 
-      let sql = `SELECT cod_ven , user_vend , AES_DECRYPT(pass_vend, '321ytiruces_drowssap987') AS pass_vend , existenceStatus , nom_ven , ced_ven FROM svend WHERE user_vend = ?;`
+      let sql = `SELECT cod_ven , user_vend , AES_DECRYPT(pass_vend, '321ytiruces_drowssap987') AS pass_vend , existenceStatus , nom_ven , ced_ven, typeSearch FROM svend WHERE user_vend = ?;`
       let [user] = await connection.execute(sql,[username.toUpperCase()])
 
       connection.release()
@@ -31,7 +31,8 @@ export class Users {
             user_ven : user[0].user_vend,
             nom_ven : user[0].nom_ven,
             ced_ven : user[0].ced_ven,
-            prodExistence: user[0].existenceStatus
+            prodExistence: user[0].existenceStatus,
+            typeSearch: user[0].typeSearch
           }
           
           let tokenUser = await createAccessToken(userToken)
