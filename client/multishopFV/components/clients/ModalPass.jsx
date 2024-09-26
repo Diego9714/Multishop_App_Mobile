@@ -1,92 +1,97 @@
-// Dependencies
-import React, { useEffect, useRef, useState } from 'react';
-import { Text, TextInput, View, Pressable,
-Modal, TouchableOpacity, Animated, Easing } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-// Token - JWT 
-import { jwtDecode } from 'jwt-decode';
-import { decode } from 'base-64';
-global.atob = decode;
+import React, { useEffect, useRef, useState } from 'react'
+import { Text, TextInput, View, Pressable, 
+  Modal, TouchableOpacity, Animated, Easing } from 'react-native'
+import AsyncStorage                           from '@react-native-async-storage/async-storage'
+// JWT - TOKEN
+import { jwtDecode }                          from 'jwt-decode'
+import { decode }                             from 'base-64'
+global.atob = decode
 // Styles
-import styles from '../../styles/ModalPass.styles';
-// Components
-import SignatureModal from './SignatureModal'
+import styles                                 from '../../styles/ModalPass.styles'
+// Components - Modals
+import SignatureModal                         from './SignatureModal'
 
 const ModalPass = ({ isVisible, onClose, client }) => {
-  const [amount, setAmount] = useState('');
-  const [paymentType, setPaymentType] = useState('');
-  const [passStatus, setPassStatus] = useState('');
-  const [isSaveEnabled, setIsSaveEnabled] = useState(false);
-  const [cambioBolivares, setCambioBolivares] = useState(null);
-  const [cambioDolares, setCambioDolares] = useState(null);
-  const [cambioPesos, setCambioPesos] = useState(null);
+  const [amount, setAmount] = useState('')
+  const [paymentType, setPaymentType] = useState('')
+  const [passStatus, setPassStatus] = useState('')
+  const [isSaveEnabled, setIsSaveEnabled] = useState(false)
+  const [cambioBolivares, setCambioBolivares] = useState(null)
+  const [cambioDolares, setCambioDolares] = useState(null)
+  const [cambioPesos, setCambioPesos] = useState(null)
   const [isSignatureVisible, setIsSignatureVisible] = useState(false)
-  const scaleValue = useRef(new Animated.Value(0)).current;
-  const opacityValue = useRef(new Animated.Value(0)).current;
+  const [isExitDisabled, setIsExitDisabled] = useState(false)
+  const [isSignatureSaved, setIsSignatureSaved] = useState(false)
+  const [hasPayment, setHasPayment] = useState(false)
+  const [paymentIds, setPaymentIds] = useState([]) // Array para almacenar IDs de abonos
+
+  const scaleValue = useRef(new Animated.Value(0)).current
+  const opacityValue = useRef(new Animated.Value(0)).current
 
   useEffect(() => {
     const fetchCurrency = async () => {
       try {
-        const storedCurrency = await AsyncStorage.getItem('currency');
+        const storedCurrency = await AsyncStorage.getItem('currency')
         if (storedCurrency !== null) {
-          const currencyArray = JSON.parse(storedCurrency);
-          const bolivares = currencyArray.find(item => item.moneda === 'Bolivares');
-          const dolares = currencyArray.find(item => item.moneda === 'Dolares');
-          const pesos = currencyArray.find(item => item.moneda === 'Pesos');
+          const currencyArray = JSON.parse(storedCurrency)
+          const bolivares = currencyArray.find(item => item.moneda === 'Bolivares')
+          const dolares = currencyArray.find(item => item.moneda === 'Dolares')
+          const pesos = currencyArray.find(item => item.moneda === 'Pesos')
 
-          if (bolivares) {
-            setCambioBolivares(bolivares.cambio);
-          }
-          if (dolares) {
-            setCambioDolares(dolares.cambio);
-          }
-          if (pesos) {
-            setCambioPesos(pesos.cambio);
-          }
+          if (bolivares) setCambioBolivares(bolivares.cambio)
+          if (dolares) setCambioDolares(dolares.cambio)
+          if (pesos) setCambioPesos(pesos.cambio)
         }
       } catch (error) {
-        console.error('Error fetching currency from asyncStorage', error);
+        console.error('Error fetching currency from asyncStorage', error)
       }
-    };
+    }
 
-    fetchCurrency();
-  }, []);
+    fetchCurrency()
+  }, [])
 
   const handleAmountChange = (text) => {
-    const numericText = text.replace(/[^0-9]/g, '');
+    const numericText = text.replace(/[^0-9]/g, '')
     if (numericText !== '' && numericText !== '0') {
-      setAmount(numericText);
+      setAmount(numericText)
     } else {
-      setAmount('');
+      setAmount('')
     }
-  };
+  }
 
   const generateRandomProductId = () => {
-    const randomNumber = Math.floor(Math.random() * 100000);
-    const timestamp = Date.now();
-    return `${timestamp}-${randomNumber}`;
-  };
+    const randomNumber = Math.floor(Math.random() * 100000)
+    const timestamp = Date.now()
+    return `${timestamp}-${randomNumber}`
+  }
+
+  const onSignatureSaved = () => {
+    setIsSignatureSaved(true) // Cambia el estado a true cuando la firma es guardada
+    setIsSaveEnabled(false) // Deshabilita el botón "Guardar"
+    setHasPayment(false) // Deshabilita el botón "Firma"
+    setIsExitDisabled(false)
+  }
 
   const regPass = async () => {
     if (!amount || !paymentType) {
-      setPassStatus('Por favor ingrese el monto y seleccione el tipo de moneda.');
-      return;
+      setPassStatus('Por favor ingrese el monto y seleccione el tipo de moneda')
+      return
     }
 
     try {
-      let token = await AsyncStorage.getItem('tokenUser');
-      const decodedToken = jwtDecode(token);
+      let token = await AsyncStorage.getItem('tokenUser')
+      const decodedToken = jwtDecode(token)
 
       const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`;
-      };
+        const date = new Date(dateString)
+        const day = String(date.getDate()).padStart(2, '0')
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const year = date.getFullYear()
+        return `${day}/${month}/${year}`
+      }
     
-      const fecha = new Date().toISOString();
-      const formattedDate = formatDate(fecha);
+      const fecha = new Date().toISOString()
+      const formattedDate = formatDate(fecha)
 
       const passUser = {
         id_pass: generateRandomProductId(),
@@ -98,26 +103,34 @@ const ModalPass = ({ isVisible, onClose, client }) => {
         tipoPago: paymentType,
         tasaPago: paymentType === 'dollars' ? cambioDolares : (paymentType === 'bs' ? cambioBolivares : cambioPesos),
         fecha: formattedDate,
-      };
+      }
 
-      const existingPass = await AsyncStorage.getItem('ClientPass');
-      const pass = existingPass ? JSON.parse(existingPass) : [];
+      const existingPass = await AsyncStorage.getItem('ClientPass')
+      const pass = existingPass ? JSON.parse(existingPass) : []
 
-      pass.push(passUser);
-      await AsyncStorage.setItem('ClientPass', JSON.stringify(pass));
-      setPassStatus('Abono registrado con éxito!');
-      setAmount(''); // Reset the amount input
+      pass.push(passUser)
+      await AsyncStorage.setItem('ClientPass', JSON.stringify(pass))
+      
+      setPassStatus('Abono registrado con éxito!')
+      setAmount('') // Reset the amount input
+
+      setIsExitDisabled(true) // Deshabilita el botón "Salir" al realizar el primer pago
+      setHasPayment(true) // Marca que ya se ha hecho un abono
+
+      // Actualiza el arreglo de IDs de abonos
+      setPaymentIds(prevIds => [...prevIds, passUser.id_pass])
+
       setTimeout(() => {
-        setPassStatus('');
-      }, 3000); // Clear the status message after 3 seconds
+        setPassStatus('')
+      }, 3000) // Clear the status message after 3 seconds
     } catch (error) {
-      setPassStatus(`Abono no registrado - ${error}`);
+      setPassStatus(`Abono no registrado - ${error}`)
     }
-  };
+  }
 
   useEffect(() => {
-    setIsSaveEnabled(amount !== '' && paymentType !== '');
-  }, [amount, paymentType]);
+    setIsSaveEnabled(amount !== '' && paymentType !== '')
+  }, [amount, paymentType])
 
   useEffect(() => {
     if (isVisible) {
@@ -134,13 +147,23 @@ const ModalPass = ({ isVisible, onClose, client }) => {
           easing: Easing.linear,
           useNativeDriver: true,
         }),
-      ]).start();
+      ]).start()
     } else {
-      scaleValue.setValue(0);
-      opacityValue.setValue(0);
-      setPassStatus(''); // Reset the message when the modal closes
+      scaleValue.setValue(0)
+      opacityValue.setValue(0)
+      setPassStatus('') // Reset the message when the modal closes
     }
-  }, [isVisible]);
+  }, [isVisible])
+
+  const handleClose = () => {
+    setAmount('')
+    setPaymentType('')
+    setPassStatus('')
+    setIsSignatureSaved(false)
+    setHasPayment(false)
+    setIsExitDisabled(false) // Deshabilitar el botón "Salir" al cerrar el modal
+    onClose() // Llama a la función onClose pasada como prop
+  }
 
   return (
     <Modal visible={isVisible} animationType="fade" transparent={true}>
@@ -157,24 +180,28 @@ const ModalPass = ({ isVisible, onClose, client }) => {
             onChangeText={handleAmountChange}
             keyboardType="numeric"
             placeholder="Ingrese el monto"
+            editable={!isSignatureSaved}
           />
 
           <View style={styles.radioContainer}>
             <TouchableOpacity
               style={[styles.radioButton, paymentType === 'dollars' && styles.radioButtonSelected]}
               onPress={() => setPaymentType('dollars')}
+              disabled={isSignatureSaved}
             >
               <Text style={styles.radioText}>Dólares</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.radioButton, paymentType === 'bs' && styles.radioButtonSelected]}
               onPress={() => setPaymentType('bs')}
+              disabled={isSignatureSaved}
             >
               <Text style={styles.radioText}>Bs</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.radioButton, paymentType === 'pesos' && styles.radioButtonSelected]}
               onPress={() => setPaymentType('pesos')}
+              disabled={isSignatureSaved}
             >
               <Text style={styles.radioText}>Pesos</Text>
             </TouchableOpacity>
@@ -190,21 +217,24 @@ const ModalPass = ({ isVisible, onClose, client }) => {
             <Pressable
               style={[styles.buttonModal, isSaveEnabled ? null : styles.disabledButton]}
               onPress={regPass}
-              disabled={!isSaveEnabled}
+              disabled={!isSaveEnabled || isSignatureSaved}
             >
-              <Text style={styles.buttonTextModal}>
-                Guardar
-              </Text>
+              <Text style={styles.buttonTextModal}>Guardar</Text>
             </Pressable>
 
             <Pressable
-              style={styles.buttonModal}
+              style={[styles.buttonModal, !hasPayment ? styles.disabledButton : null]}
               onPress={() => setIsSignatureVisible(true)}
+              disabled={!hasPayment}
             >
               <Text style={styles.buttonTextModal}>Firma</Text>
             </Pressable>
 
-            <Pressable style={styles.buttonModalExit} onPress={onClose}>
+            <Pressable
+              style={[styles.buttonModalExit, isExitDisabled ? styles.disabledButton : null]}
+              onPress={handleClose}
+              disabled={isExitDisabled}
+            >
               <Text style={styles.buttonTextModal}>Salir</Text>
             </Pressable>
           </View>
@@ -212,10 +242,15 @@ const ModalPass = ({ isVisible, onClose, client }) => {
         </View>
       </View>
 
-      <SignatureModal isVisible={isSignatureVisible} onClose={() => setIsSignatureVisible(false)} />
-
+      <SignatureModal
+        isVisible={isSignatureVisible}
+        onClose={() => setIsSignatureVisible(false)}
+        paymentIds={paymentIds}
+        client={client}
+        onSignatureSaved={onSignatureSaved} // Pasa la función como prop
+      />
     </Modal>
-  );
-};
+  )
+}
 
-export default ModalPass;
+export default ModalPass

@@ -368,9 +368,9 @@ const getAllInfo = async (setLoading, setMessage) => {
         getBrands(signal),
         getCurrency(signal),
         getCompany(signal),
-        unsyncedVisits.length > 0 ? sendVisits(signal) : { success: true },
+        // unsyncedVisits.length > 0 ? sendVisits(signal) : { success: true },
         getVisits(cod_ven , signal),
-        unsyncedPayments.length > 0 ? sendPayments(signal) : { success: true },
+        // unsyncedPayments.length > 0 ? sendPayments(signal) : { success: true },
         getPayments(cod_ven , signal),
         getOrders(cod_ven , signal)
       ])

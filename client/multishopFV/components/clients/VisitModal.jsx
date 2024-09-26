@@ -52,8 +52,6 @@ const VisitModal = ({ isVisible, onClose, client, location }) => {
           ubicacion: location ? { lat: location.coords.latitude, lon: location.coords.longitude } : null // Agrega la ubicación aquí
         }
 
-        console.log(visit)
-
         const existingVisits = await AsyncStorage.getItem('ClientVisits')
         const visitsSync = await AsyncStorage.getItem('SyncedClientVisits')
 

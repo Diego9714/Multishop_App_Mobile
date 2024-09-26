@@ -159,6 +159,8 @@ controller.getPayments = async (req, res) => {
       queueLimit: 0,
     }
 
+    console.log(cod_ven, parsedDbCredentials.password)
+
     if (!cod_ven || cod_ven.length === 0) {
       return res.status(400).json({
         status: false,
