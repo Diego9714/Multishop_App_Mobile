@@ -28,7 +28,7 @@ controller.saveOrder = async (req, res) => {
       waitForConnections: true,
       connectionLimit: 10,
       queueLimit: 0,
-    };
+    }
 
     const result = await Orders.saveOrder(order , dbConfig)
 
@@ -76,7 +76,7 @@ controller.saveVisit = async (req, res) => {
       waitForConnections: true,
       connectionLimit: 10,
       queueLimit: 0,
-    };
+    }
 
     const result = await Orders.saveVisits(visits, dbConfig)
 
@@ -106,7 +106,7 @@ controller.savePass = async (req, res) => {
       code: 500
     }
 
-    const { payments , parsedDbCredentials } = req.body
+    const { payments , signatures, parsedDbCredentials } = req.body
 
     if (!payments || payments.length === 0) {
       return res.status(400).json({
@@ -124,7 +124,7 @@ controller.savePass = async (req, res) => {
       waitForConnections: true,
       connectionLimit: 10,
       queueLimit: 0,
-    };
+    }
 
     const result = await Orders.savePass(payments, dbConfig)
 
@@ -133,11 +133,19 @@ controller.savePass = async (req, res) => {
       notCompleted: result.notCompleted
     }
 
+    const resultSign = await Orders.saveSignatures(signatures, dbConfig)
+    
+    const processSign = {
+      completed: resultSign.completed,
+      notCompleted: resultSign.notCompleted
+    }
+
     msg = {
       status: true,
       msg: "Successful synchronization",
       code: 200,
-      processPass
+      processPass,
+      processSign
     }
 
     return res.status(200).json(msg)

@@ -81,8 +81,8 @@ const VisitModal = ({ isVisible, onClose, client, location }) => {
             convertToComparableDate(v.fecha) === today
         )
 
-        console.log(existingVisitInClientVisits)
-        console.log(existingVisitInSyncedVisits)
+        // console.log(existingVisitInClientVisits)
+        // console.log(existingVisitInSyncedVisits)
 
 
         if (existingVisitInClientVisits || existingVisitInSyncedVisits) {

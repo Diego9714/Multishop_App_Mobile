@@ -49,7 +49,6 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
 
       let location = await Location.getCurrentPositionAsync({})
       setLocation(location)
-      console.log(location)
     })()
   }, [])
 
@@ -197,7 +196,7 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
       products: products.map(product => ({
         codigo: product.codigo,
         descrip: product.descrip,
-        exists: product.quantity, // Recalcular la existencia
+        exists: product.quantity,
         quantity: product.quantity,
         priceUsd: product.priceUsd,
         priceBs: (product.priceUsd * cambioBolivares).toFixed(2),
@@ -210,8 +209,6 @@ const SaveOrder = ({ isVisible, onClose, client, order, onQuantityChange, onDele
       ubicacion: location ? { lat: location.coords.latitude, lon: location.coords.longitude } : null
     }
 
-    console.log(orderData)
-  
     try {
       const existingOrders = await AsyncStorage.getItem('OrdersClient')
       const orders = existingOrders ? JSON.parse(existingOrders) : []

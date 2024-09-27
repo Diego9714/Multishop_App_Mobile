@@ -1,153 +1,148 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, TouchableOpacity, ScrollView, Pressable, ImageBackground, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import styles from '../../styles/ReportVisistsPayment.styles';
-import { images } from '../../constants';
-import { MaterialIcons, AntDesign } from '@expo/vector-icons';
+// Dependencies
+import React, { useState, useEffect }             from 'react'
+import { Modal, View, Text, TouchableOpacity, 
+  ScrollView, Pressable, ImageBackground, Alert } from 'react-native'
+import AsyncStorage                               from '@react-native-async-storage/async-storage'
+import DateTimePicker                             from '@react-native-community/datetimepicker'
+import { MaterialIcons, AntDesign }               from '@expo/vector-icons'
+// Styles
+import styles                                     from '../../styles/ReportVisistsPayment.styles'
+import { images }                                 from '../../constants'
 
 const formatDate = (date) => {
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
-};
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+  return `${day}/${month}/${year}`
+}
 
 const parseDate = (dateString) => {
-  const [day, month, year] = dateString.split('/').map(Number);
-  return new Date(year, month - 1, day);
-};
+  const [day, month, year] = dateString.split('/').map(Number)
+  return new Date(year, month - 1, day)
+}
 
 const formatNumber = (number, currency) => {
 
-  console.log(currency)
-
   // Ensure the number is a valid number and not a string or object
-  let numberFormat = typeof number === 'number' ? number : parseFloat(number);
+  let numberFormat = typeof number === 'number' ? number : parseFloat(number)
 
   if (isNaN(numberFormat)) {
-    return number; // Return the original value if it's not a valid number
+    return number // Return the original value if it's not a valid number
   }
 
   let formattedNumber = numberFormat.toLocaleString('es-ES', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
-  });
+  })
 
   switch (currency) {
     case 'dollars':
-      return `${formattedNumber} $`;
+      return `${formattedNumber} $`
     case 'pesos':
-      return `${formattedNumber} COP`;
+      return `${formattedNumber} COP`
     case 'bs':
-      return `${formattedNumber} Bs`;
+      return `${formattedNumber} Bs`
     default:
-      return formattedNumber;
+      return formattedNumber
   }
-};
+}
 
 const ReportPayments = ({ isVisible, onClose }) => {
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [dateType, setDateType] = useState('start');
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-  const [payments, setPayments] = useState([]);
-  const [filteredPayments, setFilteredPayments] = useState([]);
-  const [page, setPage] = useState(1);
-  const itemsPerPage = 10;
-
-  console.log(payments)
+  const [showDatePicker, setShowDatePicker] = useState(false)
+  const [dateType, setDateType] = useState('start')
+  const [startDate, setStartDate] = useState(null)
+  const [endDate, setEndDate] = useState(null)
+  const [payments, setPayments] = useState([])
+  const [filteredPayments, setFilteredPayments] = useState([])
+  const [page, setPage] = useState(1)
+  const itemsPerPage = 10
 
   const handleDateChange = (event, selectedDate) => {
     if (event.type === 'dismissed') {
-      setShowDatePicker(false);
-      return;
+      setShowDatePicker(false)
+      return
     }
 
     if (selectedDate) {
       if (dateType === 'start') {
-        setStartDate(selectedDate);
+        setStartDate(selectedDate)
       } else {
-        setEndDate(selectedDate);
+        setEndDate(selectedDate)
       }
-      setShowDatePicker(false);
+      setShowDatePicker(false)
     }
-  };
+  }
 
   const handleSelectDate = (type) => {
-    setDateType(type);
-    setShowDatePicker(true);
-  };
+    setDateType(type)
+    setShowDatePicker(true)
+  }
 
   const handleFilter = () => {
     if (!startDate || !endDate) {
-      Alert.alert('Error', 'Debes seleccionar ambas fechas.');
-      return;
+      Alert.alert('Error', 'Debes seleccionar ambas fechas.')
+      return
     }
 
-    const formattedStartDate = startDate ? new Date(startDate) : new Date();
-    formattedStartDate.setHours(0, 0, 0, 0);
+    const formattedStartDate = startDate ? new Date(startDate) : new Date()
+    formattedStartDate.setHours(0, 0, 0, 0)
 
-    const formattedEndDate = endDate ? new Date(endDate) : new Date();
-    formattedEndDate.setHours(23, 59, 59, 999);
+    const formattedEndDate = endDate ? new Date(endDate) : new Date()
+    formattedEndDate.setHours(23, 59, 59, 999)
 
     if (formattedEndDate < formattedStartDate) {
-      Alert.alert('Error', 'La fecha final debe ser igual o posterior a la fecha inicial.');
-      return;
+      Alert.alert('Error', 'La fecha final debe ser igual o posterior a la fecha inicial.')
+      return
     }
 
     const filtered = payments.filter(payment => {
-      const paymentDate = parseDate(payment.fecha);
-      return paymentDate >= formattedStartDate && paymentDate <= formattedEndDate;
-    });
+      const paymentDate = parseDate(payment.fecha)
+      return paymentDate >= formattedStartDate && paymentDate <= formattedEndDate
+    })
 
-    setFilteredPayments(filtered);
-    setPage(1);
-  };
+    setFilteredPayments(filtered)
+    setPage(1)
+  }
 
   const handleReset = () => {
-    const today = new Date();
-    setStartDate(null);
-    setEndDate(null);
-    setFilteredPayments(payments);
-    setPage(1);
-  };
+    const today = new Date()
+    setStartDate(null)
+    setEndDate(null)
+    setFilteredPayments(payments)
+    setPage(1)
+  }
 
   const updatePayments = async () => {
-    const paymentsString = await AsyncStorage.getItem('SyncedClientPass');
+    const paymentsString = await AsyncStorage.getItem('SyncedClientPass')
 
-    console.log("paymentsString")
-    console.log(paymentsString)
-
-
-    const synchronizedPayments = paymentsString ? JSON.parse(paymentsString) : [];
+    const synchronizedPayments = paymentsString ? JSON.parse(paymentsString) : []
 
     if (JSON.stringify(synchronizedPayments) !== JSON.stringify(payments)) {
-      setPayments(synchronizedPayments);
+      setPayments(synchronizedPayments)
       setFilteredPayments((prev) => {
         if (!startDate && !endDate) {
-          return synchronizedPayments;
+          return synchronizedPayments
         }
-        return prev;
-      });
+        return prev
+      })
     }
-  };
+  }
 
   useEffect(() => {
     if (isVisible) {
-      updatePayments();
+      updatePayments()
     }
-  }, [isVisible]);
+  }, [isVisible])
 
   const applyPagination = () => {
-    const start = (page - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-    return filteredPayments.slice(start, end);
-  };
+    const start = (page - 1) * itemsPerPage
+    const end = start + itemsPerPage
+    return filteredPayments.slice(start, end)
+  }
 
   const renderPaginationButtons = () => {
-    const totalPages = Math.ceil(filteredPayments.length / itemsPerPage);
-    const buttons = [];
+    const totalPages = Math.ceil(filteredPayments.length / itemsPerPage)
+    const buttons = []
 
     for (let i = 1; i <= totalPages; i++) {
       buttons.push(
@@ -160,11 +155,11 @@ const ReportPayments = ({ isVisible, onClose }) => {
             {i}
           </Text>
         </Pressable>
-      );
+      )
     }
 
-    return buttons;
-  };
+    return buttons
+  }
 
   return (
     <Modal
@@ -227,7 +222,7 @@ const ReportPayments = ({ isVisible, onClose }) => {
                     </View>
                     <View style={styles.priceContainer}>
                       <Text>{payment.fecha}</Text>
-                      <Text>{formatNumber(payment.amount, payment.tipoPago)}</Text>
+                      <Text>{formatNumber(payment.amount, payment.currency_type)}</Text>
                     </View>
                   </View>
                 ))
@@ -249,7 +244,7 @@ const ReportPayments = ({ isVisible, onClose }) => {
         </View>
       </ImageBackground>
     </Modal>
-  );
-};
+  )
+}
 
-export default ReportPayments;
+export default ReportPayments

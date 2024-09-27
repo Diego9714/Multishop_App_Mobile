@@ -1,3 +1,4 @@
+// Dependencies
 import React, { useState, useEffect, 
   useCallback }                         from 'react'
 import { Text, 
@@ -7,11 +8,14 @@ import { Text,
   TextInput, 
   ScrollView, 
   TouchableOpacity, 
-  Alert, 
+  Alert,
   ImageBackground }                     from 'react-native'
 import { FontAwesome5, MaterialIcons }  from '@expo/vector-icons'
 import { useFocusEffect }               from '@react-navigation/native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+// Components and Modals
 import ClientModal                      from './ClientModal'
+// Functions
 import {
   getClientsFromStorage,
   filterClientsByName,
@@ -20,6 +24,10 @@ import {
 // Styles
 import { images }                       from '../../constants'
 import styles                           from '../../styles/ListClients.styles'
+// JWT - Token
+import { jwtDecode }                    from 'jwt-decode'
+import { decode }                       from 'base-64'
+global.atob = decode
 
 const ListClients = () => {
   const [clients, setClients] = useState([])
@@ -29,6 +37,7 @@ const ListClients = () => {
   const [displaySearchText, setDisplaySearchText] = useState('')
   const [page, setPage] = useState(1)
   const [selectedClient, setSelectedClient] = useState(null)
+  const [isTypeSearch, setIsTypeSearch] = useState('')
   const itemsPerPage = 10
   const defaultMaxPages = 5
 
@@ -51,6 +60,18 @@ const ListClients = () => {
     }, [])
   )
 
+  useEffect(()=>{
+    const getTypeSearch = async() =>{
+      let token = await AsyncStorage.getItem('tokenUser')
+      const decodedToken = jwtDecode(token)
+      const typeSearch = decodedToken.typeSearch
+
+      setIsTypeSearch(typeSearch)
+    }
+
+    getTypeSearch()
+  }, [])
+
   useEffect(() => {
     const filteredClients = filterClientsByName(clients, displaySearchText)
     setVisibleClients(paginateClients(filteredClients, page, itemsPerPage))
@@ -63,6 +84,15 @@ const ListClients = () => {
       setPage(1)
     }
   }, [clients, displaySearchText, page])
+
+  const handleInputChange = (text) => {
+    setSearchText(text)
+
+    if (isTypeSearch === 2) {
+      setDisplaySearchText(text)
+      setPage(1)
+    }
+  }
 
   const handleSearch = () => {
     if (searchText.length > 0 && searchText.length < 3) {
@@ -139,7 +169,7 @@ const ListClients = () => {
             placeholder='Buscar'
             style={styles.seeker}
             value={searchText}
-            onChangeText={(text) => setSearchText(text)}
+            onChangeText={handleInputChange}
           />
           <Pressable style={styles.botonSearch} onPress={handleSearch}>
             <FontAwesome5 name="search" size={24} color="#8B8B8B"/>

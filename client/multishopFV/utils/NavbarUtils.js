@@ -17,6 +17,10 @@ const getClients = async (cod_ven, signal) => {
   try {
     const dbCredentials = await AsyncStorage.getItem("multishopDB")
     const parsedDbCredentials = JSON.parse(dbCredentials)
+
+    // const payment = await AsyncStorage.removeItem('ClientPass')
+    // const payments = await AsyncStorage.removeItem('ClientVisits')
+    // const paymentss = await AsyncStorage.removeItem('SignaturePass')
     
     const res = await instanceClient.post(`/api/clients/${cod_ven}`, {parsedDbCredentials} , { signal })
     const listClients = res.data.clients
@@ -143,7 +147,6 @@ const getUnsyncedPayments = async () => {
       const cod_ven = decodedToken.cod_ven
 
       const payments = await AsyncStorage.getItem('ClientPass')
-      const paymentsSync = await AsyncStorage.getItem('SyncedClientPass')
 
       if (payments) {
         let paymentsArray = JSON.parse(payments)
@@ -249,24 +252,40 @@ const sendPayments = async (signal) => {
     const dbCredentials = await AsyncStorage.getItem("multishopDB")
     const parsedDbCredentials = JSON.parse(dbCredentials)
 
-    const response = await instanceSincro.post('/api/register/pass', { payments: unsyncedPayments , parsedDbCredentials }, { signal })
+    const signatureClients = await AsyncStorage.getItem("SignaturePass")
+    const signatures = JSON.parse(signatureClients)
+
+    // Enviar los abonos y firmas no sincronizados al servidor
+    const response = await instanceSincro.post('/api/register/pass', { payments: unsyncedPayments, signatures, parsedDbCredentials }, { signal })
 
     if (response.data.code === 200) {
+      // Procesar los abonos sincronizados
       const syncedPass = Array.isArray(response.data.processPass.completed) ? response.data.processPass.completed : []
-      
-      // Filtra los abonos sincronizados del objeto original
       const remainingPayments = unsyncedPayments.filter(payment => !syncedPass.some(syncedPayment => syncedPayment.id_pass === payment.id_pass))
 
-      // Guardar los abonos restantes (no sincronizados) en AsyncStorage
+      // Guardar los abonos restantes (no sincronizados)
       await AsyncStorage.setItem('ClientPass', JSON.stringify(remainingPayments))
 
-      // Obtener la lista existente de abonos sincronizados
+      // Obtener y actualizar la lista de abonos sincronizados
       const syncedPaymentsString = await AsyncStorage.getItem('SyncedClientPass')
-
       const existingSyncedPayments = syncedPaymentsString ? JSON.parse(syncedPaymentsString) : []
       const updatedSyncedPayments = [...existingSyncedPayments, ...syncedPass]
       await AsyncStorage.setItem('SyncedClientPass', JSON.stringify(updatedSyncedPayments))
-      return { success: true, completed: syncedPass, notCompleted: remainingPayments }
+
+      // Procesar las firmas sincronizadas
+      const syncedSignatures = Array.isArray(response.data.processSign.completed) ? response.data.processSign.completed : []
+      const remainingSignatures = signatures.filter(signature => !syncedSignatures.some(syncedSignature => syncedSignature.id_signature === signature.id_signature))
+
+      // Guardar las firmas restantes (no sincronizadas)
+      await AsyncStorage.setItem('SignaturePass', JSON.stringify(remainingSignatures))
+
+      // Obtener y actualizar la lista de firmas sincronizadas
+      const syncedSignaturesString = await AsyncStorage.getItem('SyncedSignatures')
+      const existingSyncedSignatures = syncedSignaturesString ? JSON.parse(syncedSignaturesString) : []
+      const updatedSyncedSignatures = [...existingSyncedSignatures, ...syncedSignatures]
+      await AsyncStorage.setItem('SyncedSignatures', JSON.stringify(updatedSyncedSignatures))
+
+      return { success: true, completed: syncedPass, notCompleted: remainingPayments}
 
     } else {
       return { success: false, error: 'Unexpected response status' }
@@ -275,7 +294,7 @@ const sendPayments = async (signal) => {
     if (error.name === 'AbortError') {
       console.log('Request to sync payments was aborted.')
     } else {
-      console.error('Error sending payments:', error)
+      console.error('Error sending payments and signatures:', error)
     }
     return { success: false, error }
   }
@@ -368,9 +387,9 @@ const getAllInfo = async (setLoading, setMessage) => {
         getBrands(signal),
         getCurrency(signal),
         getCompany(signal),
-        // unsyncedVisits.length > 0 ? sendVisits(signal) : { success: true },
+        unsyncedVisits.length > 0 ? sendVisits(signal) : { success: true },
         getVisits(cod_ven , signal),
-        // unsyncedPayments.length > 0 ? sendPayments(signal) : { success: true },
+        unsyncedPayments.length > 0 ? sendPayments(signal) : { success: true },
         getPayments(cod_ven , signal),
         getOrders(cod_ven , signal)
       ])

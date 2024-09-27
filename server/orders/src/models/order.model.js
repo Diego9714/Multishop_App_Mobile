@@ -36,7 +36,11 @@ export class Orders {
             let sqlVisit = 'INSERT INTO visits (cod_visit, cod_ven, id_scli, cod_cli, nom_cli, type_visit, ubication_visit, date_created) VALUES (?, ?, ?, ?, ?, ?, ?, ?);'
             await connection.execute(sqlVisit, [id_order, cod_ven, id_scli, cod_cli, nom_cli, 2, ubication_visit, formattedFecha])
           }
-  
+
+          // Registramos la visita
+          let sqlVisit = `UPDATE visits SET type_visit = ?, ubication_visit = ? WHERE id_scli = ? AND cod_cli = ? AND cod_ven = ? AND date_created = ?;`;
+          await connection.execute(sqlVisit, [2, ubication_visit, id_scli, cod_cli, cod_ven, formattedFecha]);
+
           // Registramos el pedido
           let sqlOrder = 'INSERT INTO preorder (cod_order, id_scli, cod_cli, cod_ven, amountUsd, amountBs, tip_doc, date_created) VALUES (?, ?, ?, ?, ?, ?, ?, ?);'
           let [orderResult] = await connection.execute(sqlOrder, [id_order ,id_scli, cod_cli, cod_ven, totalUsd, totalBs, tipfac, formattedFecha])
@@ -193,6 +197,52 @@ export class Orders {
         msg: 'Pass processed',
         completed: passCompleted,
         notCompleted: passNotCompleted
+      }
+    } catch (error) {
+      return error
+    }
+  }
+
+  static async saveSignatures(signatures, dbConfig) {
+    try {
+      let signCompleted = []
+      let signNotCompleted = []
+
+      for (const info of signatures) {
+        const { id_signature,id_scli, cod_cli, nom_cli, cod_ven, img_signature, cod_payments, fecha } = info
+
+        const dateSignatureObj = parse(fecha, 'dd/MM/yyyy', new Date())
+        const formattedSignatureDate = format(dateSignatureObj, 'yyyy-MM-dd')
+
+        const pool = mysql.createPool(dbConfig)
+        const connection = await pool.getConnection()
+
+        const existingSignature = `SELECT id_signature FROM signature WHERE id_signature = ?;`
+        const [checkSignature] = await connection.execute(existingSignature, [id_signature])
+
+        // Convertir cod_payments a una cadena separada por comas (si no lo es ya)
+        let firmas = Array.isArray(cod_payments) ? cod_payments.join(',') : cod_payments;
+        let imgFirma = Array.isArray(img_signature) ? img_signature.join(',') : img_signature;
+
+        if (checkSignature.length > 0) {
+          signCompleted.push(info)
+        }
+
+        let sqlSignature = `INSERT INTO signature (cod_signature, id_scli, cod_cli, nom_cli, cod_ven, img_signature, cod_payments, date_created) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+        await connection.execute(sqlSignature, [id_signature, id_scli, cod_cli, nom_cli, cod_ven, imgFirma, firmas, formattedSignatureDate])
+  
+        signCompleted.push(info)
+
+        connection.release()
+
+      }
+  
+      return {
+        code: 200,
+        status: true,
+        msg: 'Singature processed',
+        completed: signCompleted,
+        notCompleted: signNotCompleted
       }
     } catch (error) {
       return error

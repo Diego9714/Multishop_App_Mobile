@@ -5,6 +5,10 @@ import styles from '../../styles/ReportProdModal.styles';
 import { images } from '../../constants';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import ModalFilterProducts from './ModalFilterProducts';
+// JWT - Token
+import { jwtDecode }                        from 'jwt-decode'
+import { decode }                           from 'base-64'
+global.atob = decode
 
 const ReportProducts = ({ isVisible, onClose }) => {
   const [products, setProducts] = useState([]);
@@ -18,7 +22,9 @@ const ReportProducts = ({ isVisible, onClose }) => {
   const [displaySearchProduct, setDisplaySearchProduct] = useState('');
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
-  const [isFiltering, setIsFiltering] = useState(false);
+  const [isFiltering, setIsFiltering] = useState(false)
+  const [isTypeSearch, setIsTypeSearch] = useState('')
+
 
   useEffect(() => {
     fetchOrders();
@@ -29,6 +35,18 @@ const ReportProducts = ({ isVisible, onClose }) => {
   
     return () => clearInterval(intervalId);
   }, []);
+
+  useEffect(()=>{
+    const getTypeSearch = async() =>{
+      let token = await AsyncStorage.getItem('tokenUser')
+      const decodedToken = jwtDecode(token)
+      const typeSearch = decodedToken.typeSearch
+
+      setIsTypeSearch(typeSearch)
+    }
+
+    getTypeSearch()
+  }, [])
 
   useEffect(() => {
     applyFilters();
@@ -82,9 +100,11 @@ const ReportProducts = ({ isVisible, onClose }) => {
 
   const applyFilters = () => {
     let filteredProducts = products.slice();
+
+    const minLength = isTypeSearch === 2 ? 1 : 3
   
     // Filtrar por nombre del producto
-    if (displaySearchProduct.length >= 3) {
+    if (displaySearchProduct.length >= minLength) {
       const searchTerms = displaySearchProduct.toLowerCase().split(' ').filter(term => term.length > 0);
       filteredProducts = filteredProducts.filter(product => {
         const productDescrip = product.descrip.toLowerCase();
@@ -144,6 +164,15 @@ const ReportProducts = ({ isVisible, onClose }) => {
     setFilters(newFilters);
     setPage(1);
   };
+
+  const handleInputChange = (text) => {
+    setSearchProduct(text)
+
+    if (isTypeSearch === 2) { // Búsqueda en tiempo real
+      setDisplaySearchProduct(text)
+      setPage(1)
+    }
+  }
 
   const handleSearch = () => {
     if (searchProduct.length === 0) {
@@ -216,7 +245,7 @@ const ReportProducts = ({ isVisible, onClose }) => {
                 placeholder='Buscar Producto'
                 style={styles.seeker}
                 value={searchProduct}
-                onChangeText={(text) => setSearchProduct(text)}
+                onChangeText={handleInputChange}
               />
               <Pressable onPress={handleSearch}>
                 <FontAwesome name="search" size={28} color="#8B8B8B" />

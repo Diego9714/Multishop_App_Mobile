@@ -117,33 +117,33 @@ const SelectOrders = () => {
   }, [selectedOrders, orders])
 
   const generateRandomProductId = () => {
-    const randomNumber = Math.floor(Math.random() * 100000);
-    const timestamp = Date.now();
-    return `${timestamp}-${randomNumber}`;
+    const randomNumber = Math.floor(Math.random() * 100000)
+    const timestamp = Date.now()
+    return `${timestamp}-${randomNumber}`
   }
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
+    const date = new Date(dateString)
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const year = date.getFullYear()
+    return `${day}/${month}/${year}`
   }
 
   const convertToComparableDate = (dateString) => {
-    const [day, month, year] = dateString.split('/');
-    return `${year}-${month}-${day}`; // Formato yyyy-mm-dd para comparación
+    const [day, month, year] = dateString.split('/')
+    return `${year}-${month}-${day}` // Formato yyyy-mm-dd para comparación
   }
 
   const regVisit = async (client) => {
     try {
-      console.log("Cliente a registrar la visita:", client);
+      console.log("Cliente a registrar la visita:", client)
   
-      let token = await AsyncStorage.getItem('tokenUser');
-      const decodedToken = jwtDecode(token);
+      let token = await AsyncStorage.getItem('tokenUser')
+      const decodedToken = jwtDecode(token)
   
-      const fecha = new Date().toISOString();
-      const formattedDate = formatDate(fecha);
+      const fecha = new Date().toISOString()
+      const formattedDate = formatDate(fecha)
   
       const visit = {
         id_visit: generateRandomProductId(),
@@ -153,47 +153,50 @@ const SelectOrders = () => {
         type_visit: 2,
         cod_ven: decodedToken.cod_ven,
         fecha: formattedDate,
-      };
+      }
   
-      const existingVisitsString = await AsyncStorage.getItem('ClientVisits');
-      const syncedVisitsString = await AsyncStorage.getItem('SyncedClientVisits');
+      const existingVisitsString = await AsyncStorage.getItem('ClientVisits')
+      const syncedVisitsString = await AsyncStorage.getItem('SyncedClientVisits')
   
-      const existingVisits = existingVisitsString ? JSON.parse(existingVisitsString) : [];
-      const syncedVisits = syncedVisitsString ? JSON.parse(syncedVisitsString) : [];
+      const existingVisits = existingVisitsString ? JSON.parse(existingVisitsString) : []
+      const syncedVisits = syncedVisitsString ? JSON.parse(syncedVisitsString) : []
   
-      // Verificar si ya existe una visita para este cliente por el mismo vendedor en la misma fecha
-      const today = convertToComparableDate(formattedDate);
+      const today = convertToComparableDate(formattedDate)
   
-      const existingVisitInClientVisits = existingVisits.find(
+      const visitInClientVisits = existingVisits.find(
         (v) =>
           v.id_scli === client.id_scli &&
           v.cod_ven === decodedToken.cod_ven &&
+          v.type_visit === 1 &&
           convertToComparableDate(v.fecha) === today
-      );
+      )
   
-      const existingVisitInSyncedVisits = syncedVisits.find(
+      const visitInSyncedVisits = syncedVisits.find(
         (v) =>
           v.id_scli === client.id_scli &&
           v.cod_ven === decodedToken.cod_ven &&
+          v.type_visit === 1 &&
           convertToComparableDate(v.fecha) === today
-      );
+      )
   
-      console.log(existingVisitInClientVisits);
-      console.log(existingVisitInSyncedVisits);
-  
-      if (existingVisitInClientVisits || existingVisitInSyncedVisits) {
-        console.log('Ya se ha registrado una visita para este cliente hoy.');
+      if (visitInClientVisits) {
+        visitInClientVisits.type_visit = 2
+        await AsyncStorage.setItem('ClientVisits', JSON.stringify(existingVisits))
+        console.log('Visita actualizada a estado 2 en ClientVisits')
+      } else if (visitInSyncedVisits) {
+        visitInSyncedVisits.type_visit = 2
+        await AsyncStorage.setItem('SyncedClientVisits', JSON.stringify(syncedVisits))
+        console.log('Visita actualizada a estado 2 en SyncedClientVisits')
       } else {
-        const updatedVisits = [...existingVisits, visit];
-        await AsyncStorage.setItem('ClientVisits', JSON.stringify(updatedVisits));
-        console.log('Visita registrada con éxito!');
+        const updatedVisits = [...existingVisits, visit]
+        await AsyncStorage.setItem('ClientVisits', JSON.stringify(updatedVisits))
+        console.log('Visita registrada con éxito!')
   
-        // Actualizar la lista de visitas sincronizadas sin borrar las anteriores
-        const updatedSyncedVisits = [...syncedVisits, visit];
-        await AsyncStorage.setItem('SyncedClientVisits', JSON.stringify(updatedSyncedVisits));
+        const updatedSyncedVisits = [...syncedVisits, visit]
+        await AsyncStorage.setItem('SyncedClientVisits', JSON.stringify(updatedSyncedVisits))
       }
     } catch (error) {
-      console.log(`Visita no registrada - ${error}`);
+      console.log(`Visita no registrada - ${error}`)
     }
   }
   
@@ -270,8 +273,8 @@ const SelectOrders = () => {
               id_scli: order.id_scli,
               cod_cli: order.cod_cli,
               nom_cli: order.nom_cli,
-            };
-            await regVisit(client);
+            }
+            await regVisit(client)
           }
 
           // Obtener la lista existente de pedidos sincronizados
