@@ -108,8 +108,6 @@ controller.savePass = async (req, res) => {
 
     const { payments , signatures, parsedDbCredentials } = req.body
 
-    console.log(req.body)
-
     if (!payments || payments.length === 0) {
       return res.status(400).json({
         status: false,
@@ -136,7 +134,6 @@ controller.savePass = async (req, res) => {
     }
 
     const resultSign = await Orders.saveSignatures(signatures, dbConfig)
-    console.log(resultSign)
 
     const processSign = {
       completed: resultSign.completed,

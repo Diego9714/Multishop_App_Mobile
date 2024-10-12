@@ -28,18 +28,11 @@ export class Images {
         ctx.fillStyle = 'white'
         ctx.fillRect(0, 0, width, height)
 
-        // Obtener los límites de la firma
-        const bounds = this.getBoundsFromCoordinates(coordinates);
-        
-        // Calcular el desplazamiento para centrar la firma
-        const offsetX = (width - (bounds.maxX - bounds.minX)) / 2 - bounds.minX;
-        const offsetY = (height - (bounds.maxY - bounds.minY)) / 2 - bounds.minY;
-
         // Iniciar el dibujo de la firma
         ctx.beginPath()
 
         // Procesar las coordenadas y dibujar la ruta
-        this.drawPathFromCoordinates(ctx, coordinates, offsetX, offsetY)
+        this.drawPathFromCoordinates(ctx, coordinates)
 
         // Terminar el dibujo
         ctx.stroke()
@@ -65,7 +58,7 @@ export class Images {
   }
 
   // Función para procesar las coordenadas y dibujar la ruta en el lienzo
-  static drawPathFromCoordinates(ctx, svgPath, offsetX, offsetY) {
+  static drawPathFromCoordinates(ctx, svgPath) {
     const pathInstructions = svgPath.match(/[A-Za-z][^A-Za-z]*/g) // Divide las instrucciones SVG
     pathInstructions.forEach(instruction => {
       const type = instruction[0] // El tipo de instrucción (M, L, etc.)
@@ -73,40 +66,14 @@ export class Images {
 
       if (type === 'M') {
         // Movimiento a la primera coordenada
-        ctx.moveTo(coords[0] + offsetX, coords[1] + offsetY)
+        ctx.moveTo(coords[0], coords[1])
       } else if (type === 'L') {
         // Dibuja líneas hacia las coordenadas
         for (let i = 0; i < coords.length; i += 2) {
-          ctx.lineTo(coords[i] + offsetX, coords[i + 1] + offsetY)
+          ctx.lineTo(coords[i], coords[i + 1])
         }
       }
       // Aquí puedes agregar más tipos de instrucciones SVG si es necesario
     })
-  }
-
-  // Función para obtener los límites de la firma
-  static getBoundsFromCoordinates(svgPath) {
-    const pathInstructions = svgPath.match(/[A-Za-z][^A-Za-z]*/g); // Divide las instrucciones SVG
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-
-    pathInstructions.forEach(instruction => {
-      const type = instruction[0]; // El tipo de instrucción (M, L, etc.)
-      const coords = instruction.slice(1).trim().split(/[ ,]+/).map(Number); // Las coordenadas
-
-      if (type === 'M' || type === 'L') {
-        for (let i = 0; i < coords.length; i += 2) {
-          const x = coords[i];
-          const y = coords[i + 1];
-
-          // Actualizar los límites
-          minX = Math.min(minX, x);
-          minY = Math.min(minY, y);
-          maxX = Math.max(maxX, x);
-          maxY = Math.max(maxY, y);
-        }
-      }
-    });
-
-    return { minX, minY, maxX, maxY };
   }
 }
