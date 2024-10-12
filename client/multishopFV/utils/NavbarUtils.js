@@ -2,7 +2,10 @@ import AsyncStorage       from '@react-native-async-storage/async-storage'
 import { instanceClient, 
   instanceProducts, 
   instanceSincro }        from '../global/api'
-import { jwtDecode }      from 'jwt-decode'
+// JWT - Token
+import { jwtDecode }                        from 'jwt-decode'
+import { decode }                           from 'base-64'
+global.atob = decode
 
 const storeData = async (key, value) => {
   try {
@@ -121,8 +124,6 @@ const getUnsyncedVisits = async () => {
 
       const visits = await AsyncStorage.getItem('ClientVisits')
 
-      console.log(visits)
-
       if (visits) {
         let visitsArray = JSON.parse(visits)
 
@@ -148,6 +149,11 @@ const getUnsyncedPayments = async () => {
 
       const payments = await AsyncStorage.getItem('ClientPass')
 
+    //       const payment = await AsyncStorage.removeItem('ClientPass')
+    // const paymentss = await AsyncStorage.removeItem('SignaturePass')
+
+    //   console.log(payments)
+
       if (payments) {
         let paymentsArray = JSON.parse(payments)
 
@@ -159,7 +165,32 @@ const getUnsyncedPayments = async () => {
       return []
     }
   } catch (err) {
-    console.error('Error retrieving payments:', err)
+    console.error('Error retrieving paymentsss :', err)
+    return []
+  }
+}
+
+const getUnsyncedSignature = async () => {
+  try {
+    const token = await AsyncStorage.getItem('tokenUser')
+    if (token) {
+      const decodedToken = jwtDecode(token)
+      const cod_ven = decodedToken.cod_ven
+
+      const signatures = await AsyncStorage.getItem("SignaturePass")
+
+      if (signatures) {
+        let signaturesArray = JSON.parse(signatures)
+
+        return signaturesArray.filter(signature => signature.cod_ven === cod_ven)
+      } else {
+        return []
+      }
+    } else {
+      return []
+    }
+  } catch (err) {
+    console.error('Error retrieving signatures:', err)
     return []
   }
 }
@@ -168,7 +199,6 @@ const sendVisits = async (signal) => {
   try {
     const unsyncedVisits = await getUnsyncedVisits()
 
-    console.log("unsyncedVisits - Visitas para sincronizar")
     console.log(unsyncedVisits)
 
     if (unsyncedVisits.length === 0) {
@@ -189,7 +219,7 @@ const sendVisits = async (signal) => {
       // Filtra las visitas sincronizadas del objeto original
       const remainingVisits = unsyncedVisits.filter(visit => !syncedVisits.some(syncedVisit => syncedVisit.id_visit === visit.id_visit))
 
-      // console.log(remainingVisits)
+      console.log(remainingVisits)
 
       // Guardar las visitas restantes (no sincronizadas) en AsyncStorage
       await AsyncStorage.setItem('ClientVisits', JSON.stringify(remainingVisits))
@@ -212,7 +242,7 @@ const sendVisits = async (signal) => {
     if (error.name === 'AbortError') {
       console.log('Request to sync visits was aborted.')
     } else {
-      console.error('Error sending visits:', error)
+      console.error('Error sending visitss:', error)
     }
     return { success: false, error }
   }
@@ -241,7 +271,8 @@ const getVisits = async (cod_ven, signal) => {
 const sendPayments = async (signal) => {
   try {
     const unsyncedPayments = await getUnsyncedPayments()
-
+    const signatures = await getUnsyncedSignature()
+    
     if (unsyncedPayments.length === 0) {
       setIsLoading(false)
       setModalSincroVisible(false)
@@ -251,9 +282,6 @@ const sendPayments = async (signal) => {
 
     const dbCredentials = await AsyncStorage.getItem("multishopDB")
     const parsedDbCredentials = JSON.parse(dbCredentials)
-
-    const signatureClients = await AsyncStorage.getItem("SignaturePass")
-    const signatures = JSON.parse(signatureClients)
 
     // Enviar los abonos y firmas no sincronizados al servidor
     const response = await instanceSincro.post('/api/register/pass', { payments: unsyncedPayments, signatures, parsedDbCredentials }, { signal })
@@ -383,10 +411,10 @@ const getAllInfo = async (setLoading, setMessage) => {
       const results = await Promise.all([
         getClients(cod_ven, signal),
         getProducts(signal),
-        getCategories(signal),
-        getBrands(signal),
-        getCurrency(signal),
-        getCompany(signal),
+        // getCategories(signal),
+        // getBrands(signal),
+        // getCurrency(signal),
+        // getCompany(signal),
         unsyncedVisits.length > 0 ? sendVisits(signal) : { success: true },
         getVisits(cod_ven , signal),
         unsyncedPayments.length > 0 ? sendPayments(signal) : { success: true },

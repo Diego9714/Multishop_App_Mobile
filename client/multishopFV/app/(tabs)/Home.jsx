@@ -240,7 +240,7 @@ const getAllInfo = async (setLoading, setMessage, setShowErrorModal) => {
     setLoading(false)
     setMessage('Tiempo de espera agotado. Intenta nuevamente.')
     setShowErrorModal(true)
-  }, 2000)
+  }, 5000)
 
   try {
     const token = await AsyncStorage.getItem('tokenUser')

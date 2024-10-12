@@ -153,8 +153,9 @@ const SelectOrders = () => {
         type_visit: 2,
         cod_ven: decodedToken.cod_ven,
         fecha: formattedDate,
+        ubicacion: client.ubicacion
       }
-  
+
       const existingVisitsString = await AsyncStorage.getItem('ClientVisits')
       const syncedVisitsString = await AsyncStorage.getItem('SyncedClientVisits')
   
@@ -273,6 +274,7 @@ const SelectOrders = () => {
               id_scli: order.id_scli,
               cod_cli: order.cod_cli,
               nom_cli: order.nom_cli,
+              ubicacion: order.ubicacion
             }
             await regVisit(client)
           }

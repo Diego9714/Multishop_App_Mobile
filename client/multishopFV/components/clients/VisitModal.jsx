@@ -49,7 +49,7 @@ const VisitModal = ({ isVisible, onClose, client, location }) => {
           type_visit: 1,
           cod_ven: decodedToken.cod_ven,
           fecha: formattedDate,
-          ubicacion: location ? { lat: location.coords.latitude, lon: location.coords.longitude } : null // Agrega la ubicación aquí
+          ubicacion: location ? { lat: location.coords.latitude, lon: location.coords.longitude } : null
         }
 
         const existingVisits = await AsyncStorage.getItem('ClientVisits')

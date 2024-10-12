@@ -50,8 +50,6 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
       const decodedToken = jwtDecode(token)
       const typeSearch = decodedToken.typeSearch
 
-      console.log(typeSearch)
-
       setIsTypeSearch(typeSearch)
     }
 
@@ -228,6 +226,7 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
 
     if (displaySearchProduct.length >= minLength) {
       const searchTerms = displaySearchProduct.toLowerCase().split(' ').filter(term => term.length > minLength)
+      
       filteredProducts = filteredProducts.filter(product => {
         const productDescrip = product.descrip.toLowerCase()
         return searchTerms.every(term => productDescrip.includes(term))
@@ -241,6 +240,8 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
     }
 
     const totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
+
+    console.log(filteredProducts.length)
 
     // Si no hay búsqueda ni filtros, establecer las páginas por defecto en 5
     const maxPages = (displaySearchProduct.length === 0 && searchCategory.length === 0 && searchBrand.length === 0) ? 5 : totalPages
