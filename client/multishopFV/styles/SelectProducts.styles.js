@@ -164,10 +164,7 @@ const styles = StyleSheet.create({
   productContainer:{
     height: "58%",
     width: "96%",
-    // padding: 2,
-    // margin: 50,
     backgroundColor: 'rgba(255, 255, 255, 1)',
-    // backgroundColor: 'gray',
     borderRadius: 20,
   },
   headerProductContainer:{
@@ -212,18 +209,15 @@ const styles = StyleSheet.create({
   nameProd: {
     width: '56%',
     justifyContent: 'center',
-    // backgroundColor: 'gray',
   },
   quantityContainer: {
     width: '42%',
-    // marginLeft: 2,
-    // backgroundColor: '#ccffda',
-    // justifyContent: 'center',
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
   },
   quantityInput: {
+    width: '47%',
     marginLeft: 5,
     borderWidth: 1,
     borderColor: '#ccc',
@@ -248,18 +242,16 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   centerButtonPlaceholder: {
-    width: 30, // mismo ancho que el icono delete para mantener el espacio consistente
+    width: 30,
     height: 30,
   },
   pagination: {
-    // height: '8%',
     width: '100%',
     flexDirection: 'row',
     paddingHorizontal: '24%', 
     paddingVertical: 10
   },
   pageButton: {
-    // height: '22%',
     height: 40,
     padding: 10,
     margin: 5,

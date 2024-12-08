@@ -105,6 +105,9 @@ controller.getCompany = async (req, res) => {
     }
 
     const company = await Products.company(dbConfig)
+
+    console.log(company)
+
     res.status(company.code).json(company)
 
   } catch (error) {
