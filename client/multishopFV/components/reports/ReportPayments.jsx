@@ -222,7 +222,7 @@ const ReportPayments = ({ isVisible, onClose }) => {
                     </View>
                     <View style={styles.priceContainer}>
                       <Text>{payment.fecha}</Text>
-                      <Text>{formatNumber(payment.amount, payment.currency_type)}</Text>
+                      <Text>{formatNumber(payment.amount, payment.currency_type || payment.tipoPago)}</Text>
                     </View>
                   </View>
                 ))

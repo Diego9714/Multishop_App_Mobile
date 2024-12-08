@@ -1,6 +1,10 @@
 import React, { useEffect, useState }       from 'react'
 import { View }                             from 'react-native'
 import AsyncStorage                         from '@react-native-async-storage/async-storage'
+import { NavigationContainer }              from '@react-navigation/native'
+// import { createStackNavigator }             from '@react-navigation/stack'
+import { createStackNavigator } from '@react-navigation/stack';
+
 import ModalErrorSincro                     from '../../components/home/ModalErrorSincro'
 import CardsHome                            from '../../components/home/CardsHome'
 import Navbar                               from '../../components/Navbar'
@@ -9,6 +13,8 @@ import { instanceClient, instanceProducts } from '../../global/api'
 import { jwtDecode }                        from 'jwt-decode'
 import { decode }                           from 'base-64'
 global.atob = decode
+
+const Stack = createStackNavigator()
 
 const storeData = async (key, value) => {
   try {
@@ -62,6 +68,30 @@ const getCategories = async (signal) => {
       console.log('Request to get categories was aborted.')
     } else {
       console.error('Error fetching categories:', error)
+    }
+    return { success: false, error }
+  }
+}
+
+const getBrands = async (signal) => {
+  try {
+    const storedData = await AsyncStorage.getItem('brands')
+    if (storedData){
+      return { success: true }
+    }
+
+    const dbCredentials = await AsyncStorage.getItem("multishopDB")
+    const parsedDbCredentials = JSON.parse(dbCredentials)
+
+    const res = await instanceProducts.post(`/api/brands`, {parsedDbCredentials}, { signal })
+    const listBrands = res.data.brands || []
+    await storeData('brands', listBrands)
+    return { success: true }
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      console.log('Request to get brands was aborted.')
+    } else {
+      console.error('Error fetching brands:', error)
     }
     return { success: false, error }
   }
@@ -255,6 +285,7 @@ const getAllInfo = async (setLoading, setMessage, setShowErrorModal) => {
         getOrdersSync(signal),
         getVisits(signal),
         getPayments(signal),
+        getBrands(signal)
       ])
 
       clearTimeout(timeoutId)
@@ -321,17 +352,28 @@ const Home = () => {
   }, [])
 
   return (
-    <View>
-      <Navbar />
-      <CardsHome />
-      <ModalErrorSincro
-        visible={showErrorModal}
-        onClose={handleCloseModal}
-        onRetry={handleRetry}
-        message={message}
-      />
-    </View>
-  )
-}
+    // <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen 
+          name="Home" 
+          options={{ headerShown: false }}
+        >
+          {() => (
+            <View>
+              <Navbar />
+              <CardsHome />
+              <ModalErrorSincro
+                visible={showErrorModal}
+                onClose={handleCloseModal}
+                onRetry={handleRetry}
+                message={message}
+              />
+            </View>
+          )}
+        </Stack.Screen>
+      </Stack.Navigator>
+    // </NavigationContainer>
+  );
+}  
 
 export default Home

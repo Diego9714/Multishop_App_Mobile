@@ -29,7 +29,7 @@ const Layout = () => {
           options={{
             tabBarLabel: 'Inicio',
             tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons name='home' color={color} size={30} style={{marginTop: 8}} />
+              <MaterialCommunityIcons name='home' color={color} size={30} />
             ) 
           }}
         />
@@ -37,7 +37,7 @@ const Layout = () => {
           options={{
             tabBarLabel: 'Pedidos',
             tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons name='truck' color={color} size={30} style={{marginTop: 8}} />
+              <MaterialCommunityIcons name='truck' color={color} size={30} />
             ) 
           }}
         />
@@ -45,7 +45,7 @@ const Layout = () => {
           options={{
             tabBarLabel: 'Enviar',
             tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="cloud-upload" color={color} size={30} style={{marginTop: 8}}/>
+            <MaterialCommunityIcons name="cloud-upload" color={color} size={30}/>
             ) 
           }}
         />
@@ -53,7 +53,7 @@ const Layout = () => {
           options={{
             tabBarLabel: 'Productos',
             tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons name='clipboard-edit-outline' color={color} size={30} style={{marginTop: 8}} />
+              <MaterialCommunityIcons name='clipboard-edit-outline' color={color} size={30} />
             ) 
           }}
         />
@@ -61,7 +61,7 @@ const Layout = () => {
           options={{
             tabBarLabel: 'Salir',
             tabBarIcon: ({ color }) => (
-              <MaterialIcons name="logout" size={30} color={color} style={{marginTop: 8}}/>
+              <MaterialIcons name="logout" size={30} color={color}/>
             ) 
           }}
         />
