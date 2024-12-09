@@ -17,6 +17,7 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
   const [selectedProductsCount, setSelectedProductsCount] = useState(0)
   const [producCant, setproducCant] = useState(0)
   const [products, setProducts] = useState([])
+  const [listproducts2, setListProducts2] = useState([])
   const [visibleProducts, setVisibleProducts] = useState([])
   const [searchProduct, setSearchProduct] = useState('')
   const [displaySearchProduct, setDisplaySearchProduct] = useState('')
@@ -33,13 +34,24 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
   const [prodExistence, setProdExistence] = useState(null)
   const [initialProductQuantities, setInitialProductQuantities] = useState({})
   const [isTypeSearch, setIsTypeSearch] = useState('')
+  const [addedProducts, setAddedProducts] = useState([])
+
+  console.log("addedProducts")
+  console.log(addedProducts)
+
+  console.log(selectedOrder.products)
+
 
   useEffect(() => {
     const getProducts = async () => {
       const productsInfo = await AsyncStorage.getItem('products')
       const productsJson = JSON.parse(productsInfo)
       const filteredProducts = (productsJson || []).filter(product => product.existencia > 0)
+      const allProducts = (productsJson || [])
+
       setProducts(filteredProducts)
+      setListProducts2(allProducts)
+
     }
     getProducts()
   }, []) 
@@ -98,7 +110,9 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
     const end = currentPage * itemsPerPage
     const paginatedProducts = filteredProducts.slice(start, end)
 
-    const updatedVisibleProducts = paginatedProducts.map(product => ({
+    const updatedVisibleProducts = paginatedProducts
+    .filter(product => product.existencia > 0)
+    .map(product => ({
       ...product,
       quantity: productQuantities[product.codigo] || 0,
       selected: product.codigo in productQuantities
@@ -167,10 +181,14 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
       Alert.alert('Cantidad no válida', 'Por favor ingrese solo números enteros positivos.')
       return
     }
-  
+
     const quantity = text === '' ? 0 : parseInt(text, 10)
+
     const product = products.find(p => p.codigo === productId)
     
+    console.log("product handle changed")
+    console.log(product)
+
     // No modificar la existencia del producto en el inventario
     if (prodExistence === 0 && quantity > 0) {
       const updatedProductQuantities = { ...productQuantities }
@@ -189,7 +207,7 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
     }
 
     const productOrder = selectedOrder.products.find(p => p.codigo === productId) || { exists: 0 }
-  
+
     setproducCant(productOrder.exists)
 
     if (quantity > product.existencia + productOrder.exists) { // Se debe verificar contra la existencia del inventario
@@ -199,16 +217,118 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
     }
   
     const updatedProductQuantities = { ...productQuantities }
+
     const wasSelected = updatedProductQuantities[productId] > 0
-  
+    
     updatedProductQuantities[productId] = quantity
+    
   
     if (quantity > 0 && !wasSelected) {
       setSelectedProductsCount(prevCount => prevCount + 1)
-    } else if (quantity === 0 && wasSelected) {
+    
+      // Verificar si el producto ya está en el arreglo `addedProducts` comparando por `codigo` o cualquier otro campo
+      const existingProduct = addedProducts.find(p => p.codigo === product.codigo);
+      console.log("existingProduct");
+      console.log(existingProduct);
+    
+      if (existingProduct) {
+        // Si el producto ya existe, actualizar toda su información (no solo la cantidad)
+        const updatedProducts = addedProducts.map(p => 
+          p.codigo === product.codigo 
+            ? { ...p, quantity, exists: producCant, priceUsd: product.precioUsd, priceBs: product.precioBs }
+            : p
+        );
+    
+        // Actualizar el estado con el producto actualizado
+        setAddedProducts(updatedProducts);
+        console.log("Producto actualizado:");
+        console.log(existingProduct);
+
+      } else {
+        // Si el producto no existe, agregarlo al arreglo
+        const addedProduct = {
+          codigo: product.codigo,
+          descrip: product.descrip,
+          exists: producCant,
+          quantity,
+          priceUsd: product.precioUsd,
+          priceBs: product.precioBs,
+        }
+    
+        // Actualizar el estado con el nuevo producto agregado
+        setAddedProducts(prevProducts => [...prevProducts, addedProduct]);
+        console.log("Producto agregado:");
+        console.log(addedProduct);
+      }
+    }else if (quantity > 0 && wasSelected) {
+    
+      // Verificar si el producto ya está en el arreglo `addedProducts` comparando por `codigo` o cualquier otro campo
+      const existingProduct = addedProducts.find(p => p.codigo === product.codigo);
+      console.log("existingProduct");
+      console.log(existingProduct);
+    
+      if (existingProduct) {
+        // Si el producto ya existe, actualizar toda su información (no solo la cantidad)
+        const updatedProducts = addedProducts.map(p => 
+          p.codigo === product.codigo 
+            ? { ...p, quantity, exists: producCant, priceUsd: product.precioUsd, priceBs: product.precioBs }
+            : p
+        );
+    
+        // Actualizar el estado con el producto actualizado
+        setAddedProducts(updatedProducts);
+        console.log("Producto actualizado:");
+        console.log(existingProduct);
+
+      } else {
+        // Si el producto no existe, agregarlo al arreglo
+        const addedProduct = {
+          codigo: product.codigo,
+          descrip: product.descrip,
+          exists: producCant,
+          quantity,
+          priceUsd: product.precioUsd,
+          priceBs: product.precioBs,
+        }
+    
+        // Actualizar el estado con el nuevo producto agregado
+        setAddedProducts(prevProducts => [...prevProducts, addedProduct]);
+        console.log("Producto agregado:");
+        console.log(addedProduct);
+      }
+    }
+    else if (quantity === 0 && wasSelected) {
       setSelectedProductsCount(prevCount => prevCount - 1)
     }
-  
+
+    // const selectedProductsWithQuantities = Object.entries(updatedProductQuantities).map(([codigo, quantity]) => {
+      
+    //   // console.log('codigo')
+    //   // console.log(codigo)
+
+    //   // console.log('quantity')
+    //   // console.log(quantity)
+
+    //   const product = listproducts2.find(p => p.codigo === codigo)
+    //   // .filter
+    //   // console.log(product)
+
+    //   // console.log("product exists")
+    //   // console.log(producCant)
+
+    //   return {
+    //     codigo: product.codigo,
+    //     descrip: product.descrip,
+    //     exists: producCant,
+    //     quantity,
+    //     priceUsd: product.precioUsd,
+    //     priceBs: product.precioBs,
+    //   }
+    // })
+    // console.log('selectedProductsWithQuantities')
+    // console.log(selectedProductsWithQuantities)
+
+
     setProductQuantities(updatedProductQuantities)
   }, [productQuantities, products, prodExistence])
 
@@ -240,8 +360,6 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
     }
 
     const totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
-
-    console.log(filteredProducts.length)
 
     // Si no hay búsqueda ni filtros, establecer las páginas por defecto en 5
     const maxPages = (displaySearchProduct.length === 0 && searchCategory.length === 0 && searchBrand.length === 0) ? 5 : totalPages
@@ -325,21 +443,75 @@ const SelectProducts = ({ isVisible, onClose, selectedOrder, onSave }) => {
     }
   }
 
-  const generateSelectedProductJSON = () => {
-    const selectedProductsWithQuantities = Object.entries(productQuantities).map(([codigo, quantity]) => {
-      const product = products.find(p => p.codigo === codigo)
-      return {
-        codigo: product.codigo,
-        descrip: product.descrip,
-        exists: producCant,
-        quantity,
-        priceUsd: product.precioUsd,
-        priceBs: product.precioBs,
-      }
-    })
 
-    return selectedProductsWithQuantities
-  }
+  // const generateSelectedProductJSON = () => {
+  //   const selectedProductsWithQuantities = Object.entries(productQuantities).map(([codigo, quantity]) => {
+  //     // Buscar el producto correspondiente por su código
+  //     const product = listproducts2.find(p => p.codigo === codigo)
+  
+  //     // Si el producto se está agregando o actualizando, se debe modificar la existencia solo de ese producto
+  //     const updatedProduct = {
+  //       codigo: product.codigo,
+  //       descrip: product.descrip,
+  //       exists: producCant,
+  //       quantity,
+  //       priceUsd: product.precioUsd,
+  //       priceBs: product.precioBs,
+  //     }
+  
+  //     return updatedProduct
+  //   })
+  
+  //   console.log('selectedProductsWithQuantities')
+  //   console.log(selectedProductsWithQuantities)
+  
+  //   return selectedProductsWithQuantities
+  // }
+
+  const generateSelectedProductJSON = () => {
+    // Creamos un array para almacenar los productos finales
+    const finalProducts = [];
+  
+    // Primero, recorremos los productos existentes (selectedOrder.products)
+    selectedOrder.products.forEach(product => {
+      // Buscamos si el producto ya está en addedProducts (productos agregados)
+      const updatedProduct = addedProducts.find(p => p.codigo === product.codigo);
+  
+      if (updatedProduct) {
+        // Si el producto ya está en addedProducts, actualizamos la cantidad y la existencia
+        finalProducts.push({
+          ...product,
+          quantity: updatedProduct.quantity, // Actualizamos la cantidad del producto
+          exists: updatedProduct.exists,     // Actualizamos la existencia del producto
+          priceUsd: updatedProduct.priceUsd, // Actualizamos el precio en USD
+          priceBs: updatedProduct.priceBs,   // Actualizamos el precio en Bs
+        });
+      } else {
+        // Si no está en addedProducts, lo agregamos tal cual
+        finalProducts.push(product);
+      }
+    });
+  
+    // Ahora agregamos los productos nuevos que no estaban en selectedOrder.products
+    addedProducts.forEach(product => {
+      // Si el producto no está ya en finalProducts, lo agregamos
+      const existsInFinalProducts = finalProducts.some(p => p.codigo === product.codigo);
+      if (!existsInFinalProducts) {
+        finalProducts.push({
+          ...product,
+          quantity: product.quantity,
+          exists: producCant,
+          priceUsd: product.priceUsd,
+          priceBs: product.priceBs,
+        });
+      }
+    });
+  
+    console.log('Final Products:', finalProducts);
+  
+    return finalProducts;
+  };
+  
 
   const handleCancel = () => {
     setProductQuantities(initialProductQuantities)

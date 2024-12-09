@@ -150,21 +150,43 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
         );
 
         // Actualizar existencias en la lista de productos
+        // const updatedProductList = productList.map(prod => {
+        //   const orderedProduct = order.products.find(p => p.codigo === prod.codigo);
+        //   if (orderedProduct) {
+
+        //     return {
+        //       ...prod,
+        //       existencia: (orderedProduct.exists + prod.existencia) - orderedProduct.quantity
+        //     };
+        //   } else {
+        //     // Si el producto fue eliminado, restaurar la existencia
+        //     const isDeleted = deletedProducts.some(delProd => delProd.codigo === prod.codigo);
+        //     if (isDeleted) {
+
+        //       // console.log(prod.existencia + originalOrder.products.find(p => p.codigo === prod.codigo).quantity)
+
+        //       return {
+        //         ...prod,
+        //         existencia: prod.existencia + originalOrder.products.find(p => p.codigo === prod.codigo).quantity
+        //       };
+        //     }
+        //   }
+        //   return prod;
+        // });
+
         const updatedProductList = productList.map(prod => {
           const orderedProduct = order.products.find(p => p.codigo === prod.codigo);
           if (orderedProduct) {
-
+            // Verifica que la existencia no sea negativa al actualizar
+            const newExistence = (orderedProduct.exists + prod.existencia) - orderedProduct.quantity;
             return {
               ...prod,
-              existencia: (orderedProduct.exists + prod.existencia) - orderedProduct.quantity
+              existencia: newExistence < 0 ? 0 : newExistence  // Asegura que la existencia no sea negativa
             };
           } else {
             // Si el producto fue eliminado, restaurar la existencia
             const isDeleted = deletedProducts.some(delProd => delProd.codigo === prod.codigo);
             if (isDeleted) {
-
-              // console.log(prod.existencia + originalOrder.products.find(p => p.codigo === prod.codigo).quantity)
-
               return {
                 ...prod,
                 existencia: prod.existencia + originalOrder.products.find(p => p.codigo === prod.codigo).quantity
@@ -173,6 +195,30 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
           }
           return prod;
         });
+
+        // const updatedProductList = productList.map(prod => {
+        //   const orderedProduct = order.products.find(p => p.codigo === prod.codigo);
+        
+        //   if (orderedProduct) {
+        //     // Si el producto fue agregado o modificado, actualizar la existencia.
+        //     let newExistence = prod.existencia - orderedProduct.quantity;
+        
+        //     // Verificar que la existencia no sea negativa
+        //     if (newExistence < 0) {
+        //       newExistence = 0;  // No permitir existencia negativa
+        //     }
+        
+        //     return {
+        //       ...prod,
+        //       existencia: newExistence
+        //     };
+        //   } else {
+        //     // Si el producto no ha sido agregado, no hacer nada (la existencia no cambia)
+        //     return prod;
+        //   }
+        // });
+        
+        
 
         await AsyncStorage.setItem('products', JSON.stringify(updatedProductList));
 
@@ -205,6 +251,101 @@ const EditOrder = ({ isVisible, onClose, selectedOrder }) => {
       console.error('Error al obtener/modificar el arreglo de OrdersClient:', error);
     }
   };
+  
+  // const saveOrder = async () => {
+  //   try {
+  //     if (!order || !order.products || order.products.length === 0) {
+  //       Alert.alert('Agrega al menos un producto antes de guardar.');
+  //       return;
+  //     }
+  
+  //     const jsonValue = await AsyncStorage.getItem('OrdersClient');
+  //     if (jsonValue !== null) {
+  //       let ordersClient = JSON.parse(jsonValue);
+  
+  //       // Actualizar el pedido
+  //       const updatedOrders = ordersClient.map(orderItem => {
+  //         if (orderItem.id_order === order.id_order) {
+  //           return {
+  //             ...orderItem,
+  //             products: order.products,
+  //             totalUsd: totalUSD,
+  //             totalBs: totalBS
+  //           };
+  //         }
+  //         return orderItem;
+  //       });
+  
+  //       await AsyncStorage.setItem('OrdersClient', JSON.stringify(updatedOrders));
+  
+  //       // Si la existencia no es 0, se procede a actualizar
+  //       if (order.prodExistence !== 0) {
+  //         const productsInfo = await AsyncStorage.getItem('products');
+  //         const productList = productsInfo ? JSON.parse(productsInfo) : [];
+  
+  //         // Obtener la lista original de productos del pedido
+  //         const originalOrder = ordersClient.find(orderItem => orderItem.id_order === order.id_order);
+  
+  //         // Comparar productos eliminados
+  //         const deletedProducts = originalOrder.products.filter(
+  //           origProd => !order.products.find(newProd => newProd.codigo === origProd.codigo)
+  //         );
+  
+  //         // Restaurar existencias de los productos eliminados
+  //         const updatedProductList = productList.map(prod => {
+  //           const orderedProduct = order.products.find(p => p.codigo === prod.codigo);
+  //           if (orderedProduct) {
+  //             // Si el producto está en el pedido, actualizamos su existencia
+  //             return {
+  //               ...prod,
+  //               existencia: prod.existencia - orderedProduct.quantity
+  //             };
+  //           } else {
+  //             // Si el producto fue eliminado, restauramos su existencia
+  //             const deletedProduct = deletedProducts.find(delProd => delProd.codigo === prod.codigo);
+  //             if (deletedProduct) {
+  //               // Restaurar la cantidad eliminada del pedido original
+  //               const originalProduct = originalOrder.products.find(p => p.codigo === deletedProduct.codigo);
+  //               return {
+  //                 ...prod,
+  //                 existencia: prod.existencia + originalProduct.quantity
+  //               };
+  //             }
+  //             return prod; // Si el producto no fue modificado, no hacer nada
+  //           }
+  //         });
+  
+  //         await AsyncStorage.setItem('products', JSON.stringify(updatedProductList));
+  
+  //         // Actualizar existencias en los productos del pedido
+  //         const updatedOrderProducts = order.products.map(product => {
+  //           const prodInStorage = productList.find(p => p.codigo === product.codigo);
+  //           if (prodInStorage) {
+  //             return { ...product, exists: product.quantity };
+  //           }
+  //           return product;
+  //         });
+  
+  //         // Actualizamos las órdenes con los productos modificados
+  //         const finalUpdatedOrders = updatedOrders.map(orderItem => {
+  //           if (orderItem.id_order === order.id_order) {
+  //             return {
+  //               ...orderItem,
+  //               products: updatedOrderProducts
+  //             };
+  //           }
+  //           return orderItem;
+  //         });
+  
+  //         await AsyncStorage.setItem('OrdersClient', JSON.stringify(finalUpdatedOrders));
+  //       }
+  
+  //       onClose();
+  //     }
+  //   } catch (error) {
+  //     console.error('Error al obtener/modificar el arreglo de OrdersClient:', error);
+  //   }
+  // };
   
 
   const handleCancelEdit = () => {
